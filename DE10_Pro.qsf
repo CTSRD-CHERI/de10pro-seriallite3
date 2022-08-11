@@ -1619,7 +1619,6 @@ set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to LED[2] 
 set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to LED[1] -entity DE10_Pro
 set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to LED[0] -entity DE10_Pro
 set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to LED -entity DE10_Pro
-set_global_assignment -name SEARCH_PATH ./dut_generated
 set_global_assignment -name SDC_FILE jtag.sdc
 set_global_assignment -name VERILOG_FILE DE10_Pro.v
 set_global_assignment -name SDC_FILE DE10_Pro.sdc
@@ -1628,7 +1627,6 @@ set_global_assignment -name VERILOG_FILE Fan/I2C_Bus_Controller.v
 set_global_assignment -name VERILOG_FILE Fan/I2C_Config.v
 set_global_assignment -name VERILOG_FILE Fan/SEG7_LUT.v
 set_global_assignment -name IP_FILE reset_release.ip
-source dutip.qsf
 set_global_assignment -name IP_FILE ip/soc/soc_clock_in.ip
 set_global_assignment -name IP_FILE ip/soc/soc_reset_in.ip
 set_global_assignment -name QSYS_FILE soc.qsys
