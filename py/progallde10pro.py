@@ -4,6 +4,9 @@ import subprocess as sp
 import sys, os, time
 import re, argparse
 
+default_num_fpgas = 8
+quartus_pgm_timeout = 30
+
 def find_de10pro_devices():
     devices = {}
     dev = None
@@ -28,7 +31,7 @@ def find_de10pro_devices():
                 jtagchain.append(jtag.groups())
     return devices
 
-def spawn_quartus_pgm(devices,sof):
+def spawn_quartus_pgm(devices,sof,sequential):
     process_list = []
     no_license_env = os.environ.copy()
     no_license_env['LM_LICENSE_FILE']=''
@@ -42,14 +45,17 @@ def spawn_quartus_pgm(devices,sof):
                 id=j
         cmd = ['quartus_pgm', '-m', 'jtag', '-c', d, '-o', 'p;%s@%d'%(sof,id)]
         print(' '.join(cmd))
-        process_list.append(sp.Popen(cmd, stdout=sp.PIPE, stderr=sys.stderr, env=no_license_env))
+        p=sp.Popen(cmd, stdout=sp.PIPE, stderr=sys.stderr, env=no_license_env)
+        process_list.append(p)
+        if(sequential):
+            p.wait(timeout=quartus_pgm_timeout)
     return process_list
 
 def report_process_status(devices, process_list):
     for d in devices.keys():
         proc = process_list.pop(0)
         try:
-            proc.wait(timeout=30)
+            proc.wait(timeout=quartus_pgm_timeout)
         except:
             print("%s: ERROR: Process programming timed out"%(d))
             proc.kill()
@@ -64,25 +70,34 @@ def report_process_status(devices, process_list):
             print('\n'.join(report))
 
 def main():
+    global quartus_pgm_timeout
     parser = argparse.ArgumentParser(prog='progallde10pro.py',
                                      description='Program all DE10Pro FPGA boards')
-    parser.add_argument('-n', '--numfpga', type=int, action='store', default=8, help='number of FPGAs in the system (default: 8)')
-    parser.add_argument('sof', type=str, action='store', help='SOF file to program the FPGA')
+    parser.add_argument('-n', '--numfpga', type=int, action='store', default=default_num_fpgas,
+                        help='number of FPGAs in the system (default: %d)'%(default_num_fpgas))
+    parser.add_argument('sof', type=str, action='store',
+                        help='SOF file to program the FPGA')
+    parser.add_argument('-s', '--sequential', action='store_true', default=False,
+                        help='program FPGAs sequentially')
+    parser.add_argument('-t', '--timeout', type=int, action='store', default=quartus_pgm_timeout,
+                        help='quartus_pgm timeout in seconds (default=%ds)'%(quartus_pgm_timeout))
     args = parser.parse_args()
-    num_to_program = args.numfpga
-    sof = args.sof
-    if(not(os.path.exists(sof))):
-        print("SOF file %s does not exist"%(sof))
+    quartus_pgm_timeout = args.timeout
+    if(not(os.path.exists(args.sof))):
+        print("SOF file %s does not exist"%(args.sof))
         return(1)
+
     devices = []
     timeout = 4
-    while((len(devices)!=num_to_program) and (timeout>0)):
+    while((len(devices)!=args.numfpga) and (timeout>0)):
         devices = find_de10pro_devices()
         timeout = timeout-1
     if(timeout==0):
-        print("Found %d FPGAs but you asked to program %d. Exiting."%(len(devices),num_to_program))
+        print("Found %d FPGAs but you asked to program %d. Exiting."%(len(devices),args.numfpga))
         return(1)
-    process_list = spawn_quartus_pgm(devices,sof)
+    if(args.sequential):
+        print("Programming sequentially")
+    process_list = spawn_quartus_pgm(devices=devices,sof=args.sof,sequential=args.sequential)
     report_process_status(devices, process_list)
 
     
