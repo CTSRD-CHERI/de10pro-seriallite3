@@ -26,7 +26,7 @@ def find_de10pro_devices():
                 jtagchain.append(jtag.groups())
     return devices
 
-def spawn_quartus_pgm(devices):
+def spawn_quartus_pgm(devices,sof):
     process_list = []
     no_license_env = os.environ.copy()
     no_license_env['LM_LICENSE_FILE']=''
@@ -38,7 +38,7 @@ def spawn_quartus_pgm(devices):
             j=j+1
             if(re.match("1SX280HH1",chain[1])):
                 id=j
-        cmd = ['quartus_pgm', '-m', 'jtag', '-c', d, '-o', 'p;output_files/DE10_Pro.sof@%d'%(id)]
+        cmd = ['quartus_pgm', '-m', 'jtag', '-c', d, '-o', 'p;%s@%d'%(sof,id)]
         print(' '.join(cmd))
         process_list.append(sp.Popen(cmd, stdout=sp.PIPE, stderr=sys.stderr, env=no_license_env))
     return process_list
@@ -62,13 +62,21 @@ def report_process_status(devices, process_list):
             print('\n'.join(report))
 
 def main():
+    if(len(sys.argv)!=2):
+        print("Usage %s SOF_FILE"%(sys.argv[0]))
+        return(1)
+    sof = sys.argv[1]
+    if(not(os.path.exists(sof))):
+        print("SOF file %s does not exist"%(sof))
+        return(1)
     devices = find_de10pro_devices()
-    process_list = spawn_quartus_pgm(devices)
+    process_list = spawn_quartus_pgm(devices,sof)
     report_process_status(devices, process_list)
-    return 0
+
     
 if __name__ == '__main__':
     start = time.time()
-    sys.exit(main())
+    status = main()
     end = time.time()
     print("Real time: %2.3fs"%(end-start))
+    sys.exit(status)
