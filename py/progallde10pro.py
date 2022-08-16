@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 
 import subprocess as sp
-import sys, os
-import re
-import time
+import sys, os, time
+import re, argparse
 
 def find_de10pro_devices():
     devices = {}
     dev = None
     jtagchain = []
-    proc = sp.run(["jtagconfig"], stdout=sp.PIPE, stderr=sys.stderr, timeout=5, check=True)
+    try:
+        proc = sp.run(["jtagconfig"], stdout=sp.PIPE, stderr=sys.stderr, timeout=5, check=True)
+    except:
+        return {}
     proc_stdout = proc.stdout.decode()
     for line in proc_stdout.split('\n'):
         if(dev==None):
@@ -62,14 +64,24 @@ def report_process_status(devices, process_list):
             print('\n'.join(report))
 
 def main():
-    if(len(sys.argv)!=2):
-        print("Usage %s SOF_FILE"%(sys.argv[0]))
-        return(1)
-    sof = sys.argv[1]
+    parser = argparse.ArgumentParser(prog='progallde10pro.py',
+                                     description='Program all DE10Pro FPGA boards')
+    parser.add_argument('-n', '--numfpga', type=int, action='store', default=8, help='number of FPGAs in the system (default: 8)')
+    parser.add_argument('sof', type=str, action='store', help='SOF file to program the FPGA')
+    args = parser.parse_args()
+    num_to_program = args.numfpga
+    sof = args.sof
     if(not(os.path.exists(sof))):
         print("SOF file %s does not exist"%(sof))
         return(1)
-    devices = find_de10pro_devices()
+    devices = []
+    timeout = 4
+    while((len(devices)!=num_to_program) and (timeout>0)):
+        devices = find_de10pro_devices()
+        timeout = timeout-1
+    if(timeout==0):
+        print("Found %d FPGAs but you asked to program %d. Exiting."%(len(devices),num_to_program))
+        return(1)
     process_list = spawn_quartus_pgm(devices,sof)
     report_process_status(devices, process_list)
 
