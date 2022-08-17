@@ -18,9 +18,9 @@ def find_de10pro_devices():
     proc_stdout = proc.stdout.decode()
     for line in proc_stdout.split('\n'):
         if(dev==None):
-            d = re.match("^(\d+)[\)]\WDE10-Pro\W(\S+)", line)
+            d = re.match("^(\d+)[\)]\WDE10-Pro(.*)", line)
             if(d != None):
-                dev = "DE10-Pro "+d.group(2)
+                dev = "DE10-Pro"+d.group(2)
         else:
             jtag = re.match("^\W+(\S+)\W+([\w\(\)\/\.\|]+)", line)
             if(jtag==None):  # end of jtag chain
