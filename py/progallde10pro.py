@@ -121,7 +121,8 @@ def main():
     if(any_errors):
         print("FATAL ERROR: failed to program one or more FPGAs")
     return 1 if any_errors else 0
-    
+
+
 if __name__ == '__main__':
     start = time.time()
     status = main()
