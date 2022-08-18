@@ -51,7 +51,7 @@ def spawn_quartus_pgm(devices,sof,sequential):
             p.wait(timeout=quartus_pgm_timeout)
     return process_list
 
-def report_process_status(devices, process_list):
+def report_process_status(devices, process_list, verbose):
     error_report = {}
     for d in devices.keys():
         error = False
@@ -65,12 +65,13 @@ def report_process_status(devices, process_list):
         else:
             report=[]
             so = proc.communicate()[0].decode()
-            for l in so.split('\n'):
-                error = error or re.match("\W+Error", l)
-                if(   re.match("Info: Quartus Prime Programmer was", l)
-                   or re.match("\W+Info: Elapsed time", l)
-                   or re.match("\W+Error", l)):
-                    report.append(d+": "+l)
+            for line in so.split('\n'):
+                error_found = ("Error" in line)
+                error = error or error_found
+                if(verbose or error_found
+                   or ("Info: Quartus Prime Programmer was" in line)
+                   or ("Info: Elapsed time" in line)):
+                    report.append(d+": "+line)
             print('\n'.join(report))
         finally:
             error_report[d] = error
@@ -86,6 +87,8 @@ def main():
                         help='SOF file to program the FPGA')
     parser.add_argument('-s', '--sequential', action='store_true', default=False,
                         help='program FPGAs sequentially')
+    parser.add_argument('-v', '--verbose', action='store_true', default=False,
+                        help='program FPGAs sequentially')
     parser.add_argument('-t', '--timeout', type=int, action='store', default=quartus_pgm_timeout,
                         help='quartus_pgm timeout in seconds (default=%ds)'%(quartus_pgm_timeout))
     args = parser.parse_args()
@@ -98,7 +101,9 @@ def main():
     timeout = 4
     while((len(devices)!=args.numfpga) and (timeout>0)):
         devices = find_de10pro_devices()
-        timeout = timeout-1
+        if(len(devices)!=args.numfpga):
+            timeout = timeout-1
+            time.sleep(2)
     if(timeout==0):
         print("Found %d FPGAs but you asked to program %d. Exiting."%(len(devices),args.numfpga))
         return(1)
@@ -109,7 +114,7 @@ def main():
     sequential = args.sequential
     while((timeout>0) and (any_errors)):
         process_list = spawn_quartus_pgm(devices=devices,sof=args.sof,sequential=args.sequential)
-        error_report = report_process_status(devices, process_list)
+        error_report = report_process_status(devices, process_list, args.verbose)
         any_errors = False
         for d in error_report.keys():
             if(error_report[d]):
