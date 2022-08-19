@@ -72,7 +72,7 @@ def spawn_quartus_pgm(devices,sof,sequential):
             if(re.match("1SX280HH1",chain[1])):
                 id=j
         cmd = ['quartus_pgm', '-m', 'jtag', '-c', d, '-o', 'p;%s@%d'%(sof,id)]
-        print(' '.join(cmd))
+        print(' '.join(cmd), flush=True)
         p=sp.Popen(cmd, stdout=sp.PIPE, stderr=sys.stderr, env=no_license_env)
         process_list.append(p)
         if(sequential):
@@ -87,7 +87,7 @@ def report_process_status(devices, process_list, verbose):
         try:
             proc.wait(timeout=quartus_pgm_timeout)
         except:
-            print("%s: ERROR: Process programming timed out"%(d))
+            print("%s: ERROR: Process programming timed out"%(d), flush=True)
             error = True
             proc.kill()
         else:
@@ -100,7 +100,7 @@ def report_process_status(devices, process_list, verbose):
                    or ("Info: Quartus Prime Programmer was" in line)
                    or ("Info: Elapsed time" in line)):
                     report.append(d+": "+line)
-            print('\n'.join(report))
+            print('\n'.join(report), flush=True)
         finally:
             error_report[d] = error
     return error_report
@@ -122,7 +122,7 @@ def main():
     args = parser.parse_args()
     quartus_pgm_timeout = args.timeout
     if(not(os.path.exists(args.sof))):
-        print("SOF file %s does not exist"%(args.sof))
+        print("SOF file %s does not exist"%(args.sof), flush=True)
         return(1)
 
     devices = []
@@ -133,10 +133,10 @@ def main():
             timeout = timeout-1
             time.sleep(2)
     if(timeout==0):
-        print("Found %d FPGAs but you asked to program %d. Exiting."%(len(devices),args.numfpga))
+        print("Found %d FPGAs but you asked to program %d. Exiting."%(len(devices),args.numfpga), flush=True)
         return(1)
     if(args.sequential):
-        print("Programming sequentially")
+        print("Programming sequentially", flush=True)
     timeout = 4
     any_errors = True
     sequential = args.sequential
@@ -146,13 +146,13 @@ def main():
         any_errors = False
         for d in error_report.keys():
             if(error_report[d]):
-                print("PROGRAMMING ERROR: FPGA %s failed to program, will retry"%(d))
+                print("PROGRAMMING ERROR: FPGA %s failed to program, will retry"%(d), flush=True)
                 any_errors = True
                 sequential = True
             else:
                 devices.pop(d)
     if(any_errors):
-        print("FATAL ERROR: failed to program one or more FPGAs")
+        print("FATAL ERROR: failed to program one or more FPGAs", flush=True)
     return 1 if any_errors else 0
 
 
@@ -160,5 +160,5 @@ if __name__ == '__main__':
     start = time.time()
     status = main()
     end = time.time()
-    print("Real time: %2.3fs"%(end-start))
+    print("Real time: %2.3fs"%(end-start), flush=True)
     sys.exit(status)
