@@ -62,7 +62,8 @@ def find_de10pro_devices():
 def spawn_quartus_pgm(devices,sof,sequential):
     process_list = []
     no_license_env = os.environ.copy()
-    no_license_env['LM_LICENSE_FILE']=''
+    if 'LM_LICENSE_FILE' in no_license_env:
+        no_license_env.pop('LM_LICENSE_FILE')
     for d in devices.keys():
         print("usb-to-jtag=", d, " jtag =", devices[d])
         id = 0
@@ -73,7 +74,7 @@ def spawn_quartus_pgm(devices,sof,sequential):
                 id=j
         cmd = ['quartus_pgm', '-m', 'jtag', '-c', d, '-o', 'p;%s@%d'%(sof,id)]
         print(' '.join(cmd), flush=True)
-        p=sp.Popen(cmd, stdout=sp.PIPE, stderr=sys.stderr, env=no_license_env)
+        p=sp.Popen(cmd, stdout=sp.PIPE, env=no_license_env)
         process_list.append(p)
         if(sequential):
             p.wait(timeout=quartus_pgm_timeout)
@@ -97,6 +98,7 @@ def report_process_status(devices, process_list, verbose):
                 error_found = ("Error" in line)
                 error = error or error_found
                 if(verbose or error_found
+                   or ("Warning" in line)
                    or ("Info: Quartus Prime Programmer was" in line)
                    or ("Info: Elapsed time" in line)):
                     report.append(d+": "+line)
