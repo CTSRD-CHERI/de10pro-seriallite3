@@ -1,10 +1,8 @@
 #!/bin/bash
 
-pushd bsp
-niosv-bsp -g settings.bsp
-popd
+nios2-bsp hal bsp ../soc/soc.sopcinfo
 
 pushd app
-niosv-app --app-dir=./ --bsp-dir=../bsp --srcs=main.c --elf-name=main.elf
+nios2-app-generate-makefile --app-dir=./ --bsp-dir=../bsp --src-files=main.c --elf-name=main.elf
 popd
 

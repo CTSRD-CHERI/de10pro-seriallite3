@@ -1630,8 +1630,13 @@ set_global_assignment -name IP_FILE reset_release.ip
 set_global_assignment -name IP_FILE ip/soc/soc_clock_in.ip
 set_global_assignment -name IP_FILE ip/soc/soc_reset_in.ip
 set_global_assignment -name QSYS_FILE soc.qsys
-set_global_assignment -name IP_FILE ip/soc/soc_intel_niosv_m_0.ip
 set_global_assignment -name IP_FILE ip/soc/soc_intel_onchip_memory_0.ip
 set_global_assignment -name IP_FILE ip/soc/soc_jtag_uart_0.ip
 set_global_assignment -name IP_FILE ip/soc/soc_fifo_0.ip
 set_global_assignment -name IP_FILE ip/soc/soc_fifo_1.ip
+set_global_assignment -name IP_FILE ip/soc/soc_nios2_gen2_0.ip
+set_global_assignment -name IP_FILE ip/soc/soc_sl3_0.ip
+set_global_assignment -name IP_FILE ip/soc/soc_xcvr_atx_pll_s10_htile_0.ip
+set_global_assignment -name IP_FILE ip/soc/clock_xcvr_a.ip
+set_global_assignment -name IP_FILE ip/soc/soc_st_dc_fifo_0.ip
+set_global_assignment -name IP_FILE ip/soc/soc_pio_0.ip
