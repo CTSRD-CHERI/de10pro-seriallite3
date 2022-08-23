@@ -49,9 +49,13 @@ main(void)
   alt_putstr("Start...\n");
   //  IOWR_32DIRECT(SL3_0_BASE, 0x0c2, 0xf); // link_reinit?
   //  IOWR_32DIRECT(SL3_0_BASE, 0x0c2, 0x0); // link_reinit?
-  IOWR_32DIRECT(SL3_0_BASE, 0x061, 0xffffffff); // set loop-back mode?
-  //IOWR_32DIRECT(SL3_0_BASE, 0x064, 0xffffffff); // force lock of RX PLL to data?
-  alt_printf("Loopback = 0x%x\n", IORD_32DIRECT(SL3_0_BASE, 0x061));
+  IOWR_32DIRECT(SL3_0_BASE, 0x061 * 4, 0xffffffff); // set loop-back mode on
+  //  IOWR_32DIRECT(SL3_0_BASE, 0x061 * 4, 0x00000000); // set loop-back mode off
+  IOWR_32DIRECT(SL3_0_BASE, 0x090 * 4, 0xffffffff); // clear error status register?
+  IOWR_32DIRECT(SL3_0_BASE, 0x090 * 4, 0x00000000); // clear error status register?
+  //IOWR_32DIRECT(SL3_0_BASE, 0x064 * 4, 0xffffffff); // force lock of RX PLL to data?
+  alt_printf("Loopback = 0x%x\n", IORD_32DIRECT(SL3_0_BASE, 0x061 * 4));
+  alt_printf("Error status register = 0x%x\n", IORD_32DIRECT(SL3_0_BASE, 0x090 * 4));
   altera_avalon_fifo_init(RX_FIFO_IN_CSR_BASE, 0, 0, 128);
   read_status();
   alt_putstr("Read anything left in the RX FIFO\n");
@@ -60,6 +64,12 @@ main(void)
   write_tx_fifo(TX_FIFO_IN_BASE, RX_FIFO_IN_CSR_BASE);
   alt_putstr("Read from FIFO\n");
   read_rx_fifo(RX_FIFO_OUT_BASE, RX_FIFO_IN_CSR_BASE);
+  alt_printf("Error status register = 0x%x\n", IORD_32DIRECT(SL3_0_BASE, 0x090 * 4));
   alt_putstr("The end\n\004");    
   return 0;
 }
+
+
+
+// TODO:
+// - check phy_mgmt_addr - MSB has to be "manually set" - see pg 61 of PDF doc
