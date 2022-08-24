@@ -23,7 +23,7 @@ write_tx_fifo(alt_u32 base_addr, alt_u32 ctl_addr)
 
 
 void
-read_rx_fifo(int base_addr, int ctl_addr)
+read_rx_fifo(alt_u32 base_addr, alt_u32 ctl_addr)
 {
   int num_left, data;
   num_left = altera_avalon_fifo_read_level(ctl_addr);
@@ -43,28 +43,79 @@ read_status()
   alt_printf("status from PIO = 0x%x\n",status);
 }
 
+
+void
+report_rx_data_err(alt_u32 sl3_base)
+{
+  int status = IORD_32DIRECT(SL3_0_BASE, 0x0d0 * 4);
+  if(status==0)
+    alt_printf("RX error status: no errors\n");
+  else {
+    alt_printf("RX error status:\n");
+    if((status>> 0) & 1) alt_printf("  phy_fifo_overflow\n");
+    if((status>> 1) & 1) alt_printf("  rx_block_lostlock\n");
+    if((status>> 3) & 1) alt_printf("  rx_crc32err\n");
+    if((status>> 4) & 1) alt_printf("  rx_pcs_err\n");
+    if((status>> 5) & 1) alt_printf("  rx_align_retry_fail\n");
+    if((status>> 6) & 1) alt_printf("  rx_alignment_lostlock\n");
+    if((status>> 7) & 1) alt_printf("  adapt_fifo_overflow\n");
+    if((status>> 8) & 1) alt_printf("  ecc_error_corrected\n");
+    if((status>> 9) & 1) alt_printf("  ecc_err_fatal\n");
+    if((status>>10) & 1) alt_printf("  rx_deskew_fatal\n");
+    if((status>>11) & 1) alt_printf("  rx_data_err\n");
+  }
+}
+
 int
 main(void)
 {
   alt_putstr("Start...\n");
+  //int loop_back_mode = 0xffffffff; // loop-back on
+  int loop_back_mode = 0; // loop-back off
   //  IOWR_32DIRECT(SL3_0_BASE, 0x0c2, 0xf); // link_reinit?
   //  IOWR_32DIRECT(SL3_0_BASE, 0x0c2, 0x0); // link_reinit?
-  IOWR_32DIRECT(SL3_0_BASE, 0x061 * 4, 0xffffffff); // set loop-back mode on
-  //  IOWR_32DIRECT(SL3_0_BASE, 0x061 * 4, 0x00000000); // set loop-back mode off
-  IOWR_32DIRECT(SL3_0_BASE, 0x090 * 4, 0xffffffff); // clear error status register?
-  IOWR_32DIRECT(SL3_0_BASE, 0x090 * 4, 0x00000000); // clear error status register?
   //IOWR_32DIRECT(SL3_0_BASE, 0x064 * 4, 0xffffffff); // force lock of RX PLL to data?
-  alt_printf("Loopback = 0x%x\n", IORD_32DIRECT(SL3_0_BASE, 0x061 * 4));
-  alt_printf("Error status register = 0x%x\n", IORD_32DIRECT(SL3_0_BASE, 0x090 * 4));
-  altera_avalon_fifo_init(RX_FIFO_IN_CSR_BASE, 0, 0, 128);
+  IOWR_32DIRECT(SL3_0_BASE, 0x061 * 4, loop_back_mode); // set loop-back mode
+  IOWR_32DIRECT(SL3_0_BASE, 0x090 * 4, 0xffffffff); // clear error status register
+  IOWR_32DIRECT(SL3_0_BASE, 0x0d0 * 4, 0xffffffff); // clear RX Error status register
+
+  IOWR_32DIRECT(SL3_1_BASE, 0x061 * 4, loop_back_mode); // set loop-back mode
+  IOWR_32DIRECT(SL3_1_BASE, 0x090 * 4, 0xffffffff); // clear error status register
+  IOWR_32DIRECT(SL3_1_BASE, 0x0d0 * 4, 0xffffffff); // clear RX Error status register
+  
+  alt_printf("Port B Loopback = 0x%x\n", IORD_32DIRECT(SL3_0_BASE, 0x061 * 4));
+  alt_printf("Port B Error status register = 0x%x\n", IORD_32DIRECT(SL3_0_BASE, 0x090 * 4));
+  alt_printf("Port C Loopback = 0x%x\n", IORD_32DIRECT(SL3_1_BASE, 0x061 * 4));
+  alt_printf("Port C Error status register = 0x%x\n", IORD_32DIRECT(SL3_1_BASE, 0x090 * 4));
+
+  altera_avalon_fifo_init(RX_FIFO_0_IN_CSR_BASE, 0, 0, 128);
+  altera_avalon_fifo_init(RX_FIFO_1_IN_CSR_BASE, 0, 0, 128);
+
   read_status();
-  alt_putstr("Read anything left in the RX FIFO\n");
-  read_rx_fifo(RX_FIFO_OUT_BASE, RX_FIFO_IN_CSR_BASE);
-  alt_putstr("Write to FIFO\n");
-  write_tx_fifo(TX_FIFO_IN_BASE, RX_FIFO_IN_CSR_BASE);
-  alt_putstr("Read from FIFO\n");
-  read_rx_fifo(RX_FIFO_OUT_BASE, RX_FIFO_IN_CSR_BASE);
-  alt_printf("Error status register = 0x%x\n", IORD_32DIRECT(SL3_0_BASE, 0x090 * 4));
+
+  alt_putstr("Port B: Read anything left in the RX FIFO\n");
+  read_rx_fifo(RX_FIFO_0_OUT_BASE, RX_FIFO_0_IN_CSR_BASE);
+  alt_putstr("Port C: Read anything left in the RX FIFO\n");
+  read_rx_fifo(RX_FIFO_1_OUT_BASE, RX_FIFO_1_IN_CSR_BASE);
+
+  alt_putstr("Port B: Write to FIFO\n");
+  write_tx_fifo(TX_FIFO_0_IN_BASE, RX_FIFO_0_IN_CSR_BASE);
+  alt_putstr("Port C: Write to FIFO\n");
+  write_tx_fifo(TX_FIFO_1_IN_BASE, RX_FIFO_1_IN_CSR_BASE);
+
+  alt_putstr("Port B: Read RX FIFO\n");
+  read_rx_fifo(RX_FIFO_0_OUT_BASE, RX_FIFO_0_IN_CSR_BASE);
+  alt_putstr("Port C: Read RX FIFO\n");
+  read_rx_fifo(RX_FIFO_1_OUT_BASE, RX_FIFO_1_IN_CSR_BASE);
+
+  alt_printf("Port B: TX Error status register = 0x%x\n", IORD_32DIRECT(SL3_0_BASE, 0x090 * 4));
+  alt_printf("Port B: RX error status register = 0x%x\n", IORD_32DIRECT(SL3_0_BASE, 0x0d0 * 4));
+  report_rx_data_err(SL3_0_BASE);
+
+  alt_printf("Port C: TX Error status register = 0x%x\n", IORD_32DIRECT(SL3_1_BASE, 0x090 * 4));
+  alt_printf("Port C: RX error status register = 0x%x\n", IORD_32DIRECT(SL3_1_BASE, 0x0d0 * 4));
+  report_rx_data_err(SL3_1_BASE);
+
   alt_putstr("The end\n\004");    
   return 0;
 }
