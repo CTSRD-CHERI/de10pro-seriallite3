@@ -4773,7 +4773,7 @@ https://fpgasoftware.intel.com/eula.-->
                         &lt;name&gt;in_port&lt;/name&gt;
                         &lt;role&gt;export&lt;/role&gt;
                         &lt;direction&gt;Input&lt;/direction&gt;
-                        &lt;width&gt;8&lt;/width&gt;
+                        &lt;width&gt;16&lt;/width&gt;
                         &lt;lowerBound&gt;0&lt;/lowerBound&gt;
                         &lt;vhdlType&gt;STD_LOGIC_VECTOR&lt;/vhdlType&gt;
                         &lt;terminationValue&gt;0&lt;/terminationValue&gt;
@@ -5279,7 +5279,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;name&gt;in_port&lt;/name&gt;
                     &lt;role&gt;export&lt;/role&gt;
                     &lt;direction&gt;Input&lt;/direction&gt;
-                    &lt;width&gt;8&lt;/width&gt;
+                    &lt;width&gt;16&lt;/width&gt;
                     &lt;lowerBound&gt;0&lt;/lowerBound&gt;
                     &lt;vhdlType&gt;STD_LOGIC_VECTOR&lt;/vhdlType&gt;
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
@@ -5373,7 +5373,7 @@ https://fpgasoftware.intel.com/eula.-->
         &lt;/entry&gt;
         &lt;entry&gt;
             &lt;key&gt;embeddedsw.CMacro.DATA_WIDTH&lt;/key&gt;
-            &lt;value&gt;8&lt;/value&gt;
+            &lt;value&gt;16&lt;/value&gt;
         &lt;/entry&gt;
         &lt;entry&gt;
             &lt;key&gt;embeddedsw.CMacro.DO_TEST_BENCH_WIRING&lt;/key&gt;
@@ -5425,7 +5425,7 @@ https://fpgasoftware.intel.com/eula.-->
         &lt;/entry&gt;
         &lt;entry&gt;
             &lt;key&gt;embeddedsw.dts.params.altr,gpio-bank-width&lt;/key&gt;
-            &lt;value&gt;8&lt;/value&gt;
+            &lt;value&gt;16&lt;/value&gt;
         &lt;/entry&gt;
         &lt;entry&gt;
             &lt;key&gt;embeddedsw.dts.params.resetvalue&lt;/key&gt;
@@ -28830,15 +28830,19 @@ https://fpgasoftware.intel.com/eula.-->
       <altera:interface_mapping altera:name="sl3_1_tx_serial_data" altera:internal="sl3_1.tx_serial_data" altera:type="conduit" altera:dir="end"></altera:interface_mapping>
       <altera:interface_mapping altera:name="sl3_1_xcvr_pll_ref_clk" altera:internal="sl3_1.xcvr_pll_ref_clk" altera:type="clock" altera:dir="end"></altera:interface_mapping>
       <altera:interface_mapping altera:name="xcvr_atx_pll_s10_htile_0_gxt_output_to_abv_atx" altera:internal="xcvr_atx_pll_s10_htile_0.gxt_output_to_abv_atx"></altera:interface_mapping>
+      <altera:interface_mapping altera:name="xcvr_atx_pll_s10_htile_0_pll_cal_busy" altera:internal="xcvr_atx_pll_s10_htile_0.pll_cal_busy" altera:type="conduit" altera:dir="end"></altera:interface_mapping>
       <altera:interface_mapping altera:name="xcvr_atx_pll_s10_htile_0_pll_locked" altera:internal="xcvr_atx_pll_s10_htile_0.pll_locked" altera:type="conduit" altera:dir="end"></altera:interface_mapping>
       <altera:interface_mapping altera:name="xcvr_atx_pll_s10_htile_0_pll_refclk0" altera:internal="xcvr_atx_pll_s10_htile_0.pll_refclk0" altera:type="clock" altera:dir="end"></altera:interface_mapping>
       <altera:interface_mapping altera:name="xcvr_atx_pll_s10_htile_0_tx_serial_clk_gxt" altera:internal="xcvr_atx_pll_s10_htile_0.tx_serial_clk_gxt" altera:type="hssi_serial_clock" altera:dir="start"></altera:interface_mapping>
+      <altera:interface_mapping altera:name="xcvr_atx_pll_s10_htile_1_pll_cal_busy" altera:internal="xcvr_atx_pll_s10_htile_1.pll_cal_busy" altera:type="conduit" altera:dir="end"></altera:interface_mapping>
       <altera:interface_mapping altera:name="xcvr_atx_pll_s10_htile_1_pll_locked" altera:internal="xcvr_atx_pll_s10_htile_1.pll_locked" altera:type="conduit" altera:dir="end"></altera:interface_mapping>
       <altera:interface_mapping altera:name="xcvr_atx_pll_s10_htile_1_pll_refclk0" altera:internal="xcvr_atx_pll_s10_htile_1.pll_refclk0" altera:type="clock" altera:dir="end"></altera:interface_mapping>
       <altera:interface_mapping altera:name="xcvr_atx_pll_s10_htile_1_tx_serial_clk_gxt" altera:internal="xcvr_atx_pll_s10_htile_1.tx_serial_clk_gxt" altera:type="hssi_serial_clock" altera:dir="start"></altera:interface_mapping>
+      <altera:interface_mapping altera:name="xcvr_atx_pll_s10_htile_2_pll_cal_busy" altera:internal="xcvr_atx_pll_s10_htile_2.pll_cal_busy" altera:type="conduit" altera:dir="end"></altera:interface_mapping>
       <altera:interface_mapping altera:name="xcvr_atx_pll_s10_htile_2_pll_locked" altera:internal="xcvr_atx_pll_s10_htile_2.pll_locked" altera:type="conduit" altera:dir="end"></altera:interface_mapping>
       <altera:interface_mapping altera:name="xcvr_atx_pll_s10_htile_2_pll_refclk0" altera:internal="xcvr_atx_pll_s10_htile_2.pll_refclk0" altera:type="clock" altera:dir="end"></altera:interface_mapping>
       <altera:interface_mapping altera:name="xcvr_atx_pll_s10_htile_2_tx_serial_clk_gxt" altera:internal="xcvr_atx_pll_s10_htile_2.tx_serial_clk_gxt" altera:type="hssi_serial_clock" altera:dir="start"></altera:interface_mapping>
+      <altera:interface_mapping altera:name="xcvr_atx_pll_s10_htile_3_pll_cal_busy" altera:internal="xcvr_atx_pll_s10_htile_3.pll_cal_busy" altera:type="conduit" altera:dir="end"></altera:interface_mapping>
       <altera:interface_mapping altera:name="xcvr_atx_pll_s10_htile_3_pll_locked" altera:internal="xcvr_atx_pll_s10_htile_3.pll_locked" altera:type="conduit" altera:dir="end"></altera:interface_mapping>
       <altera:interface_mapping altera:name="xcvr_atx_pll_s10_htile_3_pll_refclk0" altera:internal="xcvr_atx_pll_s10_htile_3.pll_refclk0" altera:type="clock" altera:dir="end"></altera:interface_mapping>
       <altera:interface_mapping altera:name="xcvr_atx_pll_s10_htile_3_tx_serial_clk_gxt" altera:internal="xcvr_atx_pll_s10_htile_3.tx_serial_clk_gxt" altera:type="hssi_serial_clock" altera:dir="start"></altera:interface_mapping>

@@ -322,9 +322,9 @@ module DE10_Pro
    wire 	htile_fast_clk_C1;
    wire 	htile_fast_lock_C0;
    wire 	htile_fast_lock_C1;
-   wire [3:0] 	status;
-   reg [3:0] 	status_metastable;
-   reg [3:0] 	status_latched;
+   wire [15:0] 	status;
+   reg [15:0] 	status_metastable;
+   reg [15:0] 	status_latched;
 
    always @(posedge clk_100)
      begin
@@ -336,19 +336,22 @@ module DE10_Pro
    assign QSFP28B_RST_n = 1;
    assign QSFP28B_SCL = 0;
    assign QSFP28B_SDA = 0;
-	assign QSFP28B_MOD_SEL_n = 1;
+   assign QSFP28B_MOD_SEL_n = 1;
 
    assign QSFP28C_LP_MODE = 0;
    assign QSFP28C_RST_n = 1;
    assign QSFP28C_SCL = 0;
    assign QSFP28C_SDA = 0;
-	assign QSFP28C_MOD_SEL_n = 1;
+   assign QSFP28C_MOD_SEL_n = 1;
 
+   assign status[7:4] = {htile_fast_lock_C1, htile_fast_lock_C0, htile_fast_lock_B1, htile_fast_lock_B0};
+   assign status[15:12] = 4'hf;
+   
    soc mainsoc
       (
        .clk_clk(clk_100),
        .reset_reset(!reset_n_100),
-       .pio_status_input_export                   ({4'd0, status_latched}),                  //   input,    width = 8,                           pio_status_input.export
+       .pio_status_input_export                   (status_latched),                  //   input,    width = 16,                           pio_status_input.export
 
        .sl3_0_link_up_tx_tx_link_up               (status[0]),                               //  output,    width = 1,        sl3_0_link_up_tx.tx_link_up
        .sl3_0_link_up_rx_rx_link_up               (status[1]),                               //  output,    width = 1,        sl3_0_link_up_rx.rx_link_up
@@ -371,18 +374,22 @@ module DE10_Pro
        .xcvr_atx_pll_s10_htile_0_pll_refclk0_clk       (QSFP28B_REFCLK_p),                  //   input,    width = 1,                       xcvr_atx_pll_refclk0.clk
        .xcvr_atx_pll_s10_htile_0_tx_serial_clk_gxt_clk (htile_fast_clk_B0),                 //  output,    width = 1, xcvr_atx_pll_s10_htile_0_tx_serial_clk_gxt.clk
        .xcvr_atx_pll_s10_htile_0_pll_locked_pll_locked (htile_fast_lock_B0),                //  output,    width = 1,        xcvr_atx_pll_s10_htile_0_pll_locked.pll_locked
-
+       .xcvr_atx_pll_s10_htile_0_pll_cal_busy_pll_cal_busy (status[8]),                     //  output,   width = 1,      xcvr_atx_pll_s10_htile_0_pll_cal_busy.pll_cal_busy
+       
        .xcvr_atx_pll_s10_htile_1_pll_refclk0_clk       (QSFP28B_REFCLK_p),                  //   input,    width = 1,       xcvr_atx_pll_s10_htile_1_pll_refclk0.clk
        .xcvr_atx_pll_s10_htile_1_tx_serial_clk_gxt_clk (htile_fast_clk_B1),                 //  output,    width = 1, xcvr_atx_pll_s10_htile_1_tx_serial_clk_gxt.clk
        .xcvr_atx_pll_s10_htile_1_pll_locked_pll_locked (htile_fast_lock_B1),                 //  output,    width = 1,        xcvr_atx_pll_s10_htile_0_pll_locked.pll_locked
+       .xcvr_atx_pll_s10_htile_1_pll_cal_busy_pll_cal_busy (status[9]),                     //  output,   width = 1,      xcvr_atx_pll_s10_htile_1_pll_cal_busy.pll_cal_busy
 
        .xcvr_atx_pll_s10_htile_2_pll_refclk0_clk       (QSFP28C_REFCLK_p),       //   input,    width = 1,       xcvr_atx_pll_s10_htile_2_pll_refclk0.clk
        .xcvr_atx_pll_s10_htile_2_tx_serial_clk_gxt_clk (htile_fast_clk_C0), //  output,    width = 1, xcvr_atx_pll_s10_htile_2_tx_serial_clk_gxt.clk
        .xcvr_atx_pll_s10_htile_2_pll_locked_pll_locked (htile_fast_lock_C0), //  output,    width = 1,        xcvr_atx_pll_s10_htile_2_pll_locked.pll_locked
+       .xcvr_atx_pll_s10_htile_2_pll_cal_busy_pll_cal_busy (status[10]),                     //  output,   width = 1,      xcvr_atx_pll_s10_htile_2_pll_cal_busy.pll_cal_busy
 
        .xcvr_atx_pll_s10_htile_3_pll_refclk0_clk       (QSFP28C_REFCLK_p),       //   input,    width = 1,       xcvr_atx_pll_s10_htile_3_pll_refclk0.clk
        .xcvr_atx_pll_s10_htile_3_tx_serial_clk_gxt_clk (htile_fast_clk_C1), //  output,    width = 1, xcvr_atx_pll_s10_htile_3_tx_serial_clk_gxt.clk
-       .xcvr_atx_pll_s10_htile_3_pll_locked_pll_locked (htile_fast_lock_C1)  //  output,    width = 1,        xcvr_atx_pll_s10_htile_3_pll_locked.pll_locked
+       .xcvr_atx_pll_s10_htile_3_pll_locked_pll_locked (htile_fast_lock_C1),  //  output,    width = 1,        xcvr_atx_pll_s10_htile_3_pll_locked.pll_locked
+       .xcvr_atx_pll_s10_htile_3_pll_cal_busy_pll_cal_busy (status[11])                     //  output,   width = 1,      xcvr_atx_pll_s10_htile_3_pll_cal_busy.pll_cal_busy
        );
    
    

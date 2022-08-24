@@ -1640,3 +1640,7 @@ set_global_assignment -name IP_FILE ip/soc/soc_xcvr_atx_pll_s10_htile_0.ip
 set_global_assignment -name IP_FILE ip/soc/clock_xcvr_a.ip
 set_global_assignment -name IP_FILE ip/soc/soc_st_dc_fifo_0.ip
 set_global_assignment -name IP_FILE ip/soc/soc_pio_0.ip
+set_global_assignment -name IP_FILE ip/soc/soc_swm_tx_adapter_0.ip
+set_global_assignment -name IP_FILE ip/soc/soc_swm_rx_adapter_1.ip
+set_global_assignment -name IP_FILE ip/soc/soc_swm_tx_adapter_2.ip
+set_global_assignment -name IP_FILE ip/soc/soc_swm_rx_adapter_0.ip
