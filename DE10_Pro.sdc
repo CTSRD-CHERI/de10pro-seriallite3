@@ -50,4 +50,26 @@ set_false_path -from * -to [get_ports {LED[2]}]
 set_false_path -from * -to [get_ports {LED[3]}]
 set_max_skew -to [get_ports "HPS_EMAC0_MDC"] 2
 set_max_skew -to [get_ports "HPS_EMAC0_MDIO"] 2
+# SWM: specific to this design
+set_false_path -from * -to [get_registers {status_metastable[0]}]
+set_false_path -from * -to [get_registers {status_metastable[1]}]
+set_false_path -from * -to [get_registers {status_metastable[2]}]
+set_false_path -from * -to [get_registers {status_metastable[3]}]
+set_false_path -from * -to [get_registers {status_metastable[4]}]
+set_false_path -from * -to [get_registers {status_metastable[5]}]
+set_false_path -from * -to [get_registers {status_metastable[6]}]
+set_false_path -from * -to [get_registers {status_metastable[7]}]
+set_false_path -from * -to [get_registers {status_metastable[8]}]
+set_false_path -from * -to [get_registers {status_metastable[9]}]
+set_false_path -from * -to [get_registers {status_metastable[10]}]
+set_false_path -from * -to [get_registers {status_metastable[11]}]
+set_false_path -from * -to [get_registers {status_metastable[12]}]
+set_false_path -from * -to [get_registers {status_metastable[13]}]
+set_false_path -from * -to [get_registers {status_metastable[14]}]
+set_false_path -from * -to [get_registers {status_metastable[15]}]
+
+# SWM: Serial Lite III advanced clocking scheme requires the following (from the ug_slite3_streaming.pdf manual):
+set_instance_assignment -name GLOBAL_SIGNAL OFF -to *seriallite_iii_streaming*clock_gen:sink_clock_gen|dp_sync:coreclkin_reset_sync|dp_sync_regstage:dp_sync_stage_2*o*
+
+
 source ./jtag.sdc

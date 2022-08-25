@@ -323,7 +323,7 @@ module DE10_Pro
    wire 	htile_fast_lock_C0;
    wire 	htile_fast_lock_C1;
    wire [15:0] 	status;
-   reg [15:0] 	status_metastable;
+   reg [15:0] 	status_metastable /* synthesis preserve */; // preserve net name for timing closure
    reg [15:0] 	status_latched;
 
    always @(posedge clk_100)
@@ -355,7 +355,8 @@ module DE10_Pro
 
        .sl3_0_link_up_tx_tx_link_up               (status[0]),                               //  output,    width = 1,        sl3_0_link_up_tx.tx_link_up
        .sl3_0_link_up_rx_rx_link_up               (status[1]),                               //  output,    width = 1,        sl3_0_link_up_rx.rx_link_up
-       .sl3_0_tx_serial_clk_clk                   ({htile_fast_clk_B1,htile_fast_clk_B1,htile_fast_clk_B0,htile_fast_clk_B0}), //   input,    width = 4,     sl3_0_tx_serial_clk.clk
+//       .sl3_0_tx_serial_clk_clk                   ({htile_fast_clk_B1,htile_fast_clk_B1,htile_fast_clk_B0,htile_fast_clk_B0}), //   input,    width = 4,     sl3_0_tx_serial_clk.clk
+       .sl3_0_tx_serial_clk_clk                   ({htile_fast_clk_B0,htile_fast_clk_B0,htile_fast_clk_B1,htile_fast_clk_B1}), //   input,    width = 4,     sl3_0_tx_serial_clk.clk
        .sl3_0_xcvr_pll_ref_clk_clk                (QSFP28B_REFCLK_p),                        //   input,    width = 1,  sl3_0_xcvr_pll_ref_clk.clk
        .sl3_0_tx_pll_locked_pll_locked            (htile_fast_lock_B0 && htile_fast_lock_B1), //   input,    width = 1,     sl3_0_tx_pll_locked.pll_locked
        .sl3_0_crc_error_inject_tx_err_ins         (4'd0),                                      //   input,    width = 4,  sl3_0_crc_error_inject.tx_err_ins
@@ -364,7 +365,8 @@ module DE10_Pro
 
        .sl3_1_link_up_tx_tx_link_up               (status[2]),                    //  output,    width = 1,                           sl3_1_link_up_tx.tx_link_up
        .sl3_1_link_up_rx_rx_link_up               (status[3]),                    //  output,    width = 1,                           sl3_1_link_up_rx.rx_link_up
-       .sl3_1_tx_serial_clk_clk                   ({htile_fast_clk_C1,htile_fast_clk_C1,htile_fast_clk_C0,htile_fast_clk_C0}),                        //   input,    width = 4,                        sl3_1_tx_serial_clk.clk
+//       .sl3_1_tx_serial_clk_clk                   ({htile_fast_clk_C1,htile_fast_clk_C1,htile_fast_clk_C0,htile_fast_clk_C0}),                        //   input,    width = 4,                        sl3_1_tx_serial_clk.clk
+       .sl3_1_tx_serial_clk_clk                   ({htile_fast_clk_C0,htile_fast_clk_C0,htile_fast_clk_C1,htile_fast_clk_C1}),                        //   input,    width = 4,                        sl3_1_tx_serial_clk.clk
        .sl3_1_xcvr_pll_ref_clk_clk                (QSFP28C_REFCLK_p),                     //   input,    width = 1,                     sl3_1_xcvr_pll_ref_clk.clk
        .sl3_1_tx_pll_locked_pll_locked            (htile_fast_lock_C0 && htile_fast_lock_C1),                 //   input,    width = 1,                        sl3_1_tx_pll_locked.pll_locked
        .sl3_1_crc_error_inject_tx_err_ins         (4'd0),              //   input,    width = 4,                     sl3_1_crc_error_inject.tx_err_ins
