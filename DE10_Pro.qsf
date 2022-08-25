@@ -1547,10 +1547,10 @@ set_instance_assignment -name CURRENT_STRENGTH_NEW 2MA -to HPS_CARD_PRSNT_n -ent
 set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to HPS_EMAC0_MDIO -entity DE10_Pro
 set_instance_assignment -name CURRENT_STRENGTH_NEW 4MA -to HPS_EMAC0_MDC -entity DE10_Pro
 set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to HPS_SD_CMD -entity DE10_Pro
-set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to HPS_SD_DATA[0] -entity ghrd_s10_top
-set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to HPS_SD_DATA[1] -entity ghrd_s10_top
-set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to HPS_SD_DATA[2] -entity ghrd_s10_top
-set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to HPS_SD_DATA[3] -entity ghrd_s10_top
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to HPS_SD_DATA[0] -entity DE10_Pro
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to HPS_SD_DATA[1] -entity DE10_Pro
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to HPS_SD_DATA[2] -entity DE10_Pro
+set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to HPS_SD_DATA[3] -entity DE10_Pro
 set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to HPS_USB0_CLK -entity DE10_Pro
 set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to HPS_USB0_DIR -entity DE10_Pro
 set_instance_assignment -name WEAK_PULL_UP_RESISTOR ON -to HPS_USB0_NXT -entity DE10_Pro
@@ -1644,3 +1644,4 @@ set_global_assignment -name IP_FILE ip/soc/soc_swm_tx_adapter_0.ip
 set_global_assignment -name IP_FILE ip/soc/soc_swm_rx_adapter_1.ip
 set_global_assignment -name IP_FILE ip/soc/soc_swm_tx_adapter_2.ip
 set_global_assignment -name IP_FILE ip/soc/soc_swm_rx_adapter_0.ip
+set_global_assignment -name IP_FILE ip/soc/rx_fast_fifo_0.ip
