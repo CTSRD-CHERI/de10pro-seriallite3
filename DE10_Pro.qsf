@@ -1606,7 +1606,7 @@ set_global_assignment -name MAX_CORE_JUNCTION_TEMP 100
 set_global_assignment -name TOP_LEVEL_ENTITY DE10_Pro
 set_global_assignment -name PROJECT_OUTPUT_DIRECTORY output_files
 set_global_assignment -name ENABLE_SIGNALTAP ON
-set_global_assignment -name LAST_QUARTUS_VERSION "21.3.0 Pro Edition"
+set_global_assignment -name LAST_QUARTUS_VERSION "22.1.0 Pro Edition"
 set_global_assignment -name USE_CONFIGURATION_DEVICE ON
 set_global_assignment -name GENERATE_PR_RBF_FILE ON
 set_global_assignment -name ENABLE_ED_CRC_CHECK ON

@@ -30,6 +30,11 @@ https://fpgasoftware.intel.com/eula.-->
     </altera:catalog_card_info>
     <altera:altera_system_parameters>
       <ipxact:parameters>
+        <ipxact:parameter parameterId="board" type="string">
+          <ipxact:name>board</ipxact:name>
+          <ipxact:displayName>Board</ipxact:displayName>
+          <ipxact:value>Unknown</ipxact:value>
+        </ipxact:parameter>
         <ipxact:parameter parameterId="bonusData" type="string">
           <ipxact:name>bonusData</ipxact:name>
           <ipxact:displayName>bonusData</ipxact:displayName>
@@ -1216,7 +1221,7 @@ https://fpgasoftware.intel.com/eula.-->
     &lt;/boundary&gt;
     &lt;originalModuleInfo&gt;
         &lt;className&gt;altera_avalon_jtag_uart&lt;/className&gt;
-        &lt;version&gt;19.1.0&lt;/version&gt;
+        &lt;version&gt;19.2.0&lt;/version&gt;
         &lt;displayName&gt;JTAG UART Intel FPGA IP&lt;/displayName&gt;
     &lt;/originalModuleInfo&gt;
     &lt;systemInfoParameterDescriptors&gt;
@@ -4809,7 +4814,7 @@ https://fpgasoftware.intel.com/eula.-->
     &lt;/boundary&gt;
     &lt;originalModuleInfo&gt;
         &lt;className&gt;altera_avalon_pio&lt;/className&gt;
-        &lt;version&gt;19.1.3&lt;/version&gt;
+        &lt;version&gt;19.2.0&lt;/version&gt;
         &lt;displayName&gt;PIO (Parallel I/O) Intel FPGA IP&lt;/displayName&gt;
     &lt;/originalModuleInfo&gt;
     &lt;systemInfoParameterDescriptors&gt;
@@ -5795,7 +5800,7 @@ https://fpgasoftware.intel.com/eula.-->
     &lt;/boundary&gt;
     &lt;originalModuleInfo&gt;
         &lt;className&gt;intel_onchip_memory&lt;/className&gt;
-        &lt;version&gt;1.0.1&lt;/version&gt;
+        &lt;version&gt;1.2.1&lt;/version&gt;
         &lt;displayName&gt;On-Chip Memory II (RAM or ROM) Intel FPGA IP&lt;/displayName&gt;
     &lt;/originalModuleInfo&gt;
     &lt;systemInfoParameterDescriptors&gt;
@@ -7563,6 +7568,15 @@ https://fpgasoftware.intel.com/eula.-->
         &lt;parameterType&gt;java.lang.Integer&lt;/parameterType&gt;
         &lt;parameterValue&gt;0&lt;/parameterValue&gt;
     &lt;/hdlParameterDescriptorDefinition&gt;
+    &lt;hdlParameterDescriptorDefinition&gt;
+        &lt;description&gt;This option enables the pipeline on pointer after clock domain crossing, by using this option for better timing closure added one clock cycle latency&lt;/description&gt;
+        &lt;enabled&gt;true&lt;/enabled&gt;
+        &lt;exported&gt;false&lt;/exported&gt;
+        &lt;parameterHdlType&gt;INTEGER&lt;/parameterHdlType&gt;
+        &lt;parameterName&gt;PIPELINE_POINTERS&lt;/parameterName&gt;
+        &lt;parameterType&gt;java.lang.Integer&lt;/parameterType&gt;
+        &lt;parameterValue&gt;0&lt;/parameterValue&gt;
+    &lt;/hdlParameterDescriptorDefinition&gt;
 &lt;/hdlParameterDescriptorDefinitionList&gt;</ipxact:value>
             </ipxact:parameter>
             <ipxact:parameter parameterId="hlsFile" type="string">
@@ -8489,6 +8503,15 @@ https://fpgasoftware.intel.com/eula.-->
         &lt;parameterType&gt;java.lang.Integer&lt;/parameterType&gt;
         &lt;parameterValue&gt;0&lt;/parameterValue&gt;
     &lt;/hdlParameterDescriptorDefinition&gt;
+    &lt;hdlParameterDescriptorDefinition&gt;
+        &lt;description&gt;This option enables the pipeline on pointer after clock domain crossing, by using this option for better timing closure added one clock cycle latency&lt;/description&gt;
+        &lt;enabled&gt;true&lt;/enabled&gt;
+        &lt;exported&gt;false&lt;/exported&gt;
+        &lt;parameterHdlType&gt;INTEGER&lt;/parameterHdlType&gt;
+        &lt;parameterName&gt;PIPELINE_POINTERS&lt;/parameterName&gt;
+        &lt;parameterType&gt;java.lang.Integer&lt;/parameterType&gt;
+        &lt;parameterValue&gt;0&lt;/parameterValue&gt;
+    &lt;/hdlParameterDescriptorDefinition&gt;
 &lt;/hdlParameterDescriptorDefinitionList&gt;</ipxact:value>
             </ipxact:parameter>
             <ipxact:parameter parameterId="hlsFile" type="string">
@@ -8833,7 +8856,7 @@ https://fpgasoftware.intel.com/eula.-->
     &lt;/boundary&gt;
     &lt;originalModuleInfo&gt;
         &lt;className&gt;altera_avalon_sc_fifo&lt;/className&gt;
-        &lt;version&gt;19.3.0&lt;/version&gt;
+        &lt;version&gt;19.3.1&lt;/version&gt;
         &lt;displayName&gt;Avalon Streaming Single Clock FIFO Intel FPGA IP&lt;/displayName&gt;
     &lt;/originalModuleInfo&gt;
     &lt;systemInfoParameterDescriptors&gt;
@@ -29239,7 +29262,7 @@ https://fpgasoftware.intel.com/eula.-->
       </altera:module>
     </altera:modules>
     <altera:connections>
-      <altera:connection altera:kind="avalon" altera:version="21.3" altera:start="nios2_gen2_0.data_master" altera:end="jtag_uart_0.avalon_jtag_slave">
+      <altera:connection altera:kind="avalon" altera:version="22.1" altera:start="nios2_gen2_0.data_master" altera:end="jtag_uart_0.avalon_jtag_slave">
         <altera:connection_parameter altera:parameter_name="arbitrationPriority" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="baseAddress" altera:parameter_value="0x000310b0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="defaultConnection" altera:parameter_value="false"></altera:connection_parameter>
@@ -29255,10 +29278,11 @@ https://fpgasoftware.intel.com/eula.-->
         <altera:connection_parameter altera:parameter_name="qsys_mm.maxAdditionalLatency" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.optimizeRdFifoSize" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.piplineType" altera:parameter_value="PIPELINE_STAGE"></altera:connection_parameter>
+        <altera:connection_parameter altera:parameter_name="qsys_mm.responseFifoType" altera:parameter_value="REGISTER_BASED"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.syncResets" altera:parameter_value="TRUE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.widthAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="avalon" altera:version="21.3" altera:start="nios2_gen2_0.data_master" altera:end="nios2_gen2_0.debug_mem_slave">
+      <altera:connection altera:kind="avalon" altera:version="22.1" altera:start="nios2_gen2_0.data_master" altera:end="nios2_gen2_0.debug_mem_slave">
         <altera:connection_parameter altera:parameter_name="arbitrationPriority" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="baseAddress" altera:parameter_value="0x00030800"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="defaultConnection" altera:parameter_value="false"></altera:connection_parameter>
@@ -29274,10 +29298,11 @@ https://fpgasoftware.intel.com/eula.-->
         <altera:connection_parameter altera:parameter_name="qsys_mm.maxAdditionalLatency" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.optimizeRdFifoSize" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.piplineType" altera:parameter_value="PIPELINE_STAGE"></altera:connection_parameter>
+        <altera:connection_parameter altera:parameter_name="qsys_mm.responseFifoType" altera:parameter_value="REGISTER_BASED"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.syncResets" altera:parameter_value="TRUE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.widthAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="avalon" altera:version="21.3" altera:start="nios2_gen2_0.data_master" altera:end="tx_fifo_0.in">
+      <altera:connection altera:kind="avalon" altera:version="22.1" altera:start="nios2_gen2_0.data_master" altera:end="tx_fifo_0.in">
         <altera:connection_parameter altera:parameter_name="arbitrationPriority" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="baseAddress" altera:parameter_value="0x000310a8"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="defaultConnection" altera:parameter_value="false"></altera:connection_parameter>
@@ -29293,10 +29318,11 @@ https://fpgasoftware.intel.com/eula.-->
         <altera:connection_parameter altera:parameter_name="qsys_mm.maxAdditionalLatency" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.optimizeRdFifoSize" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.piplineType" altera:parameter_value="PIPELINE_STAGE"></altera:connection_parameter>
+        <altera:connection_parameter altera:parameter_name="qsys_mm.responseFifoType" altera:parameter_value="REGISTER_BASED"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.syncResets" altera:parameter_value="TRUE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.widthAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="avalon" altera:version="21.3" altera:start="nios2_gen2_0.data_master" altera:end="tx_fifo_1.in">
+      <altera:connection altera:kind="avalon" altera:version="22.1" altera:start="nios2_gen2_0.data_master" altera:end="tx_fifo_1.in">
         <altera:connection_parameter altera:parameter_name="arbitrationPriority" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="baseAddress" altera:parameter_value="0x000310a0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="defaultConnection" altera:parameter_value="false"></altera:connection_parameter>
@@ -29312,10 +29338,11 @@ https://fpgasoftware.intel.com/eula.-->
         <altera:connection_parameter altera:parameter_name="qsys_mm.maxAdditionalLatency" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.optimizeRdFifoSize" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.piplineType" altera:parameter_value="PIPELINE_STAGE"></altera:connection_parameter>
+        <altera:connection_parameter altera:parameter_name="qsys_mm.responseFifoType" altera:parameter_value="REGISTER_BASED"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.syncResets" altera:parameter_value="TRUE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.widthAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="avalon" altera:version="21.3" altera:start="nios2_gen2_0.data_master" altera:end="rx_fifo_0.in_csr">
+      <altera:connection altera:kind="avalon" altera:version="22.1" altera:start="nios2_gen2_0.data_master" altera:end="rx_fifo_0.in_csr">
         <altera:connection_parameter altera:parameter_name="arbitrationPriority" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="baseAddress" altera:parameter_value="0x00031060"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="defaultConnection" altera:parameter_value="false"></altera:connection_parameter>
@@ -29331,10 +29358,11 @@ https://fpgasoftware.intel.com/eula.-->
         <altera:connection_parameter altera:parameter_name="qsys_mm.maxAdditionalLatency" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.optimizeRdFifoSize" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.piplineType" altera:parameter_value="PIPELINE_STAGE"></altera:connection_parameter>
+        <altera:connection_parameter altera:parameter_name="qsys_mm.responseFifoType" altera:parameter_value="REGISTER_BASED"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.syncResets" altera:parameter_value="TRUE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.widthAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="avalon" altera:version="21.3" altera:start="nios2_gen2_0.data_master" altera:end="tx_fifo_0.in_csr">
+      <altera:connection altera:kind="avalon" altera:version="22.1" altera:start="nios2_gen2_0.data_master" altera:end="tx_fifo_0.in_csr">
         <altera:connection_parameter altera:parameter_name="arbitrationPriority" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="baseAddress" altera:parameter_value="0x00031040"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="defaultConnection" altera:parameter_value="false"></altera:connection_parameter>
@@ -29350,10 +29378,11 @@ https://fpgasoftware.intel.com/eula.-->
         <altera:connection_parameter altera:parameter_name="qsys_mm.maxAdditionalLatency" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.optimizeRdFifoSize" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.piplineType" altera:parameter_value="PIPELINE_STAGE"></altera:connection_parameter>
+        <altera:connection_parameter altera:parameter_name="qsys_mm.responseFifoType" altera:parameter_value="REGISTER_BASED"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.syncResets" altera:parameter_value="TRUE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.widthAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="avalon" altera:version="21.3" altera:start="nios2_gen2_0.data_master" altera:end="rx_fifo_1.in_csr">
+      <altera:connection altera:kind="avalon" altera:version="22.1" altera:start="nios2_gen2_0.data_master" altera:end="rx_fifo_1.in_csr">
         <altera:connection_parameter altera:parameter_name="arbitrationPriority" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="baseAddress" altera:parameter_value="0x00031020"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="defaultConnection" altera:parameter_value="false"></altera:connection_parameter>
@@ -29369,10 +29398,11 @@ https://fpgasoftware.intel.com/eula.-->
         <altera:connection_parameter altera:parameter_name="qsys_mm.maxAdditionalLatency" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.optimizeRdFifoSize" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.piplineType" altera:parameter_value="PIPELINE_STAGE"></altera:connection_parameter>
+        <altera:connection_parameter altera:parameter_name="qsys_mm.responseFifoType" altera:parameter_value="REGISTER_BASED"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.syncResets" altera:parameter_value="TRUE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.widthAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="avalon" altera:version="21.3" altera:start="nios2_gen2_0.data_master" altera:end="tx_fifo_1.in_csr">
+      <altera:connection altera:kind="avalon" altera:version="22.1" altera:start="nios2_gen2_0.data_master" altera:end="tx_fifo_1.in_csr">
         <altera:connection_parameter altera:parameter_name="arbitrationPriority" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="baseAddress" altera:parameter_value="0x00031000"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="defaultConnection" altera:parameter_value="false"></altera:connection_parameter>
@@ -29388,10 +29418,11 @@ https://fpgasoftware.intel.com/eula.-->
         <altera:connection_parameter altera:parameter_name="qsys_mm.maxAdditionalLatency" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.optimizeRdFifoSize" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.piplineType" altera:parameter_value="PIPELINE_STAGE"></altera:connection_parameter>
+        <altera:connection_parameter altera:parameter_name="qsys_mm.responseFifoType" altera:parameter_value="REGISTER_BASED"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.syncResets" altera:parameter_value="TRUE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.widthAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="avalon" altera:version="21.3" altera:start="nios2_gen2_0.data_master" altera:end="rx_fifo_0.out">
+      <altera:connection altera:kind="avalon" altera:version="22.1" altera:start="nios2_gen2_0.data_master" altera:end="rx_fifo_0.out">
         <altera:connection_parameter altera:parameter_name="arbitrationPriority" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="baseAddress" altera:parameter_value="0x00031098"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="defaultConnection" altera:parameter_value="false"></altera:connection_parameter>
@@ -29407,10 +29438,11 @@ https://fpgasoftware.intel.com/eula.-->
         <altera:connection_parameter altera:parameter_name="qsys_mm.maxAdditionalLatency" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.optimizeRdFifoSize" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.piplineType" altera:parameter_value="PIPELINE_STAGE"></altera:connection_parameter>
+        <altera:connection_parameter altera:parameter_name="qsys_mm.responseFifoType" altera:parameter_value="REGISTER_BASED"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.syncResets" altera:parameter_value="TRUE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.widthAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="avalon" altera:version="21.3" altera:start="nios2_gen2_0.data_master" altera:end="rx_fifo_1.out">
+      <altera:connection altera:kind="avalon" altera:version="22.1" altera:start="nios2_gen2_0.data_master" altera:end="rx_fifo_1.out">
         <altera:connection_parameter altera:parameter_name="arbitrationPriority" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="baseAddress" altera:parameter_value="0x00031090"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="defaultConnection" altera:parameter_value="false"></altera:connection_parameter>
@@ -29426,10 +29458,11 @@ https://fpgasoftware.intel.com/eula.-->
         <altera:connection_parameter altera:parameter_name="qsys_mm.maxAdditionalLatency" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.optimizeRdFifoSize" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.piplineType" altera:parameter_value="PIPELINE_STAGE"></altera:connection_parameter>
+        <altera:connection_parameter altera:parameter_name="qsys_mm.responseFifoType" altera:parameter_value="REGISTER_BASED"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.syncResets" altera:parameter_value="TRUE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.widthAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="avalon" altera:version="21.3" altera:start="nios2_gen2_0.data_master" altera:end="sl3_0.phy_mgmt">
+      <altera:connection altera:kind="avalon" altera:version="22.1" altera:start="nios2_gen2_0.data_master" altera:end="sl3_0.phy_mgmt">
         <altera:connection_parameter altera:parameter_name="arbitrationPriority" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="baseAddress" altera:parameter_value="0x00020000"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="defaultConnection" altera:parameter_value="false"></altera:connection_parameter>
@@ -29445,10 +29478,11 @@ https://fpgasoftware.intel.com/eula.-->
         <altera:connection_parameter altera:parameter_name="qsys_mm.maxAdditionalLatency" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.optimizeRdFifoSize" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.piplineType" altera:parameter_value="PIPELINE_STAGE"></altera:connection_parameter>
+        <altera:connection_parameter altera:parameter_name="qsys_mm.responseFifoType" altera:parameter_value="REGISTER_BASED"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.syncResets" altera:parameter_value="TRUE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.widthAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="avalon" altera:version="21.3" altera:start="nios2_gen2_0.data_master" altera:end="sl3_1.phy_mgmt">
+      <altera:connection altera:kind="avalon" altera:version="22.1" altera:start="nios2_gen2_0.data_master" altera:end="sl3_1.phy_mgmt">
         <altera:connection_parameter altera:parameter_name="arbitrationPriority" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="baseAddress" altera:parameter_value="0x00010000"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="defaultConnection" altera:parameter_value="false"></altera:connection_parameter>
@@ -29464,10 +29498,11 @@ https://fpgasoftware.intel.com/eula.-->
         <altera:connection_parameter altera:parameter_name="qsys_mm.maxAdditionalLatency" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.optimizeRdFifoSize" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.piplineType" altera:parameter_value="PIPELINE_STAGE"></altera:connection_parameter>
+        <altera:connection_parameter altera:parameter_name="qsys_mm.responseFifoType" altera:parameter_value="REGISTER_BASED"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.syncResets" altera:parameter_value="TRUE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.widthAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="avalon" altera:version="21.3" altera:start="nios2_gen2_0.data_master" altera:end="ram64k.s1">
+      <altera:connection altera:kind="avalon" altera:version="22.1" altera:start="nios2_gen2_0.data_master" altera:end="ram64k.s1">
         <altera:connection_parameter altera:parameter_name="arbitrationPriority" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="baseAddress" altera:parameter_value="0x0000"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="defaultConnection" altera:parameter_value="false"></altera:connection_parameter>
@@ -29483,10 +29518,11 @@ https://fpgasoftware.intel.com/eula.-->
         <altera:connection_parameter altera:parameter_name="qsys_mm.maxAdditionalLatency" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.optimizeRdFifoSize" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.piplineType" altera:parameter_value="PIPELINE_STAGE"></altera:connection_parameter>
+        <altera:connection_parameter altera:parameter_name="qsys_mm.responseFifoType" altera:parameter_value="REGISTER_BASED"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.syncResets" altera:parameter_value="TRUE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.widthAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="avalon" altera:version="21.3" altera:start="nios2_gen2_0.data_master" altera:end="pio_status.s1">
+      <altera:connection altera:kind="avalon" altera:version="22.1" altera:start="nios2_gen2_0.data_master" altera:end="pio_status.s1">
         <altera:connection_parameter altera:parameter_name="arbitrationPriority" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="baseAddress" altera:parameter_value="0x00031080"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="defaultConnection" altera:parameter_value="false"></altera:connection_parameter>
@@ -29502,10 +29538,11 @@ https://fpgasoftware.intel.com/eula.-->
         <altera:connection_parameter altera:parameter_name="qsys_mm.maxAdditionalLatency" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.optimizeRdFifoSize" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.piplineType" altera:parameter_value="PIPELINE_STAGE"></altera:connection_parameter>
+        <altera:connection_parameter altera:parameter_name="qsys_mm.responseFifoType" altera:parameter_value="REGISTER_BASED"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.syncResets" altera:parameter_value="TRUE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.widthAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="avalon" altera:version="21.3" altera:start="nios2_gen2_0.instruction_master" altera:end="nios2_gen2_0.debug_mem_slave">
+      <altera:connection altera:kind="avalon" altera:version="22.1" altera:start="nios2_gen2_0.instruction_master" altera:end="nios2_gen2_0.debug_mem_slave">
         <altera:connection_parameter altera:parameter_name="arbitrationPriority" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="baseAddress" altera:parameter_value="0x00030800"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="defaultConnection" altera:parameter_value="false"></altera:connection_parameter>
@@ -29521,10 +29558,11 @@ https://fpgasoftware.intel.com/eula.-->
         <altera:connection_parameter altera:parameter_name="qsys_mm.maxAdditionalLatency" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.optimizeRdFifoSize" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.piplineType" altera:parameter_value="PIPELINE_STAGE"></altera:connection_parameter>
+        <altera:connection_parameter altera:parameter_name="qsys_mm.responseFifoType" altera:parameter_value="REGISTER_BASED"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.syncResets" altera:parameter_value="TRUE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.widthAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="avalon" altera:version="21.3" altera:start="nios2_gen2_0.instruction_master" altera:end="ram64k.s1">
+      <altera:connection altera:kind="avalon" altera:version="22.1" altera:start="nios2_gen2_0.instruction_master" altera:end="ram64k.s1">
         <altera:connection_parameter altera:parameter_name="arbitrationPriority" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="baseAddress" altera:parameter_value="0x0000"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="defaultConnection" altera:parameter_value="false"></altera:connection_parameter>
@@ -29540,10 +29578,11 @@ https://fpgasoftware.intel.com/eula.-->
         <altera:connection_parameter altera:parameter_name="qsys_mm.maxAdditionalLatency" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.optimizeRdFifoSize" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.piplineType" altera:parameter_value="PIPELINE_STAGE"></altera:connection_parameter>
+        <altera:connection_parameter altera:parameter_name="qsys_mm.responseFifoType" altera:parameter_value="REGISTER_BASED"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.syncResets" altera:parameter_value="TRUE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.widthAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="avalon_streaming" altera:version="21.3" altera:start="swm_rx_adapter_0.avalonst_source" altera:end="rx_dc_fifo_0.in">
+      <altera:connection altera:kind="avalon_streaming" altera:version="22.1" altera:start="swm_rx_adapter_0.avalonst_source" altera:end="rx_dc_fifo_0.in">
         <altera:connection_parameter altera:parameter_name="qsys_mm.burstAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.clockCrossingAdapter" altera:parameter_value="HANDSHAKE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.enableAllPipelines" altera:parameter_value="FALSE"></altera:connection_parameter>
@@ -29555,10 +29594,11 @@ https://fpgasoftware.intel.com/eula.-->
         <altera:connection_parameter altera:parameter_name="qsys_mm.maxAdditionalLatency" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.optimizeRdFifoSize" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.piplineType" altera:parameter_value="PIPELINE_STAGE"></altera:connection_parameter>
+        <altera:connection_parameter altera:parameter_name="qsys_mm.responseFifoType" altera:parameter_value="REGISTER_BASED"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.syncResets" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.widthAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="avalon_streaming" altera:version="21.3" altera:start="soc_swm_rx_adapter_1.avalonst_source" altera:end="rx_fast_fifo_1.in">
+      <altera:connection altera:kind="avalon_streaming" altera:version="22.1" altera:start="soc_swm_rx_adapter_1.avalonst_source" altera:end="rx_fast_fifo_1.in">
         <altera:connection_parameter altera:parameter_name="qsys_mm.burstAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.clockCrossingAdapter" altera:parameter_value="HANDSHAKE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.enableAllPipelines" altera:parameter_value="FALSE"></altera:connection_parameter>
@@ -29570,10 +29610,11 @@ https://fpgasoftware.intel.com/eula.-->
         <altera:connection_parameter altera:parameter_name="qsys_mm.maxAdditionalLatency" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.optimizeRdFifoSize" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.piplineType" altera:parameter_value="PIPELINE_STAGE"></altera:connection_parameter>
+        <altera:connection_parameter altera:parameter_name="qsys_mm.responseFifoType" altera:parameter_value="REGISTER_BASED"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.syncResets" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.widthAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="avalon_streaming" altera:version="21.3" altera:start="tx_fifo_1.out" altera:end="swm_tx_adapter_1.avalon_streaming_sink">
+      <altera:connection altera:kind="avalon_streaming" altera:version="22.1" altera:start="tx_fifo_1.out" altera:end="swm_tx_adapter_1.avalon_streaming_sink">
         <altera:connection_parameter altera:parameter_name="qsys_mm.burstAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.clockCrossingAdapter" altera:parameter_value="HANDSHAKE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.enableAllPipelines" altera:parameter_value="FALSE"></altera:connection_parameter>
@@ -29585,10 +29626,11 @@ https://fpgasoftware.intel.com/eula.-->
         <altera:connection_parameter altera:parameter_name="qsys_mm.maxAdditionalLatency" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.optimizeRdFifoSize" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.piplineType" altera:parameter_value="PIPELINE_STAGE"></altera:connection_parameter>
+        <altera:connection_parameter altera:parameter_name="qsys_mm.responseFifoType" altera:parameter_value="REGISTER_BASED"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.syncResets" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.widthAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="avalon_streaming" altera:version="21.3" altera:start="tx_fifo_0.out" altera:end="swm_tx_adapter_0.avalon_streaming_sink">
+      <altera:connection altera:kind="avalon_streaming" altera:version="22.1" altera:start="tx_fifo_0.out" altera:end="swm_tx_adapter_0.avalon_streaming_sink">
         <altera:connection_parameter altera:parameter_name="qsys_mm.burstAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.clockCrossingAdapter" altera:parameter_value="HANDSHAKE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.enableAllPipelines" altera:parameter_value="FALSE"></altera:connection_parameter>
@@ -29600,10 +29642,11 @@ https://fpgasoftware.intel.com/eula.-->
         <altera:connection_parameter altera:parameter_name="qsys_mm.maxAdditionalLatency" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.optimizeRdFifoSize" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.piplineType" altera:parameter_value="PIPELINE_STAGE"></altera:connection_parameter>
+        <altera:connection_parameter altera:parameter_name="qsys_mm.responseFifoType" altera:parameter_value="REGISTER_BASED"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.syncResets" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.widthAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="avalon_streaming" altera:version="21.3" altera:start="rx_dc_fifo_0.out" altera:end="rx_fifo_0.in">
+      <altera:connection altera:kind="avalon_streaming" altera:version="22.1" altera:start="rx_dc_fifo_0.out" altera:end="rx_fifo_0.in">
         <altera:connection_parameter altera:parameter_name="qsys_mm.burstAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.clockCrossingAdapter" altera:parameter_value="HANDSHAKE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.enableAllPipelines" altera:parameter_value="FALSE"></altera:connection_parameter>
@@ -29615,10 +29658,11 @@ https://fpgasoftware.intel.com/eula.-->
         <altera:connection_parameter altera:parameter_name="qsys_mm.maxAdditionalLatency" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.optimizeRdFifoSize" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.piplineType" altera:parameter_value="PIPELINE_STAGE"></altera:connection_parameter>
+        <altera:connection_parameter altera:parameter_name="qsys_mm.responseFifoType" altera:parameter_value="REGISTER_BASED"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.syncResets" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.widthAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="avalon_streaming" altera:version="21.3" altera:start="rx_dc_fifo_1.out" altera:end="rx_fifo_1.in">
+      <altera:connection altera:kind="avalon_streaming" altera:version="22.1" altera:start="rx_dc_fifo_1.out" altera:end="rx_fifo_1.in">
         <altera:connection_parameter altera:parameter_name="qsys_mm.burstAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.clockCrossingAdapter" altera:parameter_value="HANDSHAKE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.enableAllPipelines" altera:parameter_value="FALSE"></altera:connection_parameter>
@@ -29630,10 +29674,11 @@ https://fpgasoftware.intel.com/eula.-->
         <altera:connection_parameter altera:parameter_name="qsys_mm.maxAdditionalLatency" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.optimizeRdFifoSize" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.piplineType" altera:parameter_value="PIPELINE_STAGE"></altera:connection_parameter>
+        <altera:connection_parameter altera:parameter_name="qsys_mm.responseFifoType" altera:parameter_value="REGISTER_BASED"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.syncResets" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.widthAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="avalon_streaming" altera:version="21.3" altera:start="rx_fast_fifo_1.out" altera:end="rx_dc_fifo_1.in">
+      <altera:connection altera:kind="avalon_streaming" altera:version="22.1" altera:start="rx_fast_fifo_1.out" altera:end="rx_dc_fifo_1.in">
         <altera:connection_parameter altera:parameter_name="qsys_mm.burstAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.clockCrossingAdapter" altera:parameter_value="HANDSHAKE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.enableAllPipelines" altera:parameter_value="FALSE"></altera:connection_parameter>
@@ -29645,262 +29690,263 @@ https://fpgasoftware.intel.com/eula.-->
         <altera:connection_parameter altera:parameter_name="qsys_mm.maxAdditionalLatency" altera:parameter_value="1"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.optimizeRdFifoSize" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.piplineType" altera:parameter_value="PIPELINE_STAGE"></altera:connection_parameter>
+        <altera:connection_parameter altera:parameter_name="qsys_mm.responseFifoType" altera:parameter_value="REGISTER_BASED"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.syncResets" altera:parameter_value="FALSE"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="qsys_mm.widthAdapterImplementation" altera:parameter_value="GENERIC_CONVERTER"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="clock" altera:version="21.3" altera:start="sl3_1.interface_clock_rx" altera:end="rx_fast_fifo_1.clk"></altera:connection>
-      <altera:connection altera:kind="clock" altera:version="21.3" altera:start="sl3_1.interface_clock_rx" altera:end="soc_swm_rx_adapter_1.clock_sink"></altera:connection>
-      <altera:connection altera:kind="clock" altera:version="21.3" altera:start="sl3_0.interface_clock_rx" altera:end="swm_rx_adapter_0.clock_sink"></altera:connection>
-      <altera:connection altera:kind="clock" altera:version="21.3" altera:start="sl3_0.interface_clock_rx" altera:end="rx_dc_fifo_0.in_clk"></altera:connection>
-      <altera:connection altera:kind="clock" altera:version="21.3" altera:start="sl3_1.interface_clock_rx" altera:end="rx_dc_fifo_1.in_clk"></altera:connection>
-      <altera:connection altera:kind="clock" altera:version="21.3" altera:start="clock_in_100.out_clk" altera:end="reset_in_100.clk"></altera:connection>
-      <altera:connection altera:kind="clock" altera:version="21.3" altera:start="clock_in_100.out_clk" altera:end="jtag_uart_0.clk"></altera:connection>
-      <altera:connection altera:kind="clock" altera:version="21.3" altera:start="clock_in_100.out_clk" altera:end="nios2_gen2_0.clk"></altera:connection>
-      <altera:connection altera:kind="clock" altera:version="21.3" altera:start="clock_in_100.out_clk" altera:end="pio_status.clk"></altera:connection>
-      <altera:connection altera:kind="clock" altera:version="21.3" altera:start="clock_in_100.out_clk" altera:end="ram64k.clk1"></altera:connection>
-      <altera:connection altera:kind="clock" altera:version="21.3" altera:start="clock_in_100.out_clk" altera:end="tx_fifo_0.clk_in"></altera:connection>
-      <altera:connection altera:kind="clock" altera:version="21.3" altera:start="clock_in_100.out_clk" altera:end="rx_fifo_0.clk_in"></altera:connection>
-      <altera:connection altera:kind="clock" altera:version="21.3" altera:start="clock_in_100.out_clk" altera:end="tx_fifo_1.clk_in"></altera:connection>
-      <altera:connection altera:kind="clock" altera:version="21.3" altera:start="clock_in_100.out_clk" altera:end="rx_fifo_1.clk_in"></altera:connection>
-      <altera:connection altera:kind="clock" altera:version="21.3" altera:start="clock_in_100.out_clk" altera:end="swm_tx_adapter_1.clock_sink"></altera:connection>
-      <altera:connection altera:kind="clock" altera:version="21.3" altera:start="clock_in_100.out_clk" altera:end="swm_tx_adapter_0.clock_sink"></altera:connection>
-      <altera:connection altera:kind="clock" altera:version="21.3" altera:start="clock_in_100.out_clk" altera:end="rx_dc_fifo_0.out_clk"></altera:connection>
-      <altera:connection altera:kind="clock" altera:version="21.3" altera:start="clock_in_100.out_clk" altera:end="rx_dc_fifo_1.out_clk"></altera:connection>
-      <altera:connection altera:kind="clock" altera:version="21.3" altera:start="clock_in_100.out_clk" altera:end="sl3_0.phy_mgmt_clk"></altera:connection>
-      <altera:connection altera:kind="clock" altera:version="21.3" altera:start="clock_in_100.out_clk" altera:end="sl3_1.phy_mgmt_clk"></altera:connection>
-      <altera:connection altera:kind="clock" altera:version="21.3" altera:start="clock_in_100.out_clk" altera:end="sl3_0.user_clock_tx"></altera:connection>
-      <altera:connection altera:kind="clock" altera:version="21.3" altera:start="clock_in_100.out_clk" altera:end="sl3_1.user_clock_tx"></altera:connection>
-      <altera:connection altera:kind="conduit" altera:version="21.3" altera:start="sl3_1.data_rx" altera:end="soc_swm_rx_adapter_1.data_rx">
+      <altera:connection altera:kind="clock" altera:version="22.1" altera:start="sl3_1.interface_clock_rx" altera:end="rx_fast_fifo_1.clk"></altera:connection>
+      <altera:connection altera:kind="clock" altera:version="22.1" altera:start="sl3_1.interface_clock_rx" altera:end="soc_swm_rx_adapter_1.clock_sink"></altera:connection>
+      <altera:connection altera:kind="clock" altera:version="22.1" altera:start="sl3_0.interface_clock_rx" altera:end="swm_rx_adapter_0.clock_sink"></altera:connection>
+      <altera:connection altera:kind="clock" altera:version="22.1" altera:start="sl3_0.interface_clock_rx" altera:end="rx_dc_fifo_0.in_clk"></altera:connection>
+      <altera:connection altera:kind="clock" altera:version="22.1" altera:start="sl3_1.interface_clock_rx" altera:end="rx_dc_fifo_1.in_clk"></altera:connection>
+      <altera:connection altera:kind="clock" altera:version="22.1" altera:start="clock_in_100.out_clk" altera:end="reset_in_100.clk"></altera:connection>
+      <altera:connection altera:kind="clock" altera:version="22.1" altera:start="clock_in_100.out_clk" altera:end="jtag_uart_0.clk"></altera:connection>
+      <altera:connection altera:kind="clock" altera:version="22.1" altera:start="clock_in_100.out_clk" altera:end="nios2_gen2_0.clk"></altera:connection>
+      <altera:connection altera:kind="clock" altera:version="22.1" altera:start="clock_in_100.out_clk" altera:end="pio_status.clk"></altera:connection>
+      <altera:connection altera:kind="clock" altera:version="22.1" altera:start="clock_in_100.out_clk" altera:end="ram64k.clk1"></altera:connection>
+      <altera:connection altera:kind="clock" altera:version="22.1" altera:start="clock_in_100.out_clk" altera:end="tx_fifo_0.clk_in"></altera:connection>
+      <altera:connection altera:kind="clock" altera:version="22.1" altera:start="clock_in_100.out_clk" altera:end="rx_fifo_0.clk_in"></altera:connection>
+      <altera:connection altera:kind="clock" altera:version="22.1" altera:start="clock_in_100.out_clk" altera:end="tx_fifo_1.clk_in"></altera:connection>
+      <altera:connection altera:kind="clock" altera:version="22.1" altera:start="clock_in_100.out_clk" altera:end="rx_fifo_1.clk_in"></altera:connection>
+      <altera:connection altera:kind="clock" altera:version="22.1" altera:start="clock_in_100.out_clk" altera:end="swm_tx_adapter_1.clock_sink"></altera:connection>
+      <altera:connection altera:kind="clock" altera:version="22.1" altera:start="clock_in_100.out_clk" altera:end="swm_tx_adapter_0.clock_sink"></altera:connection>
+      <altera:connection altera:kind="clock" altera:version="22.1" altera:start="clock_in_100.out_clk" altera:end="rx_dc_fifo_0.out_clk"></altera:connection>
+      <altera:connection altera:kind="clock" altera:version="22.1" altera:start="clock_in_100.out_clk" altera:end="rx_dc_fifo_1.out_clk"></altera:connection>
+      <altera:connection altera:kind="clock" altera:version="22.1" altera:start="clock_in_100.out_clk" altera:end="sl3_0.phy_mgmt_clk"></altera:connection>
+      <altera:connection altera:kind="clock" altera:version="22.1" altera:start="clock_in_100.out_clk" altera:end="sl3_1.phy_mgmt_clk"></altera:connection>
+      <altera:connection altera:kind="clock" altera:version="22.1" altera:start="clock_in_100.out_clk" altera:end="sl3_0.user_clock_tx"></altera:connection>
+      <altera:connection altera:kind="clock" altera:version="22.1" altera:start="clock_in_100.out_clk" altera:end="sl3_1.user_clock_tx"></altera:connection>
+      <altera:connection altera:kind="conduit" altera:version="22.1" altera:start="sl3_1.data_rx" altera:end="soc_swm_rx_adapter_1.data_rx">
         <altera:connection_parameter altera:parameter_name="endPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="endPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="width" altera:parameter_value="0"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="conduit" altera:version="21.3" altera:start="swm_rx_adapter_0.data_rx" altera:end="sl3_0.data_rx">
+      <altera:connection altera:kind="conduit" altera:version="22.1" altera:start="swm_rx_adapter_0.data_rx" altera:end="sl3_0.data_rx">
         <altera:connection_parameter altera:parameter_name="endPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="endPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="width" altera:parameter_value="0"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="conduit" altera:version="21.3" altera:start="swm_tx_adapter_1.data_tx" altera:end="sl3_1.data_tx">
+      <altera:connection altera:kind="conduit" altera:version="22.1" altera:start="swm_tx_adapter_1.data_tx" altera:end="sl3_1.data_tx">
         <altera:connection_parameter altera:parameter_name="endPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="endPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="width" altera:parameter_value="0"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="conduit" altera:version="21.3" altera:start="swm_tx_adapter_0.data_tx" altera:end="sl3_0.data_tx">
+      <altera:connection altera:kind="conduit" altera:version="22.1" altera:start="swm_tx_adapter_0.data_tx" altera:end="sl3_0.data_tx">
         <altera:connection_parameter altera:parameter_name="endPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="endPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="width" altera:parameter_value="0"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="conduit" altera:version="21.3" altera:start="sl3_1.end_of_burst_rx" altera:end="soc_swm_rx_adapter_1.end_of_burst_rx">
+      <altera:connection altera:kind="conduit" altera:version="22.1" altera:start="sl3_1.end_of_burst_rx" altera:end="soc_swm_rx_adapter_1.end_of_burst_rx">
         <altera:connection_parameter altera:parameter_name="endPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="endPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="width" altera:parameter_value="0"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="conduit" altera:version="21.3" altera:start="sl3_0.end_of_burst_rx" altera:end="swm_rx_adapter_0.end_of_burst_rx">
+      <altera:connection altera:kind="conduit" altera:version="22.1" altera:start="sl3_0.end_of_burst_rx" altera:end="swm_rx_adapter_0.end_of_burst_rx">
         <altera:connection_parameter altera:parameter_name="endPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="endPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="width" altera:parameter_value="0"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="conduit" altera:version="21.3" altera:start="swm_tx_adapter_1.end_of_burst_tx" altera:end="sl3_1.end_of_burst_tx">
+      <altera:connection altera:kind="conduit" altera:version="22.1" altera:start="swm_tx_adapter_1.end_of_burst_tx" altera:end="sl3_1.end_of_burst_tx">
         <altera:connection_parameter altera:parameter_name="endPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="endPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="width" altera:parameter_value="0"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="conduit" altera:version="21.3" altera:start="swm_tx_adapter_0.end_of_burst_tx" altera:end="sl3_0.end_of_burst_tx">
+      <altera:connection altera:kind="conduit" altera:version="22.1" altera:start="swm_tx_adapter_0.end_of_burst_tx" altera:end="sl3_0.end_of_burst_tx">
         <altera:connection_parameter altera:parameter_name="endPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="endPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="width" altera:parameter_value="0"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="conduit" altera:version="21.3" altera:start="sl3_1.error_rx" altera:end="soc_swm_rx_adapter_1.error_rx">
+      <altera:connection altera:kind="conduit" altera:version="22.1" altera:start="sl3_1.error_rx" altera:end="soc_swm_rx_adapter_1.error_rx">
         <altera:connection_parameter altera:parameter_name="endPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="endPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="width" altera:parameter_value="0"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="conduit" altera:version="21.3" altera:start="sl3_0.error_rx" altera:end="swm_rx_adapter_0.error_rx">
+      <altera:connection altera:kind="conduit" altera:version="22.1" altera:start="sl3_0.error_rx" altera:end="swm_rx_adapter_0.error_rx">
         <altera:connection_parameter altera:parameter_name="endPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="endPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="width" altera:parameter_value="0"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="conduit" altera:version="21.3" altera:start="swm_tx_adapter_1.error_tx" altera:end="sl3_1.error_tx">
+      <altera:connection altera:kind="conduit" altera:version="22.1" altera:start="swm_tx_adapter_1.error_tx" altera:end="sl3_1.error_tx">
         <altera:connection_parameter altera:parameter_name="endPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="endPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="width" altera:parameter_value="0"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="conduit" altera:version="21.3" altera:start="swm_tx_adapter_0.error_tx" altera:end="sl3_0.error_tx">
+      <altera:connection altera:kind="conduit" altera:version="22.1" altera:start="swm_tx_adapter_0.error_tx" altera:end="sl3_0.error_tx">
         <altera:connection_parameter altera:parameter_name="endPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="endPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="width" altera:parameter_value="0"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="conduit" altera:version="21.3" altera:start="sl3_1.ready_rx" altera:end="soc_swm_rx_adapter_1.ready_rx">
+      <altera:connection altera:kind="conduit" altera:version="22.1" altera:start="sl3_1.ready_rx" altera:end="soc_swm_rx_adapter_1.ready_rx">
         <altera:connection_parameter altera:parameter_name="endPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="endPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="width" altera:parameter_value="0"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="conduit" altera:version="21.3" altera:start="sl3_0.ready_rx" altera:end="swm_rx_adapter_0.ready_rx">
+      <altera:connection altera:kind="conduit" altera:version="22.1" altera:start="sl3_0.ready_rx" altera:end="swm_rx_adapter_0.ready_rx">
         <altera:connection_parameter altera:parameter_name="endPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="endPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="width" altera:parameter_value="0"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="conduit" altera:version="21.3" altera:start="swm_tx_adapter_1.ready_tx" altera:end="sl3_1.ready_tx">
+      <altera:connection altera:kind="conduit" altera:version="22.1" altera:start="swm_tx_adapter_1.ready_tx" altera:end="sl3_1.ready_tx">
         <altera:connection_parameter altera:parameter_name="endPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="endPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="width" altera:parameter_value="0"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="conduit" altera:version="21.3" altera:start="swm_tx_adapter_0.ready_tx" altera:end="sl3_0.ready_tx">
+      <altera:connection altera:kind="conduit" altera:version="22.1" altera:start="swm_tx_adapter_0.ready_tx" altera:end="sl3_0.ready_tx">
         <altera:connection_parameter altera:parameter_name="endPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="endPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="width" altera:parameter_value="0"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="conduit" altera:version="21.3" altera:start="sl3_1.start_of_burst_rx" altera:end="soc_swm_rx_adapter_1.start_of_burst">
+      <altera:connection altera:kind="conduit" altera:version="22.1" altera:start="sl3_1.start_of_burst_rx" altera:end="soc_swm_rx_adapter_1.start_of_burst">
         <altera:connection_parameter altera:parameter_name="endPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="endPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="width" altera:parameter_value="0"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="conduit" altera:version="21.3" altera:start="sl3_0.start_of_burst_rx" altera:end="swm_rx_adapter_0.start_of_burst">
+      <altera:connection altera:kind="conduit" altera:version="22.1" altera:start="sl3_0.start_of_burst_rx" altera:end="swm_rx_adapter_0.start_of_burst">
         <altera:connection_parameter altera:parameter_name="endPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="endPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="width" altera:parameter_value="0"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="conduit" altera:version="21.3" altera:start="swm_tx_adapter_1.start_of_burst_tx" altera:end="sl3_1.start_of_burst_tx">
+      <altera:connection altera:kind="conduit" altera:version="22.1" altera:start="swm_tx_adapter_1.start_of_burst_tx" altera:end="sl3_1.start_of_burst_tx">
         <altera:connection_parameter altera:parameter_name="endPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="endPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="width" altera:parameter_value="0"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="conduit" altera:version="21.3" altera:start="swm_tx_adapter_0.start_of_burst_tx" altera:end="sl3_0.start_of_burst_tx">
+      <altera:connection altera:kind="conduit" altera:version="22.1" altera:start="swm_tx_adapter_0.start_of_burst_tx" altera:end="sl3_0.start_of_burst_tx">
         <altera:connection_parameter altera:parameter_name="endPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="endPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="width" altera:parameter_value="0"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="conduit" altera:version="21.3" altera:start="soc_swm_rx_adapter_1.sync_rx" altera:end="sl3_1.sync_rx">
+      <altera:connection altera:kind="conduit" altera:version="22.1" altera:start="soc_swm_rx_adapter_1.sync_rx" altera:end="sl3_1.sync_rx">
         <altera:connection_parameter altera:parameter_name="endPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="endPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="width" altera:parameter_value="0"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="conduit" altera:version="21.3" altera:start="sl3_0.sync_rx" altera:end="swm_rx_adapter_0.sync_rx">
+      <altera:connection altera:kind="conduit" altera:version="22.1" altera:start="sl3_0.sync_rx" altera:end="swm_rx_adapter_0.sync_rx">
         <altera:connection_parameter altera:parameter_name="endPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="endPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="width" altera:parameter_value="0"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="conduit" altera:version="21.3" altera:start="sl3_1.sync_tx" altera:end="swm_tx_adapter_1.sync_tx">
+      <altera:connection altera:kind="conduit" altera:version="22.1" altera:start="sl3_1.sync_tx" altera:end="swm_tx_adapter_1.sync_tx">
         <altera:connection_parameter altera:parameter_name="endPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="endPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="width" altera:parameter_value="0"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="conduit" altera:version="21.3" altera:start="swm_tx_adapter_0.sync_tx" altera:end="sl3_0.sync_tx">
+      <altera:connection altera:kind="conduit" altera:version="22.1" altera:start="swm_tx_adapter_0.sync_tx" altera:end="sl3_0.sync_tx">
         <altera:connection_parameter altera:parameter_name="endPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="endPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="width" altera:parameter_value="0"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="conduit" altera:version="21.3" altera:start="sl3_1.valid_rx" altera:end="soc_swm_rx_adapter_1.valid_rx">
+      <altera:connection altera:kind="conduit" altera:version="22.1" altera:start="sl3_1.valid_rx" altera:end="soc_swm_rx_adapter_1.valid_rx">
         <altera:connection_parameter altera:parameter_name="endPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="endPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="width" altera:parameter_value="0"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="conduit" altera:version="21.3" altera:start="swm_rx_adapter_0.valid_rx" altera:end="sl3_0.valid_rx">
+      <altera:connection altera:kind="conduit" altera:version="22.1" altera:start="swm_rx_adapter_0.valid_rx" altera:end="sl3_0.valid_rx">
         <altera:connection_parameter altera:parameter_name="endPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="endPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="width" altera:parameter_value="0"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="conduit" altera:version="21.3" altera:start="sl3_1.valid_tx" altera:end="swm_tx_adapter_1.valid_tx">
+      <altera:connection altera:kind="conduit" altera:version="22.1" altera:start="sl3_1.valid_tx" altera:end="swm_tx_adapter_1.valid_tx">
         <altera:connection_parameter altera:parameter_name="endPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="endPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="width" altera:parameter_value="0"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="conduit" altera:version="21.3" altera:start="swm_tx_adapter_0.valid_tx" altera:end="sl3_0.valid_tx">
+      <altera:connection altera:kind="conduit" altera:version="22.1" altera:start="swm_tx_adapter_0.valid_tx" altera:end="sl3_0.valid_tx">
         <altera:connection_parameter altera:parameter_name="endPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="endPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPort" altera:parameter_value=""></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="startPortLSB" altera:parameter_value="0"></altera:connection_parameter>
         <altera:connection_parameter altera:parameter_name="width" altera:parameter_value="0"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="interrupt" altera:version="21.3" altera:start="nios2_gen2_0.irq" altera:end="jtag_uart_0.irq">
+      <altera:connection altera:kind="interrupt" altera:version="22.1" altera:start="nios2_gen2_0.irq" altera:end="jtag_uart_0.irq">
         <altera:connection_parameter altera:parameter_name="irqNumber" altera:parameter_value="0"></altera:connection_parameter>
       </altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="nios2_gen2_0.debug_reset_request" altera:end="rx_dc_fifo_0.out_clk_reset"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="nios2_gen2_0.debug_reset_request" altera:end="rx_dc_fifo_1.out_clk_reset"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="nios2_gen2_0.debug_reset_request" altera:end="sl3_0.phy_mgmt_clk_reset"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="nios2_gen2_0.debug_reset_request" altera:end="sl3_1.phy_mgmt_clk_reset"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="nios2_gen2_0.debug_reset_request" altera:end="nios2_gen2_0.reset"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="nios2_gen2_0.debug_reset_request" altera:end="rx_fifo_0.reset_in"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="nios2_gen2_0.debug_reset_request" altera:end="tx_fifo_1.reset_in"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="nios2_gen2_0.debug_reset_request" altera:end="rx_fifo_1.reset_in"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="nios2_gen2_0.debug_reset_request" altera:end="tx_fifo_0.reset_in"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="nios2_gen2_0.debug_reset_request" altera:end="sl3_0.user_clock_reset_tx"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="nios2_gen2_0.debug_reset_request" altera:end="sl3_1.user_clock_reset_tx"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="sl3_1.interface_clock_reset_rx" altera:end="rx_fast_fifo_1.clk_reset"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="sl3_0.interface_clock_reset_rx" altera:end="rx_dc_fifo_0.in_clk_reset"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="sl3_1.interface_clock_reset_rx" altera:end="rx_dc_fifo_1.in_clk_reset"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="sl3_1.interface_clock_reset_rx" altera:end="soc_swm_rx_adapter_1.reset_sink"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="sl3_0.interface_clock_reset_rx" altera:end="swm_rx_adapter_0.reset_sink"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="reset_in_100.out_reset" altera:end="rx_dc_fifo_0.out_clk_reset"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="reset_in_100.out_reset" altera:end="rx_dc_fifo_1.out_clk_reset"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="reset_in_100.out_reset" altera:end="sl3_0.phy_mgmt_clk_reset"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="reset_in_100.out_reset" altera:end="sl3_1.phy_mgmt_clk_reset"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="reset_in_100.out_reset" altera:end="jtag_uart_0.reset"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="reset_in_100.out_reset" altera:end="nios2_gen2_0.reset"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="reset_in_100.out_reset" altera:end="pio_status.reset"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="reset_in_100.out_reset" altera:end="ram64k.reset1"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="reset_in_100.out_reset" altera:end="rx_fifo_0.reset_in"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="reset_in_100.out_reset" altera:end="tx_fifo_0.reset_in"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="reset_in_100.out_reset" altera:end="tx_fifo_1.reset_in"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="reset_in_100.out_reset" altera:end="rx_fifo_1.reset_in"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="reset_in_100.out_reset" altera:end="swm_tx_adapter_1.reset_sink"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="reset_in_100.out_reset" altera:end="swm_tx_adapter_0.reset_sink"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="reset_in_100.out_reset" altera:end="sl3_0.user_clock_reset_tx"></altera:connection>
-      <altera:connection altera:kind="reset" altera:version="21.3" altera:start="reset_in_100.out_reset" altera:end="sl3_1.user_clock_reset_tx"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="nios2_gen2_0.debug_reset_request" altera:end="rx_dc_fifo_0.out_clk_reset"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="nios2_gen2_0.debug_reset_request" altera:end="rx_dc_fifo_1.out_clk_reset"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="nios2_gen2_0.debug_reset_request" altera:end="sl3_0.phy_mgmt_clk_reset"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="nios2_gen2_0.debug_reset_request" altera:end="sl3_1.phy_mgmt_clk_reset"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="nios2_gen2_0.debug_reset_request" altera:end="nios2_gen2_0.reset"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="nios2_gen2_0.debug_reset_request" altera:end="rx_fifo_0.reset_in"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="nios2_gen2_0.debug_reset_request" altera:end="tx_fifo_1.reset_in"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="nios2_gen2_0.debug_reset_request" altera:end="rx_fifo_1.reset_in"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="nios2_gen2_0.debug_reset_request" altera:end="tx_fifo_0.reset_in"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="nios2_gen2_0.debug_reset_request" altera:end="sl3_0.user_clock_reset_tx"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="nios2_gen2_0.debug_reset_request" altera:end="sl3_1.user_clock_reset_tx"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="sl3_1.interface_clock_reset_rx" altera:end="rx_fast_fifo_1.clk_reset"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="sl3_0.interface_clock_reset_rx" altera:end="rx_dc_fifo_0.in_clk_reset"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="sl3_1.interface_clock_reset_rx" altera:end="rx_dc_fifo_1.in_clk_reset"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="sl3_1.interface_clock_reset_rx" altera:end="soc_swm_rx_adapter_1.reset_sink"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="sl3_0.interface_clock_reset_rx" altera:end="swm_rx_adapter_0.reset_sink"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="reset_in_100.out_reset" altera:end="rx_dc_fifo_0.out_clk_reset"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="reset_in_100.out_reset" altera:end="rx_dc_fifo_1.out_clk_reset"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="reset_in_100.out_reset" altera:end="sl3_0.phy_mgmt_clk_reset"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="reset_in_100.out_reset" altera:end="sl3_1.phy_mgmt_clk_reset"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="reset_in_100.out_reset" altera:end="jtag_uart_0.reset"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="reset_in_100.out_reset" altera:end="nios2_gen2_0.reset"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="reset_in_100.out_reset" altera:end="pio_status.reset"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="reset_in_100.out_reset" altera:end="ram64k.reset1"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="reset_in_100.out_reset" altera:end="rx_fifo_0.reset_in"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="reset_in_100.out_reset" altera:end="tx_fifo_0.reset_in"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="reset_in_100.out_reset" altera:end="tx_fifo_1.reset_in"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="reset_in_100.out_reset" altera:end="rx_fifo_1.reset_in"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="reset_in_100.out_reset" altera:end="swm_tx_adapter_1.reset_sink"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="reset_in_100.out_reset" altera:end="swm_tx_adapter_0.reset_sink"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="reset_in_100.out_reset" altera:end="sl3_0.user_clock_reset_tx"></altera:connection>
+      <altera:connection altera:kind="reset" altera:version="22.1" altera:start="reset_in_100.out_reset" altera:end="sl3_1.user_clock_reset_tx"></altera:connection>
     </altera:connections>
     <altera:interconnect_requirements></altera:interconnect_requirements>
     <altera:wire_level_connections></altera:wire_level_connections>
@@ -29954,63 +30000,63 @@ https://fpgasoftware.intel.com/eula.-->
         <ipxact:busInterfaces>
           <ipxact:busInterface>
             <ipxact:name>jtag_uart_0.avalon_jtag_slave</ipxact:name>
-            <ipxact:busType vendor="intel" library="intel" name="avalon" version="21.3"></ipxact:busType>
+            <ipxact:busType vendor="intel" library="intel" name="avalon" version="22.1"></ipxact:busType>
           </ipxact:busInterface>
           <ipxact:busInterface>
             <ipxact:name>nios2_gen2_0.debug_mem_slave</ipxact:name>
-            <ipxact:busType vendor="intel" library="intel" name="avalon" version="21.3"></ipxact:busType>
+            <ipxact:busType vendor="intel" library="intel" name="avalon" version="22.1"></ipxact:busType>
           </ipxact:busInterface>
           <ipxact:busInterface>
             <ipxact:name>tx_fifo_0.in</ipxact:name>
-            <ipxact:busType vendor="intel" library="intel" name="avalon" version="21.3"></ipxact:busType>
+            <ipxact:busType vendor="intel" library="intel" name="avalon" version="22.1"></ipxact:busType>
           </ipxact:busInterface>
           <ipxact:busInterface>
             <ipxact:name>tx_fifo_1.in</ipxact:name>
-            <ipxact:busType vendor="intel" library="intel" name="avalon" version="21.3"></ipxact:busType>
+            <ipxact:busType vendor="intel" library="intel" name="avalon" version="22.1"></ipxact:busType>
           </ipxact:busInterface>
           <ipxact:busInterface>
             <ipxact:name>rx_fifo_0.in_csr</ipxact:name>
-            <ipxact:busType vendor="intel" library="intel" name="avalon" version="21.3"></ipxact:busType>
+            <ipxact:busType vendor="intel" library="intel" name="avalon" version="22.1"></ipxact:busType>
           </ipxact:busInterface>
           <ipxact:busInterface>
             <ipxact:name>tx_fifo_0.in_csr</ipxact:name>
-            <ipxact:busType vendor="intel" library="intel" name="avalon" version="21.3"></ipxact:busType>
+            <ipxact:busType vendor="intel" library="intel" name="avalon" version="22.1"></ipxact:busType>
           </ipxact:busInterface>
           <ipxact:busInterface>
             <ipxact:name>rx_fifo_1.in_csr</ipxact:name>
-            <ipxact:busType vendor="intel" library="intel" name="avalon" version="21.3"></ipxact:busType>
+            <ipxact:busType vendor="intel" library="intel" name="avalon" version="22.1"></ipxact:busType>
           </ipxact:busInterface>
           <ipxact:busInterface>
             <ipxact:name>tx_fifo_1.in_csr</ipxact:name>
-            <ipxact:busType vendor="intel" library="intel" name="avalon" version="21.3"></ipxact:busType>
+            <ipxact:busType vendor="intel" library="intel" name="avalon" version="22.1"></ipxact:busType>
           </ipxact:busInterface>
           <ipxact:busInterface>
             <ipxact:name>rx_fifo_0.out</ipxact:name>
-            <ipxact:busType vendor="intel" library="intel" name="avalon" version="21.3"></ipxact:busType>
+            <ipxact:busType vendor="intel" library="intel" name="avalon" version="22.1"></ipxact:busType>
           </ipxact:busInterface>
           <ipxact:busInterface>
             <ipxact:name>rx_fifo_1.out</ipxact:name>
-            <ipxact:busType vendor="intel" library="intel" name="avalon" version="21.3"></ipxact:busType>
+            <ipxact:busType vendor="intel" library="intel" name="avalon" version="22.1"></ipxact:busType>
           </ipxact:busInterface>
           <ipxact:busInterface>
             <ipxact:name>sl3_0.phy_mgmt</ipxact:name>
-            <ipxact:busType vendor="intel" library="intel" name="avalon" version="21.3"></ipxact:busType>
+            <ipxact:busType vendor="intel" library="intel" name="avalon" version="22.1"></ipxact:busType>
           </ipxact:busInterface>
           <ipxact:busInterface>
             <ipxact:name>sl3_1.phy_mgmt</ipxact:name>
-            <ipxact:busType vendor="intel" library="intel" name="avalon" version="21.3"></ipxact:busType>
+            <ipxact:busType vendor="intel" library="intel" name="avalon" version="22.1"></ipxact:busType>
           </ipxact:busInterface>
           <ipxact:busInterface>
             <ipxact:name>ram64k.s1</ipxact:name>
-            <ipxact:busType vendor="intel" library="intel" name="avalon" version="21.3"></ipxact:busType>
+            <ipxact:busType vendor="intel" library="intel" name="avalon" version="22.1"></ipxact:busType>
           </ipxact:busInterface>
           <ipxact:busInterface>
             <ipxact:name>pio_status.s1</ipxact:name>
-            <ipxact:busType vendor="intel" library="intel" name="avalon" version="21.3"></ipxact:busType>
+            <ipxact:busType vendor="intel" library="intel" name="avalon" version="22.1"></ipxact:busType>
           </ipxact:busInterface>
           <ipxact:busInterface>
             <ipxact:name>nios2_gen2_0.data_master</ipxact:name>
-            <ipxact:busType vendor="intel" library="intel" name="avalon" version="21.3"></ipxact:busType>
+            <ipxact:busType vendor="intel" library="intel" name="avalon" version="22.1"></ipxact:busType>
             <ipxact:master>
               <ipxact:addressSpaceRef addressSpaceRef="nios2_gen2_0.data_master">
                 <ipxact:baseAddress>0x0003_10b0</ipxact:baseAddress>
@@ -30019,15 +30065,15 @@ https://fpgasoftware.intel.com/eula.-->
           </ipxact:busInterface>
           <ipxact:busInterface>
             <ipxact:name>nios2_gen2_0.debug_mem_slave</ipxact:name>
-            <ipxact:busType vendor="intel" library="intel" name="avalon" version="21.3"></ipxact:busType>
+            <ipxact:busType vendor="intel" library="intel" name="avalon" version="22.1"></ipxact:busType>
           </ipxact:busInterface>
           <ipxact:busInterface>
             <ipxact:name>ram64k.s1</ipxact:name>
-            <ipxact:busType vendor="intel" library="intel" name="avalon" version="21.3"></ipxact:busType>
+            <ipxact:busType vendor="intel" library="intel" name="avalon" version="22.1"></ipxact:busType>
           </ipxact:busInterface>
           <ipxact:busInterface>
             <ipxact:name>nios2_gen2_0.instruction_master</ipxact:name>
-            <ipxact:busType vendor="intel" library="intel" name="avalon" version="21.3"></ipxact:busType>
+            <ipxact:busType vendor="intel" library="intel" name="avalon" version="22.1"></ipxact:busType>
             <ipxact:master>
               <ipxact:addressSpaceRef addressSpaceRef="nios2_gen2_0.instruction_master">
                 <ipxact:baseAddress>0x0003_0800</ipxact:baseAddress>

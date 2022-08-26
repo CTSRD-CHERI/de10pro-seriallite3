@@ -20,10 +20,10 @@ https://fpgasoftware.intel.com/eula.-->
   <ipxact:busInterfaces>
     <ipxact:busInterface>
       <ipxact:name>clk_in</ipxact:name>
-      <ipxact:busType vendor="intel" library="intel" name="clock" version="21.3"></ipxact:busType>
+      <ipxact:busType vendor="intel" library="intel" name="clock" version="22.1"></ipxact:busType>
       <ipxact:abstractionTypes>
         <ipxact:abstractionType>
-          <ipxact:abstractionRef vendor="intel" library="intel" name="clock" version="21.3"></ipxact:abstractionRef>
+          <ipxact:abstractionRef vendor="intel" library="intel" name="clock" version="22.1"></ipxact:abstractionRef>
           <ipxact:portMaps>
             <ipxact:portMap>
               <ipxact:logicalPort>
@@ -57,10 +57,10 @@ https://fpgasoftware.intel.com/eula.-->
     </ipxact:busInterface>
     <ipxact:busInterface>
       <ipxact:name>reset_in</ipxact:name>
-      <ipxact:busType vendor="intel" library="intel" name="reset" version="21.3"></ipxact:busType>
+      <ipxact:busType vendor="intel" library="intel" name="reset" version="22.1"></ipxact:busType>
       <ipxact:abstractionTypes>
         <ipxact:abstractionType>
-          <ipxact:abstractionRef vendor="intel" library="intel" name="reset" version="21.3"></ipxact:abstractionRef>
+          <ipxact:abstractionRef vendor="intel" library="intel" name="reset" version="22.1"></ipxact:abstractionRef>
           <ipxact:portMaps>
             <ipxact:portMap>
               <ipxact:logicalPort>
@@ -89,10 +89,10 @@ https://fpgasoftware.intel.com/eula.-->
     </ipxact:busInterface>
     <ipxact:busInterface>
       <ipxact:name>in</ipxact:name>
-      <ipxact:busType vendor="intel" library="intel" name="avalon" version="21.3"></ipxact:busType>
+      <ipxact:busType vendor="intel" library="intel" name="avalon" version="22.1"></ipxact:busType>
       <ipxact:abstractionTypes>
         <ipxact:abstractionType>
-          <ipxact:abstractionRef vendor="intel" library="intel" name="avalon" version="21.3"></ipxact:abstractionRef>
+          <ipxact:abstractionRef vendor="intel" library="intel" name="avalon" version="22.1"></ipxact:abstractionRef>
           <ipxact:portMaps>
             <ipxact:portMap>
               <ipxact:logicalPort>
@@ -362,10 +362,10 @@ https://fpgasoftware.intel.com/eula.-->
     </ipxact:busInterface>
     <ipxact:busInterface>
       <ipxact:name>out</ipxact:name>
-      <ipxact:busType vendor="intel" library="intel" name="avalon_streaming" version="21.3"></ipxact:busType>
+      <ipxact:busType vendor="intel" library="intel" name="avalon_streaming" version="22.1"></ipxact:busType>
       <ipxact:abstractionTypes>
         <ipxact:abstractionType>
-          <ipxact:abstractionRef vendor="intel" library="intel" name="avalon_streaming" version="21.3"></ipxact:abstractionRef>
+          <ipxact:abstractionRef vendor="intel" library="intel" name="avalon_streaming" version="22.1"></ipxact:abstractionRef>
           <ipxact:portMaps>
             <ipxact:portMap>
               <ipxact:logicalPort>
@@ -381,22 +381,6 @@ https://fpgasoftware.intel.com/eula.-->
               </ipxact:logicalPort>
               <ipxact:physicalPort>
                 <ipxact:name>avalonst_source_data</ipxact:name>
-              </ipxact:physicalPort>
-            </ipxact:portMap>
-            <ipxact:portMap>
-              <ipxact:logicalPort>
-                <ipxact:name>channel</ipxact:name>
-              </ipxact:logicalPort>
-              <ipxact:physicalPort>
-                <ipxact:name>avalonst_source_channel</ipxact:name>
-              </ipxact:physicalPort>
-            </ipxact:portMap>
-            <ipxact:portMap>
-              <ipxact:logicalPort>
-                <ipxact:name>error</ipxact:name>
-              </ipxact:logicalPort>
-              <ipxact:physicalPort>
-                <ipxact:name>avalonst_source_error</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -471,7 +455,7 @@ https://fpgasoftware.intel.com/eula.-->
         <ipxact:parameter parameterId="maxChannel" type="int">
           <ipxact:name>maxChannel</ipxact:name>
           <ipxact:displayName>Maximum channel</ipxact:displayName>
-          <ipxact:value>255</ipxact:value>
+          <ipxact:value>0</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="packetDescription" type="string">
           <ipxact:name>packetDescription</ipxact:name>
@@ -502,10 +486,10 @@ https://fpgasoftware.intel.com/eula.-->
     </ipxact:busInterface>
     <ipxact:busInterface>
       <ipxact:name>in_csr</ipxact:name>
-      <ipxact:busType vendor="intel" library="intel" name="avalon" version="21.3"></ipxact:busType>
+      <ipxact:busType vendor="intel" library="intel" name="avalon" version="22.1"></ipxact:busType>
       <ipxact:abstractionTypes>
         <ipxact:abstractionType>
-          <ipxact:abstractionRef vendor="intel" library="intel" name="avalon" version="21.3"></ipxact:abstractionRef>
+          <ipxact:abstractionRef vendor="intel" library="intel" name="avalon" version="22.1"></ipxact:abstractionRef>
           <ipxact:portMaps>
             <ipxact:portMap>
               <ipxact:logicalPort>
@@ -916,42 +900,6 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>avalonst_source_channel</ipxact:name>
-        <ipxact:wire>
-          <ipxact:direction>out</ipxact:direction>
-          <ipxact:vectors>
-            <ipxact:vector>
-              <ipxact:left>0</ipxact:left>
-              <ipxact:right>7</ipxact:right>
-            </ipxact:vector>
-          </ipxact:vectors>
-          <ipxact:wireTypeDefs>
-            <ipxact:wireTypeDef>
-              <ipxact:typeName>STD_LOGIC_VECTOR</ipxact:typeName>
-              <ipxact:viewRef>QUARTUS_SYNTH</ipxact:viewRef>
-            </ipxact:wireTypeDef>
-          </ipxact:wireTypeDefs>
-        </ipxact:wire>
-      </ipxact:port>
-      <ipxact:port>
-        <ipxact:name>avalonst_source_error</ipxact:name>
-        <ipxact:wire>
-          <ipxact:direction>out</ipxact:direction>
-          <ipxact:vectors>
-            <ipxact:vector>
-              <ipxact:left>0</ipxact:left>
-              <ipxact:right>7</ipxact:right>
-            </ipxact:vector>
-          </ipxact:vectors>
-          <ipxact:wireTypeDefs>
-            <ipxact:wireTypeDef>
-              <ipxact:typeName>STD_LOGIC_VECTOR</ipxact:typeName>
-              <ipxact:viewRef>QUARTUS_SYNTH</ipxact:viewRef>
-            </ipxact:wireTypeDef>
-          </ipxact:wireTypeDefs>
-        </ipxact:wire>
-      </ipxact:port>
-      <ipxact:port>
         <ipxact:name>avalonst_source_startofpacket</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>out</ipxact:direction>
@@ -1099,12 +1047,12 @@ https://fpgasoftware.intel.com/eula.-->
         <ipxact:parameter parameterId="channelWidth" type="int">
           <ipxact:name>channelWidth</ipxact:name>
           <ipxact:displayName>Channel width</ipxact:displayName>
-          <ipxact:value>8</ipxact:value>
+          <ipxact:value>0</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="errorWidth" type="int">
           <ipxact:name>errorWidth</ipxact:name>
           <ipxact:displayName>Error width</ipxact:displayName>
-          <ipxact:value>8</ipxact:value>
+          <ipxact:value>0</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="fifoDepth" type="int">
           <ipxact:name>fifoDepth</ipxact:name>
@@ -1194,11 +1142,11 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:parameter>
         <ipxact:parameter parameterId="embeddedsw.CMacro.CHANNEL_WIDTH" type="string">
           <ipxact:name>embeddedsw.CMacro.CHANNEL_WIDTH</ipxact:name>
-          <ipxact:value>8</ipxact:value>
+          <ipxact:value>0</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="embeddedsw.CMacro.ERROR_WIDTH" type="string">
           <ipxact:name>embeddedsw.CMacro.ERROR_WIDTH</ipxact:name>
-          <ipxact:value>8</ipxact:value>
+          <ipxact:value>0</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="embeddedsw.CMacro.FIFO_DEPTH" type="string">
           <ipxact:name>embeddedsw.CMacro.FIFO_DEPTH</ipxact:name>
@@ -1256,6 +1204,11 @@ https://fpgasoftware.intel.com/eula.-->
     </altera:altera_assignments>
     <altera:altera_system_parameters>
       <ipxact:parameters>
+        <ipxact:parameter parameterId="board" type="string">
+          <ipxact:name>board</ipxact:name>
+          <ipxact:displayName>Board</ipxact:displayName>
+          <ipxact:value>Unknown</ipxact:value>
+        </ipxact:parameter>
         <ipxact:parameter parameterId="device" type="string">
           <ipxact:name>device</ipxact:name>
           <ipxact:displayName>Device</ipxact:displayName>
@@ -1707,24 +1660,6 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;avalonst_source_channel&lt;/name&gt;
-                    &lt;role&gt;channel&lt;/role&gt;
-                    &lt;direction&gt;Output&lt;/direction&gt;
-                    &lt;width&gt;8&lt;/width&gt;
-                    &lt;lowerBound&gt;0&lt;/lowerBound&gt;
-                    &lt;vhdlType&gt;STD_LOGIC_VECTOR&lt;/vhdlType&gt;
-                    &lt;terminationValue&gt;0&lt;/terminationValue&gt;
-                &lt;/port&gt;
-                &lt;port&gt;
-                    &lt;name&gt;avalonst_source_error&lt;/name&gt;
-                    &lt;role&gt;error&lt;/role&gt;
-                    &lt;direction&gt;Output&lt;/direction&gt;
-                    &lt;width&gt;8&lt;/width&gt;
-                    &lt;lowerBound&gt;0&lt;/lowerBound&gt;
-                    &lt;vhdlType&gt;STD_LOGIC_VECTOR&lt;/vhdlType&gt;
-                    &lt;terminationValue&gt;0&lt;/terminationValue&gt;
-                &lt;/port&gt;
-                &lt;port&gt;
                     &lt;name&gt;avalonst_source_startofpacket&lt;/name&gt;
                     &lt;role&gt;startofpacket&lt;/role&gt;
                     &lt;direction&gt;Output&lt;/direction&gt;
@@ -1790,7 +1725,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;/entry&gt;
                     &lt;entry&gt;
                         &lt;key&gt;maxChannel&lt;/key&gt;
-                        &lt;value&gt;255&lt;/value&gt;
+                        &lt;value&gt;0&lt;/value&gt;
                     &lt;/entry&gt;
                     &lt;entry&gt;
                         &lt;key&gt;packetDescription&lt;/key&gt;
@@ -2337,10 +2272,8 @@ https://fpgasoftware.intel.com/eula.-->
         <altera:port_mapping altera:name="wrclk_control_slave_writedata" altera:internal="wrclk_control_slave_writedata"></altera:port_mapping>
       </altera:interface_mapping>
       <altera:interface_mapping altera:name="out" altera:internal="fifo_0.out" altera:type="avalon_streaming" altera:dir="start">
-        <altera:port_mapping altera:name="avalonst_source_channel" altera:internal="avalonst_source_channel"></altera:port_mapping>
         <altera:port_mapping altera:name="avalonst_source_data" altera:internal="avalonst_source_data"></altera:port_mapping>
         <altera:port_mapping altera:name="avalonst_source_endofpacket" altera:internal="avalonst_source_endofpacket"></altera:port_mapping>
-        <altera:port_mapping altera:name="avalonst_source_error" altera:internal="avalonst_source_error"></altera:port_mapping>
         <altera:port_mapping altera:name="avalonst_source_ready" altera:internal="avalonst_source_ready"></altera:port_mapping>
         <altera:port_mapping altera:name="avalonst_source_startofpacket" altera:internal="avalonst_source_startofpacket"></altera:port_mapping>
         <altera:port_mapping altera:name="avalonst_source_valid" altera:internal="avalonst_source_valid"></altera:port_mapping>
