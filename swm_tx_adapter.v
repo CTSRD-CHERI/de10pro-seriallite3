@@ -21,7 +21,8 @@ module swm_tx_adapter
    wire [7:0] num_64b_words_per_cycle = 8'd4;
 
    assign data_tx[31:0] = avalonst_sink_data;
-   assign data_tx[255:32] = 223'd0;
+   // fill unused bits with the word alignment pattern
+   assign data_tx[255:32] = 224'hbcbcbcbc_bcbcbcbc_bcbcbcbc_bcbcbcbc_bcbcbcbc_bcbcbcbc_bcbcbcbc; 
    assign valid_tx = avalonst_sink_valid;
    assign start_of_burst_tx = avalonst_sink_startofpacket;
    assign end_of_burst_tx = avalonst_sink_endofpacket;
