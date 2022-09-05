@@ -38,7 +38,7 @@ make
 xterm -e juart-terminal &
 ```
 * download and run the code:
-    ```
+```
 niosv-download -g main.elf
 ```
 
