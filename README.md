@@ -41,3 +41,10 @@ xterm -e juart-terminal &
     ```
 niosv-download -g main.elf
 ```
+
+
+## Tuning Serial Links
+
+Analog parameters for serial links can be tuned using System Console.  Please see the demonstration video below:
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/y_UbtNqbIaM" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
