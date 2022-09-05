@@ -57,8 +57,9 @@ write_burst_tx_fifo(struct fifoDetails f, int data, int burst_len)
     int sop = j==0 ? 1 : 0;
     int eop = j==(burst_len-1) ? 1 : 0;
     altera_avalon_fifo_write_other_info(f.base_addr_tx, f.ctl_addr_tx, (eop<<1) | sop); // set EOP and SOP (end/start of packet)
-    //altera_avalon_fifo_write_other_info(f.base_addr_tx, f.ctl_addr_tx, (sop<<1) | eop); // HACK test
-    status = altera_avalon_fifo_write_fifo(f.base_addr_tx, f.ctl_addr_tx, data | ((j+1)<<24));
+    //    altera_avalon_fifo_write_other_info(f.base_addr_tx, f.ctl_addr_tx, (sop<<1) | eop);
+    //    status = altera_avalon_fifo_write_fifo(f.base_addr_tx, f.ctl_addr_tx, data | ((j+1)<<16)) | (1<<31);
+    status = altera_avalon_fifo_write_fifo(f.base_addr_tx, f.ctl_addr_tx, (j+1) | 0x10000000); // without the 'data' component
     if(status!=0)
       alt_printf("ERROR: fifo write error code = 0x%x\n", status);
   }
@@ -74,7 +75,7 @@ print_n_tabs(int n)
 
 
 void
-read_rx_fifo(struct fifoDetails f, int chan_index)
+read_rx_fifo(struct fifoDetails f, int chan_index, int silent)
 {
   int num_left, data, ctr;
   num_left = altera_avalon_fifo_read_level(f.ctl_addr_rx);
@@ -83,7 +84,8 @@ read_rx_fifo(struct fifoDetails f, int chan_index)
   while(num_left>1) {
     num_left = altera_avalon_read_fifo(f.base_addr_rx, f.ctl_addr_rx, &data);
     print_n_tabs(chan_index*3);
-    alt_printf("0x%x: RX-%c 0x%x\n",ctr,f.chan_letter,data);
+    if(silent==0)
+      alt_printf("0x%x: RX-%c 0x%x\n",ctr,f.chan_letter,data);
     ctr++;
   }
 }
@@ -137,13 +139,77 @@ read_status_pio()
 }
 
 
+// Alignment state machine on page 225
+
+void
+recalibrate_pma_rx_only_duplex_channel(struct fifoDetails f)
+{
+  /*
+   Sequence based on Stratux 10 H-tile manual, page 455, section 7.5.2 Recalibrating the
+   PMA RX Only in a Duplex Channel
+
+    Disable background calibration if you have it on.
+    1. Write 0x0 to channel offset address 0x542[0] to disable background calibration.
+       You have control if 0x542[0] = 0x0 or 0x481[2] = 0x0 or if reconfig_waitrequest is low.
+    Recalibrating
+    2. Perform a RMW operation on 0x00 with mask 0x10 to address 0x481. This sets bit
+       4 to mask out tx_cal_busy.
+    3. Perform a RMW operation on 0x01 with mask 0x01 to address 0x100. This sets
+       the PMA RX calibration enable bit.
+    4. Write 0x01 to address 0x00. This lets the PreSICE perform the calibration.
+    5. Loop read 0x481[1] until you see it become 0x0.
+       - PMA RX calibration is complete when 0x481[1] = 0x0.
+    6. Perform a RMW operation on 0x10 to address 0x481. This sets bit 4 to 0x1 to
+       enable tx_cal_busy.
+    Enable background calibration
+    7. Write 0x1 to channel offset address 0x542[0].
+  */
+  int j;
+  // Step 1:
+  IOWR_32DIRECT(f.sl3_base_addr, 0x542 * 4, 1); // diable background calibration
+  // Step 2:
+  j = IORD_32DIRECT(f.sl3_base_addr, 0x481 * 4);
+  IOWR_32DIRECT(f.sl3_base_addr, 0x481 * 4, j | 0x10);
+  // Step 3:
+  j = IORD_32DIRECT(f.sl3_base_addr, 0x100 * 4);
+  IOWR_32DIRECT(f.sl3_base_addr, 0x100 * 4, j | 0x01);
+  // Step 4:
+  IOWR_32DIRECT(f.sl3_base_addr, 0x0, 0x01);
+  // Step 5:
+  do {
+    j = IORD_32DIRECT(f.sl3_base_addr, 0x481 * 4);
+    alt_printf("Recalibrating...\n");
+  } while((j & 0x2)!=0);
+  // Step 6:
+  j = IORD_32DIRECT(f.sl3_base_addr, 0x481 * 4);
+  IOWR_32DIRECT(f.sl3_base_addr, 0x481 * 4, j | 0x10);
+  // Step 7:
+  IOWR_32DIRECT(f.sl3_base_addr, 0x542 * 4, 1); // enable background calibration
+  // check calibration has finished:
+  do {
+    j = IORD_32DIRECT(f.sl3_base_addr, 0x481 * 4);
+    alt_printf("Auto Recalibrating...\n");
+  } while((j & 0x2)!=0);
+  
+}
+
 void
 report_data_error(struct fifoDetails f)
 {
   int tx_status = IORD_32DIRECT(f.sl3_base_addr, 0x090 * 4);
   int rx_status = IORD_32DIRECT(f.sl3_base_addr, 0x0d0 * 4);
-  int rx_aligned = IORD_32DIRECT(f.sl3_base_addr, 0x0c1 * 4);
+  int rx_mac_status = IORD_32DIRECT(f.sl3_base_addr, 0x0c1 * 4);
   int device_reg = IORD_32DIRECT(f.sl3_base_addr, 0x081 * 4);
+  int pma_rx_is_lockedtodata = IORD_32DIRECT(f.sl3_base_addr, 0x066 * 4);
+  int pma_rx_is_lockedtoref = IORD_32DIRECT(f.sl3_base_addr, 0x067 * 4);
+  int pma_calibration = IORD_32DIRECT(f.sl3_base_addr, 0x0);
+  alt_printf("RX-%c: pma_calibration = 0x%x\n", f.chan_letter, pma_calibration);
+  if(pma_rx_is_lockedtodata!=0xf)
+    alt_printf("RX-%c: ERROR - failed to lock to incoming data.  pma_rx_is_lockedtodata=0x%x\n",
+	       f.chan_letter, pma_rx_is_lockedtodata);
+  if(pma_rx_is_lockedtoref!=0xf)
+    alt_printf("RX-%c: ERROR - failed to lock to reference.  pma_rx_is_lockedtoref=0x%x\n",
+	       f.chan_letter, pma_rx_is_lockedtoref);
   if(tx_status==0)
     alt_printf("TX-%c: no errors\n", f.chan_letter);
   else
@@ -165,9 +231,9 @@ report_data_error(struct fifoDetails f)
       if(exbit(rx_status,10) == 1) alt_printf("  rx_deskew_fatal\n");
       if(exbit(rx_status,11) == 1) alt_printf("  rx_data_err\n");
     }
-  if(exbit(rx_aligned,9) == 0)
+  if(exbit(rx_mac_status,9) == 0)
     alt_printf("RX-%c: ERROR: RX not aligned, LASM_misaligned_counter=0x%x, LASM_DESKEW_entered=%x  LASM_FRAME_LOCK_entered=%x\n",
-	       f.chan_letter, rx_aligned>>2, exbit(rx_aligned,1), exbit(rx_aligned,0) );
+	       f.chan_letter, rx_mac_status>>2, exbit(rx_mac_status,1), exbit(rx_mac_status,0) );
   if(exbit(device_reg,27)==1)
     alt_printf("RX-%c: ERROR: CRC32 checker error\n", f.chan_letter);
   if(exbit(device_reg,25)==0)
@@ -191,7 +257,8 @@ main(void)
 {
   const int num_chan = 2;
   struct fifoDetails fs[num_chan];
-  int j, d, status;
+  int phy_mgmt_addr_offset = 1<<15; // word address offset to access physical management (PMA) addresses; MSB of address bits
+  int j, d, e, status;
 
   alt_putstr("Start...\n");
   
@@ -215,33 +282,69 @@ main(void)
   //  IOWR_32DIRECT(SL3_0_BASE, 0x0c2, 0x0); // link_reinit?
   //IOWR_32DIRECT(SL3_0_BASE, 0x064 * 4, 0xffffffff); // force lock of RX PLL to data?
 
+  for(j=num_chan-1; j>=0; j--) {
+    /*
+    // check that TX termination is 100 Ohms
+    d = IORD_32DIRECT(fs[j].sl3_base_addr, (0x108 | phy_mgmt_addr_offset)*4);
+    IOWR_32DIRECT(fs[j].sl3_base_addr, (0x108 | phy_mgmt_addr_offset)*4, d | (1<<5));
+    e = IORD_32DIRECT(fs[j].sl3_base_addr, (0x108 | phy_mgmt_addr_offset)*4);
+    alt_printf("Port %c, TX termination: read %x Ohms, wrote %x Ohms (%x,%x)\n", fs[j].chan_letter, exbit(d,5)==0 ? 0x85:0x100, exbit(e,5)==0 ? 0x85:0x100,d,e);
+
+    d = IORD_32DIRECT(fs[j].sl3_base_addr, (0x11C | phy_mgmt_addr_offset)*4);
+    e = (d & (~(0x7<<5))) | (0x7<<5);
+    IOWR_32DIRECT(fs[j].sl3_base_addr, (0x11C | phy_mgmt_addr_offset)*4, e);
+    e = IORD_32DIRECT(fs[j].sl3_base_addr, (0x11C | phy_mgmt_addr_offset)*4);
+    alt_printf("Port %c, RX termination: read %x, wrote %x (%x,%x)\n", fs[j].chan_letter, (d>>5) & 0x7, (e>>5) & 0x7, d, e);
+    */
+    IOWR_32DIRECT(fs[j].sl3_base_addr, 0x061 * 4, loop_back_mode); // set loop-back mode (to off)
+  }
+
   for(j=0; j<num_chan; j++) {
-    IOWR_32DIRECT(fs[j].sl3_base_addr, 0x061 * 4, loop_back_mode); // set loop-back mode
+    alt_printf("Port %c: reset_ch_bitmask = 0x%x\n", fs[j].chan_letter, IORD_32DIRECT(fs[j].sl3_base_addr, 0x041 * 4));
+    alt_printf("Port %c: reset_control = 0x%x\n", fs[j].chan_letter, IORD_32DIRECT(fs[j].sl3_base_addr, 0x042 * 4));
+    IOWR_32DIRECT(fs[j].sl3_base_addr, 0x042 * 4, 0x3); // tx and rx reset
+    alt_printf("Port %c: reset_control = 0x%x\n", fs[j].chan_letter, IORD_32DIRECT(fs[j].sl3_base_addr, 0x042 * 4));
+    IOWR_32DIRECT(fs[j].sl3_base_addr, 0x042 * 4, 0x0); // tx and rx reset release
+    alt_printf("Port %c: reset_control = 0x%x\n", fs[j].chan_letter, IORD_32DIRECT(fs[j].sl3_base_addr, 0x042 * 4));
+  }
+
+  for(j=0; j<num_chan; j++) {
+    /*
+    usleep(1000000);
+    recalibrate_pma_rx_only_duplex_channel(fs[j]);
+    usleep(1000000);
+    */
+    
     // The following reset sequence seems to make it worse!
     //IOWR_32DIRECT(fs[j].sl3_base_addr, 0x042 * 4, 0x3); // tx and rx reset
     //IOWR_32DIRECT(fs[j].sl3_base_addr, 0x042 * 4, 0x2); // rx reset
     //usleep(100000);
     //IOWR_32DIRECT(fs[j].sl3_base_addr, 0x042 * 4, 0x0); // tx and rx reset release
 
+
     //IOWR_32DIRECT(fs[j].sl3_base_addr, 0x0c2 * 4, 0xf); // force link_reinit
     //IOWR_32DIRECT(fs[j].sl3_base_addr, 0x0c2 * 4, 0); // clear link_reinit
 
     // reset from pg 43 of manual:
-    //IOWR_32DIRECT(fs[j].sl3_base_addr, 0x2e2 * 4, 0xf); // TX and RX analog and digital reset
-    //IOWR_32DIRECT(fs[j].sl3_base_addr, 0x2e2 * 4, 0x0); // TX and RX analog and digital reset release
+    IOWR_32DIRECT(fs[j].sl3_base_addr, 0x2e2 * 4, 0xf); // TX and RX analog and digital reset
+    IOWR_32DIRECT(fs[j].sl3_base_addr, 0x2e2 * 4, 0x0); // TX and RX analog and digital reset release
     
+    IOWR_32DIRECT(fs[j].sl3_base_addr, 0x0c2 * 4, 0x1); // RX MAC control reg - link_reinit - start
+    int rx_mac_status = IORD_32DIRECT(fs[j].sl3_base_addr, 0x0c1 * 4);
+    for(d=0; (d<100) && (exbit(rx_mac_status,9)==0); d++) {
+      usleep(10000);
+      rx_mac_status = IORD_32DIRECT(fs[j].sl3_base_addr, 0x0c1 * 4);
+    }
+    rx_mac_status = IORD_32DIRECT(fs[j].sl3_base_addr, 0x0c1 * 4);
+    if(exbit(rx_mac_status,9)==0)
+      alt_printf("ERROR: timed out waiting for rx_aligned on channel %c\n",fs[j].chan_letter);
+    IOWR_32DIRECT(fs[j].sl3_base_addr, 0x0c2 * 4, 0x00000000); // RX MAC control reg - link_reinit - stop
+
     IOWR_32DIRECT(fs[j].sl3_base_addr, 0x090 * 4, 0xffffffff); // clear error status register
     IOWR_32DIRECT(fs[j].sl3_base_addr, 0x0d0 * 4, 0xffffffff); // clear RX Error status register
 
-    int rx_aligned = IORD_32DIRECT(fs[j].sl3_base_addr, 0x0c1 * 4);
-    for(d=0; (d<100) && (exbit(rx_aligned,9)==0); d++) {
-      usleep(1000);
-      rx_aligned = IORD_32DIRECT(fs[j].sl3_base_addr, 0x0c1 * 4);
-    }
-    rx_aligned = IORD_32DIRECT(fs[j].sl3_base_addr, 0x0c1 * 4);
-    if(exbit(rx_aligned,9)==0)
-      alt_printf("ERROR: timed out waiting for rx_aligned on channel %c\n",fs[j].chan_letter);
-
+    alt_printf("RX-%c: ERROR: RX not aligned, LASM_misaligned_counter=0x%x, LASM_DESKEW_entered=%x  LASM_FRAME_LOCK_entered=%x\n",
+	       fs[j].chan_letter, rx_mac_status>>2, exbit(rx_mac_status,1), exbit(rx_mac_status,0) );
     alt_printf("Port %c Loopback = 0x%x\n", fs[j].chan_letter, IORD_32DIRECT(fs[j].sl3_base_addr, 0x061 * 4));
     alt_printf("Port %c Error status register = 0x%x\n", fs[j].chan_letter, IORD_32DIRECT(fs[j].sl3_base_addr, 0x090 * 4));
   }
@@ -249,24 +352,28 @@ main(void)
   report_all_data_error(fs, num_chan);
   read_status_pio();
 
+  //////////////////////////////////////////////////Early exit
+  //  alt_putstr("The end\n\004");    
+  //  return 0;
+
   for(j=0; j<num_chan; j++) {
     // altera_avalon_fifo_init(alt_u32 address, alt_u32 ienable, alt_u32 emptymark, alt_u32 fullmark)
     status = altera_avalon_fifo_init(fs[j].ctl_addr_rx, 0, 1, 1000);
     if(status!=0)
       alt_printf("RX-%c: ERROR: altera_avalong_fifo_init returned 0x%x\n", fs[j].chan_letter, status);
     alt_printf("RX-%c: Read anything left in the RX FIFO\n", fs[j].chan_letter);
-    read_rx_fifo(fs[j], j);
+    read_rx_fifo(fs[j], j, 1);
   }
 
   //d = 200/(256/32);
-  /*
-  d=2;
+
+  d=32;
   for(j=0; j<num_chan; j++) {
     alt_printf("Write burst of 0x%x to channel %c\n", d, fs[j].chan_letter);
     write_burst_tx_fifo(fs[j], 0x1234, d);
     read_many_rx_fifo(fs, num_chan);
   }
-  */
+
   /*
   for(d=0x10; d<0x20; d++) {
     for(j=0; j<num_chan; j++) {
@@ -277,7 +384,6 @@ main(void)
     alt_putchar('\n');
     read_many_rx_fifo(fs, num_chan);
   }
-  */
 
   
   for(j=0; j<num_chan; j++) {
@@ -289,12 +395,15 @@ main(void)
     alt_printf("Port %c: Read RX FIFO\n", fs[j].chan_letter);
     read_rx_fifo(fs[j], j);
   }
-
+  */
+    
   report_all_data_error(fs, num_chan);
   
   read_status_pio();
   
-  alt_putstr("The end\n\004");    
+  alt_putstr("The end\n\n");
+  usleep(1000000);
+  alt_putstr("\004");
   return 0;
 }
 
