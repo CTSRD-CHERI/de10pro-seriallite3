@@ -45,6 +45,8 @@ niosv-download -g main.elf
 
 ## Tuning Serial Links
 
-Analog parameters for serial links can be tuned using System Console.  Please see the demonstration video below:
+Analog parameters for serial links can be tuned using System Console.
+Please see the demonstration video below.  The tuned analog (PMA)
+parameters are included in the DE10Pro.qsf file.
 
 [![Link Tuning Video](https://img.youtube.com/vi/y_UbtNqbIaM/default.jpg)](https://youtu.be/y_UbtNqbIaM)
