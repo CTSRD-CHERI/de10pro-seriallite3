@@ -47,6 +47,4 @@ niosv-download -g main.elf
 
 Analog parameters for serial links can be tuned using System Console.  Please see the demonstration video below:
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/y_UbtNqbIaM" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
 [![Link Tuning Video](https://img.youtube.com/vi/y_UbtNqbIaM/default.jpg)](https://youtu.be/y_UbtNqbIaM)
