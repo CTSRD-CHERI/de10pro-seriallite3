@@ -1,3 +1,5 @@
+// This is a place holder insantiation template that needs to be replaced with generation of Serial Lite III IP
+
 	soc_sl3_0 u0 (
 		.user_clock_tx            (_connected_to_user_clock_tx_),            //   input,    width = 1,            user_clock_tx.clk
 		.user_clock_reset_tx      (_connected_to_user_clock_reset_tx_),      //   input,    width = 1,      user_clock_reset_tx.reset
