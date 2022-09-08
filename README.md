@@ -71,7 +71,6 @@ parameters are included in the DE10Pro.qsf file.
 |ready_tx            | control output | 1 | ready signal for the above, i.e. if ready to send a word; also status signal that serial TX is up |
 |start_of_burst_tx   | metadata input | 1 | goes with data_tx to signal start of a packet in avalon-stream speak |
 |end_of_burst_tx     | metadata input | 1 | goes with data_tx to signal end of a packet in avalon-stream speak |
-|error_tx            | metadata input | 4 | error signal that goes with the avalon-stream; currently zero; might be usable for metadata? |
 |sync_tx             | status input   | 8 | caputured at start-of-burst and end-of-burst; end-of-burst to indicate number of 64b words valid; currently sending zero |
 |**Data received stream**   | | | |
 |interface_clock_rx  | clock output | 1 | clock recovered from serial RX data; around 366MHz |
@@ -81,11 +80,12 @@ parameters are included in the DE10Pro.qsf file.
 |ready_rx            | control input  |   1 | indicate if receiver FIFO has space; unclear to me if this back propagates very far |
 |start_of_burst_rx   | metadata output |  1 | goes with data_rx to signal start of packet in avalon-stream speak |
 |end_of_burst_rx     | metadata output |  1 | goes with data_rx to signal end of packet in avalon-stream speak |
-|error_rx            | metadata output |  9 | currently ignored - what does it contain??? |
 |sync_rx             | status output   |  8 | counterpart to sync_rx |
 |**Link Status**     | | | |
 |link_up_tx          | status output | 1 | indicates that the serial TX is up; currently attached to a PIO input to allow status to be read |
 |link_up_rx          | status output | 1 | indicates that the serial RX is up; currently attached to a PIO input to allow status to be read |
+|error_tx            | status output | 4 | see definition below |
+|error_rx            | status output | 5 | see definition below |
 |**Physical management** | **memory mapped registers** | | **Avalon MM** |
 |phy_mgmt_address        | input  | 14 | address (32b aligned) |
 |phy_mgmt_read           | input  | 1  | read enable |
@@ -101,6 +101,18 @@ parameters are included in the DE10Pro.qsf file.
 |tx_serial_data | output | 4 | to serial TX pins |
 |rx_serial_data | input  | 4 | from serial RX pins |
 
+* **error_tx** - This vector indicates an overflow in the source adaptation module’s FIFO buffer.
+ * Bit 0: Source adaptation module’s FIFO buffer overflow
+ * Bit 1: An SEU error occurred and was corrected (ECC enabled). Don't care (ECC disabled)
+ * Bit 2: An SEU error occurred and cannot be corrected (ECC enabled). Don't care (ECC disabled)
+ * Bit 3: A burst gap error occurred due to a mismatch in the BURST GAP parameter value and the gap between end of burst and start of burst.
+* **error_rx** - This vector indicates the state of the sink adaptation module’s FIFO buffer. N represents the number of lanes.  N=4 in our setup:
+ * [N+4]: Since we're using advanced clocking mode, this is don't care, so we've removed it from our error status.
+ * [N+3]: Since we're using advanced clocking mode, this is don't care, so we've removed it from our error status.
+ * [N+2]: Since we're using advanced clocking mode, this is don't care, so we've removed it from our error status.
+ * [N+1]: Don't care. Tied to zero. So we've removed it from our error status.
+ * [N]: Loss of alignment
+ * [N-1:0]: PCS sync header, multiframe, or CRC-32 error
 
 ## Platform Designer
 
