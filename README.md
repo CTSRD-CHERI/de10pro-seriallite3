@@ -30,7 +30,7 @@ parameters are included in the DE10Pro.qsf file.
 |ready_tx            | control output | 1 | ready signal for the above, i.e. if ready to send a word; also status signal that serial TX is up |
 |start_of_burst_tx   | metadata input | 1 | goes with data_tx to signal start of a packet in avalon-stream speak |
 |end_of_burst_tx     | metadata input | 1 | goes with data_tx to signal end of a packet in avalon-stream speak |
-|sync_tx             | status input   | 8 | caputured at start-of-burst and end-of-burst; end-of-burst to indicate number of 64b words valid; currently sending zero |
+|sync_tx             | metadata input   | 8 | caputured at start-of-burst and end-of-burst; end-of-burst to indicate number of 64b words valid; currently sending zero |
 |**Data received stream**   | | | |
 |interface_clock_rx  | clock output | 1 | clock recovered from serial RX data; around 366MHz |
 |interface_clock_reset_rx | reset output | 1 | reset that goes with the above; use to reset receiver FIFO |
@@ -39,7 +39,7 @@ parameters are included in the DE10Pro.qsf file.
 |ready_rx            | control input  |   1 | indicate if receiver FIFO has space; unclear to me if this back propagates very far |
 |start_of_burst_rx   | metadata output |  1 | goes with data_rx to signal start of packet in avalon-stream speak |
 |end_of_burst_rx     | metadata output |  1 | goes with data_rx to signal end of packet in avalon-stream speak |
-|sync_rx             | status output   |  8 | counterpart to sync_rx |
+|sync_rx             | metadata output   |  8 | counterpart to sync_rx; currently ignored |
 |**Link Status**     | | | |
 |link_up_tx          | status output | 1 | indicates that the serial TX is up; currently attached to a PIO input to allow status to be read |
 |link_up_rx          | status output | 1 | indicates that the serial RX is up; currently attached to a PIO input to allow status to be read |
