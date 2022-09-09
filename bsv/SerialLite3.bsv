@@ -3,6 +3,7 @@ package SerialLite3;
 import BlueAXI4 :: *;
 import BlueBasics :: *;
 import Clocks :: *;
+import FIFO :: *;
 
 // This package provides types / interfaces for the SerialLite3 interface
 // Note: the following signals are not currently provided:
@@ -41,8 +42,7 @@ interface SerialLite3 #(
   // data received stream parameters
 //, type rx_payload // use SerialLite3_StreamFlit
   // Physical management memory-mapped AXI4 subordinate port parameters
-  numeric type t_id
-, numeric type t_addr
+  numeric type t_addr
 , numeric type t_data
 , numeric type t_awuser, numeric type t_wuser, numeric type t_buser
 , numeric type t_aruser, numeric type t_ruser
@@ -69,9 +69,9 @@ interface SerialLite3 #(
   // - phy_mgmt_waitrequest
   // - phy_mgmt_write
   // - phy_mgmt_writedata
-  interface AXI4_Slave #( t_id, t_addr, t_data
-                        , t_awuser, t_wuser, t_buser
-                        , t_aruser, t_ruser) management_subordinate;
+  interface AXI4Lite_Slave #( t_addr, t_data
+                            , t_awuser, t_wuser, t_buser
+                            , t_aruser, t_ruser) management_subordinate;
 
   interface SerialLite3_ExternalPins pins;
 
@@ -167,9 +167,11 @@ endmodule
 module mkSerialLite3
   (
    Clock tx_clk, Reset tx_rst, Clock qsfp_refclk,
-   SerialLite3#(t_id, t_addr, t_data, t_awuser, t_wuser, t_buser, t_aruser, t_ruser ) sl3_ifc
+   SerialLite3#(t_addr, t_data, t_awuser, t_wuser, t_buser, t_aruser, t_ruser) sl3_ifc
   )
-  provisos (Add#(14,_na,t_addr), Add#(32,_nd,t_data));
+  provisos ( Add#(14,_na,t_addr)
+           , Add#(32,_nd,t_data)
+           , Alias#(t_bus_req, Tuple4#(Bit#(14), Bit#(1), Bit#(1), Bit#(32))) );
 
   Clock local_clk <- exposeCurrentClock();
   Stratix10_SerialLite3_4Lane sl3 <- mkStratix10_SerialLite3_4Lane(tx_clk, tx_rst, qsfp_refclk);
@@ -177,6 +179,9 @@ module mkSerialLite3
   CrossingReg#(Bit#(5)) sync_error_rx <- mkNullCrossingReg(local_clk, 0, clocked_by sl3.rx_clk, reset_by sl3.rx_rst);
   SyncBitIfc#(Bool) sync_link_up_tx <- mkSyncBitToCC(tx_clk, tx_rst);
   SyncBitIfc#(Bool) sync_link_up_rx <- mkSyncBitToCC(sl3.rx_clk, sl3.rx_rst);
+  AXI4Lite_Shim#( t_addr, t_data
+                , t_awuser, t_wuser, t_buser
+                , t_aruser, t_ruser) axi4LiteShim <- mkAXI4LiteShimFF;
 
   rule do_sync_from_tx_clk_domain;
     sync_link_up_tx.send(sl3.link_up_tx==1);
@@ -189,6 +194,54 @@ module mkSerialLite3
   rule no_crc_error_testing;
     sl3.crc_error_inject(0);
   endrule
+
+  //----------------------------------------------------------------------------
+  // TODO: need help!!!
+  // from @aj443 to @swm11:
+  // I make the assumption that
+  // - when bus_request is called for a write, there is no impact on the
+  //   behaviour of bus_read_data or bus_waitrequest
+  // - when bus_request is called for a read, bus_waitrequest goes hi on the
+  //   next cycle and goes low when the bus_read_data corresponds to the data to
+  //   be returned
+
+  FIFO#(t_bus_req) busReqFF <- mkFIFO1; // for bus access from a single rule
+  FIFO#(Bit#(0))   rdRspFF <- mkFIFO1; // for flow control
+  rule forward_bus_req (sl3.bus_waitrequest == 1'b0);
+    match {.addr, .rd, .wr, .data} = busReqFF.first;
+    busReqFF.deq;
+    sl3.bus_request (addr, rd, wr, data);
+    if (rd == 1'b1) rdRspFF.enq(?);
+  endrule
+
+  // XXX proposed implementation for AXI4Lite reads, rely on the bus eventually
+  //     providing a response
+  (* descending_urgency = "axi4Lite_read_request, axi4Lite_write" *)
+  rule axi4Lite_read_request;
+    let arflit <- get (axi4LiteShim.master.ar);
+    // TODO assert that the requested size is indeed 32 bits?
+    busReqFF.enq (tuple4 (truncate (arflit.araddr), 1'b1, 1'b0, ?));
+  endrule
+  rule axi4Lite_read_response (sl3.bus_waitrequest == 1'b0);
+    rdRspFF.deq;
+    axi4LiteShim.master.r.put(AXI4Lite_RFlit { rdata: zeroExtend (sl3.bus_read_data)
+                                             , rresp: OKAY
+                                             , ruser: ? });
+  endrule
+
+  // XXX proposed implementation for AXI4Lite writes (fire and forget)
+  rule axi4Lite_write;
+    let awflit <- get (axi4LiteShim.master.aw);
+    let wflit <- get (axi4LiteShim.master.w);
+    // TODO assert that the writen size is indeed 32 bits?
+    // TODO consider w.wstrb?
+    //      would imply a read first to get the value to merge with?
+    //      or maybe assert that it is always 'b1111
+    busReqFF.enq (tuple4 (truncate (awflit.awaddr), 1'b0, 1'b1, truncate (wflit.wdata)));
+    axi4LiteShim.master.b.put(AXI4Lite_BFlit { bresp: OKAY
+                                             , buser: ? });
+  endrule
+  //----------------------------------------------------------------------------
 
   interface Clock rx_clk = sl3.rx_clk;
   interface Reset rx_rst = sl3.rx_rst;
@@ -219,9 +272,7 @@ module mkSerialLite3
                            link_up_tx:sync_link_up_tx.read(),
                            link_up_rx:sync_link_up_rx.read()};
 
-  interface AXI4_Slave management_subordinate;
-  // TODO: need help!!!
-  endinterface
+  interface management_subordinate = axi4LiteShim.slave;
 
 endmodule
 
@@ -231,10 +282,10 @@ endmodule
 module mkSerialLite3_Instance (
    Clock tx_clk, Reset tx_rst, Clock qsfp_refclk,
    SerialLite3#(/*SerialLite3_StreamFlit, SerialLite3_StreamFlit,*/
-      // t_id, t_addr, t_data, t_awuser, t_wuser, t_buser, t_aruser, t_ruser
-      0,    14,     32,     0,        0,       0,       0,        0) sl3);
+      //  t_addr, t_data, t_awuser, t_wuser, t_buser, t_aruser, t_ruser
+          14,     32,     0,        0,       0,       0,        0) sl3);
 
-  SerialLite3#(0,14,32,0,0,0,0,0) sl3 <- mkSerialLite3(tx_clk, tx_rst, qsfp_refclk);
+  SerialLite3#(14,32,0,0,0,0,0) sl3 <- mkSerialLite3(tx_clk, tx_rst, qsfp_refclk);
   return sl3;
 
 endmodule
