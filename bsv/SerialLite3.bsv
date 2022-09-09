@@ -11,7 +11,7 @@ import Clocks :: *;
 // - method Action crc_error_inject (Bit #(4) x);
 
 // This flit structure can be used as payload for the rx/tx channels in the
-// SerialLiteIII interface. Note that the valid / ready signals are abstracted
+// SerialLite3 interface. Note that the valid / ready signals are abstracted
 // away and expected to be handled, here, using Source and Sink interfaces
 typedef struct {
   Bit #(256) data;
@@ -72,12 +72,10 @@ interface SerialLite3 #(
   interface AXI4_Slave #( t_id, t_addr, t_data
                         , t_awuser, t_wuser, t_buser
                         , t_aruser, t_ruser) management_subordinate;
-  
+
   interface SerialLite3_ExternalPins pins;
-  
+
 endinterface
-
-
 
 // Interface to Stratix 10 SerialLite3 IP block insantiated with 4 lanes
 interface Stratix10_SerialLite3_4Lane;
@@ -112,7 +110,7 @@ interface Stratix10_SerialLite3_4Lane;
   (* always_ready, always_enabled *) method Action crc_error_inject(Bit#(4) error_inject);
 endinterface
 
-import "BVI" stratix10_seriallite3_4lane = 
+import "BVI" stratix10_seriallite3_4lane =
 module mkStratix10_SerialLite3_4Lane (Clock tx_clk, Reset tx_rst, Clock qsfp_refclk, Stratix10_SerialLite3_4Lane sl3);
   // Clocks
   default_clock clk (phy_mgmt_clk, (*unused*) phy_mgmt_clk_gate);
@@ -123,7 +121,7 @@ module mkStratix10_SerialLite3_4Lane (Clock tx_clk, Reset tx_rst, Clock qsfp_ref
   input_reset tx_rst(user_clock_reset_tx) clocked_by (tx_clk) = tx_rst;
   // High-speed transmitter clock that must be physically connected to the same H-tile as the tx/rx pins
   input_clock (xcvr_pll_ref_clk, (*unused*) xcvr_pll_ref_clk_gate) = qsfp_refclk;
-  
+
   // Transmit stream
   method tx(data_tx, start_of_burst_tx, end_of_burst_tx, sync_tx)
             enable (valid_tx) ready (ready_tx) clocked_by(tx_clk) reset_by(tx_rst);
@@ -143,7 +141,7 @@ module mkStratix10_SerialLite3_4Lane (Clock tx_clk, Reset tx_rst, Clock qsfp_ref
   method    err_interrupt_rx error_interrupt_rx() clocked_by(rx_clk) reset_by(rx_rst);
   method            valid_rx valid_rx()           clocked_by(rx_clk) reset_by(rx_rst);
   method rx_drop() enable(ready_rx) ready(valid_rx) clocked_by(rx_clk) reset_by(rx_rst);
-  
+
   // Memory mapped interface (uses the default clock and reset)
   // ***********TODO not using phy_mgmt_valid but may need to to generate phy_mgmt_read and phy_mgmt_write correctly
   method bus_request(phy_mgmt_addr, phy_mgmt_read, phy_mgmt_write, phy_mgmt_writedata) enable(phy_mgmt_valid);
@@ -153,10 +151,10 @@ module mkStratix10_SerialLite3_4Lane (Clock tx_clk, Reset tx_rst, Clock qsfp_ref
   // High-speed serial pins (no clock domain)
   method qsfp28_tx_pins qsfp28_tx_pins();
   method qsfp28_rx_pins(qsfp28_rx_pins) enable((*inhigh*) EN_rx_serial_data);
-  
+
   // Test/monitor ports (TODO: correct clock domain?)
   method crc_error_inject(crc_error_inject) enable((*inhigh*) EN_crc_error_inject) clocked_by(tx_clk) reset_by(tx_rst);
- 
+
   // Scheduling
   schedule ( data_rx, start_of_burst_rx, end_of_burst_rx, valid_rx, error_rx, link_up_rx, sync_rx, error_interrupt_rx, rx_drop
            , link_up_rx, link_up_tx, error_tx, tx_pll_locked, error_interrupt_tx, ready_tx
@@ -165,7 +163,6 @@ module mkStratix10_SerialLite3_4Lane (Clock tx_clk, Reset tx_rst, Clock qsfp_ref
            , link_up_rx, link_up_tx, error_tx, tx_pll_locked, error_interrupt_tx, ready_tx
            , bus_request, bus_read_data, bus_waitrequest, crc_error_inject, tx, qsfp28_tx_pins, qsfp28_rx_pins);
 endmodule
-
 
 module mkSerialLite3
   (
@@ -192,7 +189,7 @@ module mkSerialLite3
   rule no_crc_error_testing;
     sl3.crc_error_inject(0);
   endrule
-  
+
   interface Clock rx_clk = sl3.rx_clk;
   interface Reset rx_rst = sl3.rx_rst;
 
@@ -200,14 +197,14 @@ module mkSerialLite3
     method qsfp28_tx_pins = sl3.qsfp28_tx_pins;
     method qsfp28_rx_pins = sl3.qsfp28_rx_pins;
   endinterface
-  
+
   interface Sink tx;
     method canPut = sl3.ready_tx==1; // clocked_by tx_clk reset_by tx_rst
     method Action put(d); // clocked_by tx_clk reset_by tx_rst;
       sl3.tx(d.data, pack(d.start_of_burst), pack(d.end_of_burst), d.sync);
     endmethod
   endinterface
-  
+
   interface Source rx;
     method Bool canPeek = sl3.valid_rx()==1; // clocked_by rx_clk reset_by rx_rst;
     method SerialLite3_StreamFlit peek(); // if (sl3.valid_rx); // clocked_by rx_clk reset_by rx_rst =
@@ -215,12 +212,12 @@ module mkSerialLite3
     endmethod
     method Action drop = sl3.rx_drop; // clocked_by rx_clk reset_by rx_rst;
   endinterface
-  
+
   method SerialLite3_LinkStatus link_status =
-    SerialLite3_LinkStatus{error_rx:sync_error_rx.crossed(), 
-			   error_tx:sync_error_tx.crossed(),
-			   link_up_tx:sync_link_up_tx.read(),
-			   link_up_rx:sync_link_up_rx.read()};
+    SerialLite3_LinkStatus{error_rx:sync_error_rx.crossed(),
+                           error_tx:sync_error_tx.crossed(),
+                           link_up_tx:sync_link_up_tx.read(),
+                           link_up_rx:sync_link_up_rx.read()};
 
   interface AXI4_Slave management_subordinate;
   // TODO: need help!!!
@@ -236,10 +233,10 @@ module mkSerialLite3_Instance (
    SerialLite3#(/*SerialLite3_StreamFlit, SerialLite3_StreamFlit,*/
       // t_id, t_addr, t_data, t_awuser, t_wuser, t_buser, t_aruser, t_ruser
       0,    14,     32,     0,        0,       0,       0,        0) sl3);
-  
+
   SerialLite3#(0,14,32,0,0,0,0,0) sl3 <- mkSerialLite3(tx_clk, tx_rst, qsfp_refclk);
   return sl3;
-  
+
 endmodule
-  
+
 endpackage: SerialLite3
