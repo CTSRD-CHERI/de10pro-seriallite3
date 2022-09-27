@@ -21,6 +21,21 @@ typedef struct {
   Bit #(8) sync;
 } SerialLite3_StreamFlit deriving (Bits);
 
+function SerialLite3_StreamFlit axs2sl3 (AXI4Stream_Flit #(0, 256, 0, 9) axs) =
+  SerialLite3_StreamFlit { data: axs.tdata
+                         , start_of_burst: unpack (msb (axs.tuser))
+                         , end_of_burst: axs.tlast
+                         , sync: truncate (axs.tuser) };
+
+function AXI4Stream_Flit #(0, 256, 0, 9) sl32axs (SerialLite3_StreamFlit sl3) =
+  AXI4Stream_Flit { tdata: sl3.data
+                  , tstrb: ~0
+                  , tkeep: ~0
+                  , tlast: sl3.end_of_burst
+                  , tid  : ?
+                  , tdest: ?
+                  , tuser: {pack (sl3.start_of_burst), sl3.sync} };
+
 typedef struct {
    Bit #(5) error_rx;
    Bit #(4) error_tx;
@@ -49,11 +64,10 @@ interface SerialLite3 #(
 );
 
   // data to send stream
-  //interface Sink #(tx_payload) tx;
-  interface Sink #(SerialLite3_StreamFlit) tx;
+  interface AXI4Stream_Slave #(0, 256, 0, 9) tx;
   // data received stream
-  //interface Source #(rx_payload) rx;
-  interface Source #(SerialLite3_StreamFlit) rx;
+  interface AXI4Stream_Master #(0, 256, 0, 9) rx;
+
   // export receive stream clock
   interface Clock rx_clk;
   interface Reset rx_rst;
@@ -85,8 +99,8 @@ interface SerialLite3_Sig #(
 , numeric type t_aruser, numeric type t_ruser
 );
 
-  interface Sink #(SerialLite3_StreamFlit) tx;
-  interface Source #(SerialLite3_StreamFlit) rx;
+  interface AXI4Stream_Slave_Sig #(0, 256, 0, 9) tx;
+  interface AXI4Stream_Master_Sig #(0, 256, 0, 9) rx;
   interface Clock rx_clk;
   interface Reset rx_rst;
   method SerialLite3_LinkStatus link_status;
@@ -96,16 +110,19 @@ interface SerialLite3_Sig #(
   interface SerialLite3_ExternalPins pins;
 endinterface
 
-module toSerialLite3_Sig #(SerialLite3 #(a,b,c,d,e,f,g) ifc)
+module toSerialLite3_Sig #(SerialLite3 #(a,b,c,d,e,f,g) ifc
+                          , Clock tx_clk, Reset tx_rst)
                           (SerialLite3_Sig #(a,b,c,d,e,f,g));
-  let sigPort <- toAXI4Lite_Slave_Sig (ifc.management_subordinate);
+  let sigAXI4LitePort <- toAXI4Lite_Slave_Sig (ifc.management_subordinate);
+  let sigTXPort <- toAXI4Stream_Slave_Sig (ifc.tx, clocked_by tx_clk, reset_by tx_rst);
+  let sigRXPort <- toAXI4Stream_Master_Sig (ifc.rx, clocked_by ifc.rx_clk, reset_by ifc.rx_rst);
   return interface SerialLite3_Sig;
-    interface tx = ifc.tx;
-    interface rx = ifc.rx;
+    interface tx = sigTXPort;
+    interface rx = sigRXPort;
     interface rx_clk = ifc.rx_clk;
     interface rx_rst = ifc.rx_rst;
     method link_status = ifc.link_status;
-    interface management_subordinate = sigPort;
+    interface management_subordinate = sigAXI4LitePort;
     interface pins = ifc.pins;
   endinterface;
 endmodule
@@ -274,6 +291,23 @@ module mkSerialLite3
     axi4LiteShim.master.b.put(AXI4Lite_BFlit { bresp: OKAY
                                              , buser: ? });
   endrule
+
+  //----------------------------------------------------------------------------
+  Sink #(SerialLite3_StreamFlit) rawTX = interface Sink;
+    method canPut = sl3.ready_tx==1; // clocked_by tx_clk reset_by tx_rst
+    method Action put(d); // clocked_by tx_clk reset_by tx_rst;
+      sl3.tx(d.data, pack(d.start_of_burst), pack(d.end_of_burst), d.sync);
+    endmethod
+  endinterface;
+
+  Source #(SerialLite3_StreamFlit) rawRX = interface Source;
+    method Bool canPeek = sl3.valid_rx()==1; // clocked_by rx_clk reset_by rx_rst;
+    method SerialLite3_StreamFlit peek(); // if (sl3.valid_rx); // clocked_by rx_clk reset_by rx_rst =
+      return SerialLite3_StreamFlit{data:sl3.data_rx(), start_of_burst:sl3.start_of_burst_rx()==1, end_of_burst:sl3.end_of_burst_rx()==1, sync:sl3.sync_rx()};
+    endmethod
+    method Action drop = sl3.rx_drop; // clocked_by rx_clk reset_by rx_rst;
+  endinterface;
+
   //----------------------------------------------------------------------------
 
   interface Clock rx_clk = sl3.rx_clk;
@@ -284,20 +318,8 @@ module mkSerialLite3
     method qsfp28_rx_pins = sl3.qsfp28_rx_pins;
   endinterface
 
-  interface Sink tx;
-    method canPut = sl3.ready_tx==1; // clocked_by tx_clk reset_by tx_rst
-    method Action put(d); // clocked_by tx_clk reset_by tx_rst;
-      sl3.tx(d.data, pack(d.start_of_burst), pack(d.end_of_burst), d.sync);
-    endmethod
-  endinterface
-
-  interface Source rx;
-    method Bool canPeek = sl3.valid_rx()==1; // clocked_by rx_clk reset_by rx_rst;
-    method SerialLite3_StreamFlit peek(); // if (sl3.valid_rx); // clocked_by rx_clk reset_by rx_rst =
-      return SerialLite3_StreamFlit{data:sl3.data_rx(), start_of_burst:sl3.start_of_burst_rx()==1, end_of_burst:sl3.end_of_burst_rx()==1, sync:sl3.sync_rx()};
-    endmethod
-    method Action drop = sl3.rx_drop; // clocked_by rx_clk reset_by rx_rst;
-  endinterface
+  interface tx = mapSink (axs2sl3, rawTX);
+  interface rx = mapSource (sl32axs, rawRX);
 
   method SerialLite3_LinkStatus link_status =
     SerialLite3_LinkStatus{error_rx:sync_error_rx.crossed(),
@@ -319,7 +341,7 @@ module mkSerialLite3_Instance (
           14,     32,     0,        0,       0,       0,        0) sl3);
 
   let sl3 <- mkSerialLite3(tx_clk, tx_rst, qsfp_refclk);
-  let sl3_sig <- toSerialLite3_Sig (sl3);
+  let sl3_sig <- toSerialLite3_Sig (sl3, tx_clk, tx_rst);
   return sl3_sig;
 
 endmodule
