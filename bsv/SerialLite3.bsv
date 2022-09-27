@@ -77,6 +77,39 @@ interface SerialLite3 #(
 
 endinterface
 
+// The SerialLite3 "Sig" version of the interface
+interface SerialLite3_Sig #(
+  numeric type t_addr
+, numeric type t_data
+, numeric type t_awuser, numeric type t_wuser, numeric type t_buser
+, numeric type t_aruser, numeric type t_ruser
+);
+
+  interface Sink #(SerialLite3_StreamFlit) tx;
+  interface Source #(SerialLite3_StreamFlit) rx;
+  interface Clock rx_clk;
+  interface Reset rx_rst;
+  method SerialLite3_LinkStatus link_status;
+  interface AXI4Lite_Slave_Sig #( t_addr, t_data
+                                , t_awuser, t_wuser, t_buser
+                                , t_aruser, t_ruser) management_subordinate;
+  interface SerialLite3_ExternalPins pins;
+endinterface
+
+module toSerialLite3_Sig #(SerialLite3 #(a,b,c,d,e,f,g) ifc)
+                          (SerialLite3_Sig #(a,b,c,d,e,f,g));
+  let sigPort <- toAXI4Lite_Slave_Sig (ifc.management_subordinate);
+  return interface SerialLite3_Sig;
+    interface tx = ifc.tx;
+    interface rx = ifc.rx;
+    interface rx_clk = ifc.rx_clk;
+    interface rx_rst = ifc.rx_rst;
+    method link_status = ifc.link_status;
+    interface management_subordinate = sigPort;
+    interface pins = ifc.pins;
+  endinterface;
+endmodule
+
 // Interface to Stratix 10 SerialLite3 IP block insantiated with 4 lanes
 interface Stratix10_SerialLite3_4Lane;
   // export receive stream clock
@@ -281,12 +314,13 @@ endmodule
 (* synthesize *)
 module mkSerialLite3_Instance (
    Clock tx_clk, Reset tx_rst, Clock qsfp_refclk,
-   SerialLite3#(/*SerialLite3_StreamFlit, SerialLite3_StreamFlit,*/
+   SerialLite3_Sig#(/*SerialLite3_StreamFlit, SerialLite3_StreamFlit,*/
       //  t_addr, t_data, t_awuser, t_wuser, t_buser, t_aruser, t_ruser
           14,     32,     0,        0,       0,       0,        0) sl3);
 
-  SerialLite3#(14,32,0,0,0,0,0) sl3 <- mkSerialLite3(tx_clk, tx_rst, qsfp_refclk);
-  return sl3;
+  let sl3 <- mkSerialLite3(tx_clk, tx_rst, qsfp_refclk);
+  let sl3_sig <- toSerialLite3_Sig (sl3);
+  return sl3_sig;
 
 endmodule
 
