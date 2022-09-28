@@ -108,7 +108,7 @@ interface SerialLite3_Sig #(
   interface Reset rx_rst;
   (* result = "coe_link_status", always_ready, always_enabled *)
   method SerialLite3_LinkStatus link_status;
-  (* prefix = "s_axi_management" *)
+  (* prefix = "axls_management" *)
   interface AXI4Lite_Slave_Sig #( t_addr, t_data
                                 , t_awuser, t_wuser, t_buser
                                 , t_aruser, t_ruser) management_subordinate;
