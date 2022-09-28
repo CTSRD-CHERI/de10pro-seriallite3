@@ -100,9 +100,9 @@ interface SerialLite3_Sig #(
 , numeric type t_aruser, numeric type t_ruser
 );
 
-  (* prefix = "axs_txstream" *)
+  (* prefix = "axstrs_tx" *)
   interface AXI4Stream_Slave_Sig #(0, 256, 0, 9) tx;
-  (* prefix = "axm_rxstream" *)
+  (* prefix = "axstrm_rx" *)
   interface AXI4Stream_Master_Sig #(0, 256, 0, 9) rx;
   interface Clock rx_clk;
   interface Reset rx_rst;
