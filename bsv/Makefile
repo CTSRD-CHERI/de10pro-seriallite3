@@ -53,13 +53,18 @@ BSCFLAGS += -show-range-conflict
 #BSCFLAGS += -show-rule-rel \* \*
 #BSCFLAGS += -steps-warn-interval n
 
-SRC = SerialLite3.bsv
+SRC_SerialLite3 = SerialLite3.bsv
+SRC_BERT = BERT.bsv
 
-all: mkSerialLite3_Instance
+all: mkSerialLite3_Instance mkAXI4_PacketGenerator_Instance
 
-mkSerialLite3_Instance: $(SRC)
+mkSerialLite3_Instance: $(SRC_SerialLite3)
 	mkdir -p $(OUTPUTDIR)/$@-info $(BDIR)
-	$(BSC) -info-dir $(OUTPUTDIR)/$@-info -vdir $(OUTPUTDIR) -opt-undetermined-vals -unspecified-to X $(BSCFLAGS) -verilog -g mkSerialLite3_Instance -u $(SRC)
+	$(BSC) -info-dir $(OUTPUTDIR)/$@-info -vdir $(OUTPUTDIR) -opt-undetermined-vals -unspecified-to X $(BSCFLAGS) -verilog -g mkSerialLite3_Instance -u $(SRC_SerialLite3)
+
+mkBERT_Inst: $(SRC_BERT)
+	mkdir -p $(OUTPUTDIR)/$@-info $(BDIR)
+	$(BSC) -info-dir $(OUTPUTDIR)/$@-info -vdir $(OUTPUTDIR) -opt-undetermined-vals -unspecified-to X $(BSCFLAGS) -verilog -g mkBERT_Inst -u $(SRC_BERT)
 
 clean:
 	rm -f -r $(BUILDDIR)
