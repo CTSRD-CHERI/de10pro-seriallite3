@@ -100,17 +100,15 @@ interface SerialLite3_Sig #(
 , numeric type t_aruser, numeric type t_ruser
 );
 
-  (* prefix = "axs_txstream" *)
+  (* prefix = "axstrs_tx" *)
   interface AXI4Stream_Slave_Sig #(0, 256, 0, 9) tx;
-  (* prefix = "axm_rxstream" *)
+  (* prefix = "axstrm_rx" *)
   interface AXI4Stream_Master_Sig #(0, 256, 0, 9) rx;
-  (* prefix = "cso_rx" *)
   interface Clock rx_clk;
-  (* prefix = "rso_rx" *)
   interface Reset rx_rst;
   (* result = "coe_link_status", always_ready, always_enabled *)
   method SerialLite3_LinkStatus link_status;
-  (* prefix = "s_axi_management" *)
+  (* prefix = "axls_management" *)
   interface AXI4Lite_Slave_Sig #( t_addr, t_data
                                 , t_awuser, t_wuser, t_buser
                                 , t_aruser, t_ruser) management_subordinate;
@@ -341,12 +339,14 @@ endmodule
 
 
 // Create a stand-alone instance that could be imported into Platform Designer as a component
-(* synthesize, clock_prefix="csi", reset_prefix="rsi" *)
-module mkSerialLite3_Instance (
-   Clock tx_clk, Reset tx_rst, Clock qsfp_refclk,
-   SerialLite3_Sig#(/*SerialLite3_StreamFlit, SerialLite3_StreamFlit,*/
-      //  t_addr, t_data, t_awuser, t_wuser, t_buser, t_aruser, t_ruser
-          14,     32,     0,        0,       0,       0,        0) sl3);
+(* synthesize, default_clock_osc = "csi_clk", default_reset = "rsi_rst"
+             , clock_prefix = "cso", reset_prefix= "rso" *)
+module mkSerialLite3_Instance ( (* osc = "csi_tx_clk" *) Clock tx_clk
+                              , (* reset = "rsi_tx_rst" *) Reset tx_rst
+                              , (* osc = "csi_qsfp_refclk" *) Clock qsfp_refclk
+                              , SerialLite3_Sig#(/*SerialLite3_StreamFlit, SerialLite3_StreamFlit,*/
+                                                 //  t_addr, t_data, t_awuser, t_wuser, t_buser, t_aruser, t_ruser
+                                                         14,     32,     0,        0,       0,       0,        0) sl3);
 
   let sl3 <- mkSerialLite3(tx_clk, tx_rst, qsfp_refclk);
   let sl3_sig <- toSerialLite3_Sig (sl3, tx_clk, tx_rst);

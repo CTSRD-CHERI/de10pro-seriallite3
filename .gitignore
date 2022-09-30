@@ -1,0 +1,4 @@
+*_hw.tcl
+qdb/
+bsv/build/
+bsv/output/
