@@ -29,6 +29,12 @@ IP_SRC = soc.qsys				\
 	 $(wildcard *.ip)			\
 	 $(wildcard ip/soc/*.ip)
 
+VIPBUNDLEDIR = $(CURDIR)/vipbundle
+VIPBUNDLE = $(VIPBUNDLEDIR)/vipbundle
+SERIALLITE3_HW_TCL = $(CURDIR)/mkSerialLite3_hw.tcl
+SERIALLITE3_BSV_DIR = $(CURDIR)/bsv
+SERIALLITE3_RTL = $(SERIALLITE3_BSV_DIR)/output/mkSerialLite3_Instance.v
+
 .PHONY: help
 help:
 	@echo "This Makefile is typically started by a ../tests/*/Makefile"
@@ -44,7 +50,6 @@ help:
 all: fpga_image niosv_software
 # program_fpga test
 
-
 #-----------------------------------------------------------------------------
 # build the FPGA image
 #  - also generates IP required by DE10_Pro.qsf
@@ -55,15 +60,44 @@ output_files/DE10_Pro.sof: $(VERILOG_SRC) generate_ip
 	quartus_sh --flow compile DE10_Pro.qpf
 
 .PHONY: generate_ip
-generate_ip: $(IP_SRC)
+generate_ip: $(IP_SRC) $(SERIALLITE3_HW_TCL)
 	quartus_ipgenerate --generate_project_ip_files -synthesis=verilog DE10_Pro.qpf --clear_ip_generation_dirs
+
+#-----------------------------------------------------------------------------
+# get the tcl for the serial lite 3 rtl
+$(SERIALLITE3_HW_TCL): $(VIPBUNDLE) $(SERIALLITE3_RTL)
+	$(VIPBUNDLE) -f quartus_ip_tcl -o $@ $(SERIALLITE3_RTL)
+.PHONY: generate_seriallite3_tcl clean_seriallite3_tcl
+generate_seriallite3_tcl: $(SERIALLITE3_HW_TCL)
+clean_seriallite3_tcl:
+	rm -f $(SERIALLITE3_HW_TCL)
+
+#-----------------------------------------------------------------------------
+# Build the RTL for the Serial lite 3 module
+$(SERIALLITE3_RTL):
+	$(MAKE) -C $(SERIALLITE3_BSV_DIR) mkSerialLite3_Instance
+.PHONY: generate_seriallite3_rtl clean_seriallite3_rtl mrproper_seriallite3_rtl
+generate_seriallite3_rtl: $(SERIALLITE3_RTL)
+clean_seriallite3_rtl:
+	$(MAKE) -C $(SERIALLITE3_BSV_DIR) clean
+mrproper_seriallite3_rtl:
+	$(MAKE) -C $(SERIALLITE3_BSV_DIR) mrproper
+
+#-----------------------------------------------------------------------------
+# build vipbundle
+$(VIPBUNDLE):
+	$(MAKE) -C $(VIPBUNDLEDIR) vipbundle
+
+.PHONY: vipbundle clean-vipbundle
+vipbundle: $(VIPBUNDLE)
+clean-vipbundle:
+	$(MAKE) -C $(VIPBUNDLEDIR) clean
 
 #-----------------------------------------------------------------------------
 # program the FPGA
 .PHONY: program_fpga
 program_fpga:
 	./py/flashDE10 output_files/DE10_Pro.sof
-
 
 #-----------------------------------------------------------------------------
 # build the software for the NIOS-V soft core
@@ -76,6 +110,7 @@ niosv_software:
 .PHONE: boot_niosv
 boot_niosv:
 	niosv-download -g software/app/main.elf
+
 
 #-----------------------------------------------------------------------------
 # start a jtag terminal in a separate window
