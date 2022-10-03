@@ -113,7 +113,7 @@ $(VIPBUNDLE):
 
 .PHONY: vipbundle clean-vipbundle
 vipbundle: $(VIPBUNDLE)
-clean-vipbundle:
+clean_vipbundle:
 	$(MAKE) -C $(VIPBUNDLEDIR) clean
 
 #-----------------------------------------------------------------------------
