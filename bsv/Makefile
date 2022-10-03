@@ -62,9 +62,9 @@ mkSerialLite3_Instance: $(SRC_SerialLite3)
 	mkdir -p $(OUTPUTDIR)/$@-info $(BDIR)
 	$(BSC) -info-dir $(OUTPUTDIR)/$@-info -vdir $(OUTPUTDIR) -opt-undetermined-vals -unspecified-to X $(BSCFLAGS) -verilog -g mkSerialLite3_Instance -u $(SRC_SerialLite3)
 
-mkBERT_Inst: $(SRC_BERT)
+mkBERT_Instance: $(SRC_BERT)
 	mkdir -p $(OUTPUTDIR)/$@-info $(BDIR)
-	$(BSC) -info-dir $(OUTPUTDIR)/$@-info -vdir $(OUTPUTDIR) -opt-undetermined-vals -unspecified-to X $(BSCFLAGS) -verilog -g mkBERT_Inst -u $(SRC_BERT)
+	$(BSC) -info-dir $(OUTPUTDIR)/$@-info -vdir $(OUTPUTDIR) -opt-undetermined-vals -unspecified-to X $(BSCFLAGS) -verilog -g mkBERT_Instance -u $(SRC_BERT)
 
 clean:
 	rm -f -r $(BUILDDIR)
