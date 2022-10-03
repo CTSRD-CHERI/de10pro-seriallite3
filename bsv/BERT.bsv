@@ -43,10 +43,10 @@ interface BERT#(
   // stream to receive
   interface AXI4Stream_Slave #(0, 256, 0, 9) rxstream;
 
-  // memory slave for control/status registers  
+  // memory slave for control/status registers
   interface AXI4Lite_Slave #( t_addr, 32
-			   , t_awuser, t_wuser, t_buser
-			   , t_aruser, t_ruser) mem_csrs;
+                            , t_awuser, t_wuser, t_buser
+                            , t_aruser, t_ruser) mem_csrs;
 endinterface
 
 
@@ -59,10 +59,10 @@ interface BERT_Sig#(
 
   interface AXI4Stream_Master_Sig #(0, 256, 0, 9) txstream;
   interface AXI4Stream_Slave_Sig  #(0, 256, 0, 9) rxstream;
-  
+
   interface AXI4Lite_Slave_Sig #( t_addr, 32
-				, t_awuser, t_wuser, t_buser
-				, t_aruser, t_ruser) mem_csrs;
+                                , t_awuser, t_wuser, t_buser
+                                , t_aruser, t_ruser) mem_csrs;
 endinterface
 
 
@@ -77,9 +77,9 @@ module mkBERT(BERT#(t_addr, t_awuser, t_wuser, t_buser, t_aruser, t_ruser) ifc);
     Bit#(32) d = 32'hdeaddead;
     if((r.araddr[2]==1'b0) && rxfifo.master.canPeek)
       begin
-	let f = rxfifo.master.peek;
-	d = truncate(f.tdata);
-	rxfifo.master.drop;
+        let f = rxfifo.master.peek;
+        d = truncate(f.tdata);
+        rxfifo.master.drop;
       end
     if(r.araddr[2]==1'b1)
       d = zeroExtend({pack(rxfifo.master.canPeek), pack(txfifo.slave.canPut)});
@@ -95,16 +95,17 @@ module mkBERT(BERT#(t_addr, t_awuser, t_wuser, t_buser, t_aruser, t_ruser) ifc);
     let w <- get (axiShim.master.w);
     if((aw.awaddr[2]==1'b0) && txfifo.slave.canPut())
       txfifo.slave.put(AXI4Stream_Flit{ tdata: zeroExtend(w.wdata)
-				      , tstrb: ~0
-				      , tkeep: ~0
-				      , tlast: True
-				      , tid: ?
-				      , tdest: ?
-				      , tuser: 0} );
+                                      , tstrb: ~0
+                                      , tkeep: ~0
+                                      , tlast: True
+                                      , tid: ?
+                                      , tdest: ?
+                                      , tuser: 0} );
     // if (aw.awaddr[1]==1'b1) - use this to control testing?
     let rsp = AXI4Lite_BFlit { bresp: OKAY, buser: ? };
     axiShim.master.b.put (rsp);
   endrule
+
   // interface
   interface mem_csrs = axiShim.slave;
   interface txstream = txfifo.master;
@@ -114,7 +115,7 @@ endmodule
 
 
 module toBERT_Sig#(BERT#(t_addr, t_awuser, t_wuser, t_buser, t_aruser, t_ruser) ifc)
-   		         (BERT_Sig#(t_addr, t_awuser, t_wuser, t_buser, t_aruser, t_ruser));
+                  (BERT_Sig#(t_addr, t_awuser, t_wuser, t_buser, t_aruser, t_ruser));
   let sigAXI4LitePort <- toAXI4Lite_Slave_Sig(ifc.mem_csrs);
   let sigTXport <- toAXI4Stream_Master_Sig(ifc.txstream);
   let sigRXport <- toAXI4Stream_Slave_Sig(ifc.rxstream);
@@ -124,11 +125,11 @@ module toBERT_Sig#(BERT#(t_addr, t_awuser, t_wuser, t_buser, t_aruser, t_ruser) 
     interface rxstream = sigRXport;
   endinterface;
 endmodule
-  
+
 
 (* synthesize *)
 module mkBERT_Instance(BERT_Sig#(// t_addr, t_awuser, t_wuser, t_buser, t_aruser, t_ruser
-		 	                 3,        0,       0,       0,        0,       0) pg);
+                                         3,        0,       0,       0,        0,       0) pg);
   let pg <- mkBERT();
   let pg_sig <- toBERT_Sig(pg);
   return pg_sig;
