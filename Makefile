@@ -34,6 +34,9 @@ VIPBUNDLE = $(VIPBUNDLEDIR)/vipbundle
 SERIALLITE3_HW_TCL = $(CURDIR)/mkSerialLite3_hw.tcl
 SERIALLITE3_BSV_DIR = $(CURDIR)/bsv
 SERIALLITE3_RTL = $(SERIALLITE3_BSV_DIR)/output/mkSerialLite3_Instance.v
+BERT_HW_TCL = $(CURDIR)/mkBERT_hw.tcl
+BERT_BSV_DIR = $(CURDIR)/bsv
+BERT_RTL = $(BERT_BSV_DIR)/output/mkBERT_Instance.v
 
 .PHONY: help
 help:
@@ -60,7 +63,7 @@ output_files/DE10_Pro.sof: $(VERILOG_SRC) generate_ip
 	quartus_sh --flow compile DE10_Pro.qpf
 
 .PHONY: generate_ip
-generate_ip: $(IP_SRC) $(SERIALLITE3_HW_TCL)
+generate_ip: $(IP_SRC) $(SERIALLITE3_HW_TCL) $(BERT_HW_TCL)
 	quartus_ipgenerate --generate_project_ip_files -synthesis=verilog DE10_Pro.qpf --clear_ip_generation_dirs
 
 #-----------------------------------------------------------------------------
@@ -82,6 +85,26 @@ clean_seriallite3_rtl:
 	$(MAKE) -C $(SERIALLITE3_BSV_DIR) clean
 mrproper_seriallite3_rtl:
 	$(MAKE) -C $(SERIALLITE3_BSV_DIR) mrproper
+
+#-----------------------------------------------------------------------------
+# get the tcl for the bit error rate tester
+$(BERT_HW_TCL): $(VIPBUNDLE) $(BERT_RTL)
+	$(VIPBUNDLE) -f quartus_ip_tcl -o $@ $(BERT_RTL)
+.PHONY: generate_bert_tcl clean_bert_tcl
+generate_bert_tcl: $(BERT_HW_TCL)
+clean_bert_tcl:
+	rm -f $(BERT_HW_TCL)
+
+#-----------------------------------------------------------------------------
+# Build the RTL for the bit error rate tester
+$(BERT_RTL):
+	$(MAKE) -C $(BERT_BSV_DIR) mkBERT_Instance
+.PHONY: generate_bert_rtl clean_bert_rtl mrproper_bert_rtl
+generate_bert_rtl: $(BERT_RTL)
+clean_bert_rtl:
+	$(MAKE) -C $(BERT_BSV_DIR) clean
+mrproper_bert_rtl:
+	$(MAKE) -C $(BERT_BSV_DIR) mrproper
 
 #-----------------------------------------------------------------------------
 # build vipbundle
