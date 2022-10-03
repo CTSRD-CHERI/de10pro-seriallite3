@@ -127,8 +127,8 @@ endmodule
   
 
 (* synthesize *)
-module mkBERT_Inst(BERT_Sig#(// t_addr, t_awuser, t_wuser, t_buser, t_aruser, t_ruser
-			             3,        0,       0,       0,        0,       0) pg);
+module mkBERT_Instance(BERT_Sig#(// t_addr, t_awuser, t_wuser, t_buser, t_aruser, t_ruser
+		 	                 3,        0,       0,       0,        0,       0) pg);
   let pg <- mkBERT();
   let pg_sig <- toBERT_Sig(pg);
   return pg_sig;
