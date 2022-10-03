@@ -57,9 +57,12 @@ interface BERT_Sig#(
 , numeric type t_aruser, numeric type t_ruser
 );
 
+  (* prefix = "axstrm_txstream" *)
   interface AXI4Stream_Master_Sig #(0, 256, 0, 9) txstream;
+  (* prefix = "axstrs_rxstream" *)
   interface AXI4Stream_Slave_Sig  #(0, 256, 0, 9) rxstream;
 
+  (* prefix = "axls_mem_csrs" *)
   interface AXI4Lite_Slave_Sig #( t_addr, 32
                                 , t_awuser, t_wuser, t_buser
                                 , t_aruser, t_ruser) mem_csrs;
