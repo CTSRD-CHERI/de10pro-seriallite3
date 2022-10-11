@@ -31,6 +31,9 @@ package BERT;
 
 import BlueAXI4   :: *;
 import BlueBasics :: *;
+import FIFOF      :: *;
+import Clocks     :: *;
+
 
 interface BERT#(
   numeric type t_addr
@@ -61,7 +64,6 @@ interface BERT_Sig#(
   interface AXI4Stream_Master_Sig #(0, 256, 0, 9) txstream;
   (* prefix = "axstrs_rxstream" *)
   interface AXI4Stream_Slave_Sig  #(0, 256, 0, 9) rxstream;
-
   (* prefix = "axls_mem_csrs" *)
   interface AXI4Lite_Slave_Sig #( t_addr, 32
                                 , t_awuser, t_wuser, t_buser
@@ -69,19 +71,33 @@ interface BERT_Sig#(
 endinterface
 
 
-module mkBERT(BERT#(t_addr, t_awuser, t_wuser, t_buser, t_aruser, t_ruser) ifc);
+module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst, BERT#(t_addr, t_awuser, t_wuser, t_buser, t_aruser, t_ruser) ifc);
 
-  AXI4Stream_Shim#(0, 256, 0, 9) txfifo <- mkAXI4StreamShimUGSizedFIFOF32();
-  AXI4Stream_Shim#(0, 256, 0, 9) rxfifo <- mkAXI4StreamShimUGSizedFIFOF32();
+  AXI4Stream_Shim#(0, 256, 0, 9)                  txfifo <- mkAXI4StreamShimUGSizedFIFOF32();
+  AXI4Stream_Shim#(0, 256, 0, 9)            rx_fast_fifo <- mkAXI4StreamShimUGSizedFIFOF32(clocked_by csi_rx_clk, reset_by csi_rx_rst);
+  SyncFIFOIfc#(AXI4Stream_Flit#(0,256,0,9)) rx_sync_fifo <- mkSyncFIFOToCC(32, csi_rx_clk, csi_rx_rst);
+  AXI4Stream_Shim#(0, 256, 0, 9)                  rxfifo <- mkAXI4StreamShimUGSizedFIFOF32();
+  
   let axiShim <- mkAXI4LiteShimFF;
+  
+  // rule runs in csi_rx_clk domain
+  rule clock_cross_rx_data(rx_fast_fifo.master.canPeek);
+    rx_sync_fifo.enq(rx_fast_fifo.master.peek());
+    rx_fast_fifo.master.drop;
+  endrule
+  
+  rule clock_crossed_rx_data_to_axi4_stream(rx_sync_fifo.notEmpty() && rxfifo.slave.canPut());
+    rxfifo.slave.put(rx_sync_fifo.first);
+    rx_sync_fifo.deq;
+  endrule
 
   rule read_req;
     let r <- get (axiShim.master.ar);
     Bit#(32) d = 32'hdeaddead;
     if((r.araddr[2]==1'b0) && rxfifo.master.canPeek)
       begin
-        let f = rxfifo.master.peek;
-        d = truncate(f.tdata);
+        let a = rxfifo.master.peek;
+	d = truncate(a.tdata);
         rxfifo.master.drop;
       end
     if(r.araddr[2]==1'b1)
@@ -98,12 +114,12 @@ module mkBERT(BERT#(t_addr, t_awuser, t_wuser, t_buser, t_aruser, t_ruser) ifc);
     let w <- get (axiShim.master.w);
     if((aw.awaddr[2]==1'b0) && txfifo.slave.canPut())
       txfifo.slave.put(AXI4Stream_Flit{ tdata: zeroExtend(w.wdata)
-                                      , tstrb: ~0
-                                      , tkeep: ~0
-                                      , tlast: True
-                                      , tid: ?
-                                      , tdest: ?
-                                      , tuser: 0} );
+                                       , tstrb: ~0
+                                       , tkeep: ~0
+                                       , tlast: True
+                                       , tid: ?
+                                       , tdest: ?
+                                       , tuser: 0} );
     // if (aw.awaddr[1]==1'b1) - use this to control testing?
     let rsp = AXI4Lite_BFlit { bresp: OKAY, buser: ? };
     axiShim.master.b.put (rsp);
@@ -112,16 +128,16 @@ module mkBERT(BERT#(t_addr, t_awuser, t_wuser, t_buser, t_aruser, t_ruser) ifc);
   // interface
   interface mem_csrs = axiShim.slave;
   interface txstream = txfifo.master;
-  interface rxstream = rxfifo.slave;
+  interface rxstream = rx_fast_fifo.slave;
 endmodule
 
 
 
-module toBERT_Sig#(BERT#(t_addr, t_awuser, t_wuser, t_buser, t_aruser, t_ruser) ifc)
+module toBERT_Sig#(Clock csi_rx_clk, Reset csi_rx_rst, BERT#(t_addr, t_awuser, t_wuser, t_buser, t_aruser, t_ruser) ifc)
                   (BERT_Sig#(t_addr, t_awuser, t_wuser, t_buser, t_aruser, t_ruser));
   let sigAXI4LitePort <- toAXI4Lite_Slave_Sig(ifc.mem_csrs);
   let sigTXport <- toAXI4Stream_Master_Sig(ifc.txstream);
-  let sigRXport <- toAXI4Stream_Slave_Sig(ifc.rxstream);
+  let sigRXport <- toAXI4Stream_Slave_Sig(ifc.rxstream, clocked_by csi_rx_clk, reset_by csi_rx_rst);
   return interface BERT_Sig;
     interface mem_csrs = sigAXI4LitePort;
     interface txstream = sigTXport;
@@ -131,10 +147,10 @@ endmodule
 
 
 (* synthesize *)
-module mkBERT_Instance(BERT_Sig#(// t_addr, t_awuser, t_wuser, t_buser, t_aruser, t_ruser
-                                         3,        0,       0,       0,        0,       0) pg);
-  let pg <- mkBERT();
-  let pg_sig <- toBERT_Sig(pg);
+module mkBERT_Instance(Clock csi_rx_clk, Reset csi_rx_rst, BERT_Sig#(// t_addr, t_awuser, t_wuser, t_buser, t_aruser, t_ruser
+                                                                             3,        0,       0,       0,        0,       0) pg);
+  let pg <- mkBERT(csi_rx_clk, csi_rx_rst);
+  let pg_sig <- toBERT_Sig(csi_rx_clk, csi_rx_rst, pg);
   return pg_sig;
 endmodule
 
