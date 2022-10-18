@@ -37,8 +37,10 @@ module stratix10_seriallite3_4lane_invrst (
 		input  wire [7:0]   sync_tx                   //                  sync_tx.tx_sync
 	);
 
+   wire   interface_clock_reset_rx;
+   assign interface_clock_reset_rx_n = ~interface_clock_reset_rx;
 
-	stratix10_seriallite3_4lane u0 (
+   stratix10_seriallite3_4lane u0 (
 		.user_clock_tx            (user_clock_tx),            //   input,    width = 1,            user_clock_tx.clk
 		.user_clock_reset_tx      (~user_clock_reset_tx_n),   //   input,    width = 1,      user_clock_reset_tx.reset
 		.data_tx                  (data_tx),                  //   input,  width = 256,                  data_tx.tx_data
@@ -49,7 +51,7 @@ module stratix10_seriallite3_4lane_invrst (
 		.link_up_tx               (link_up_tx),               //  output,    width = 1,               link_up_tx.tx_link_up
 		.error_tx                 (error_tx),                 //  output,    width = 4,                 error_tx.tx_error
 		.interface_clock_rx       (interface_clock_rx),       //  output,    width = 1,       interface_clock_rx.clk
-		.interface_clock_reset_rx (~interface_clock_reset_rx_n), //  output,    width = 1, interface_clock_reset_rx.reset
+		.interface_clock_reset_rx (interface_clock_reset_rx), //  output,    width = 1, interface_clock_reset_rx.reset
 		.data_rx                  (data_rx),                  //  output,  width = 256,                  data_rx.rx_data
 		.valid_rx                 (valid_rx),                 //  output,    width = 1,                 valid_rx.rx_valid
 		.sync_rx                  (sync_rx),                  //  output,    width = 8,                  sync_rx.rx_sync
@@ -76,4 +78,6 @@ module stratix10_seriallite3_4lane_invrst (
 		.rx_serial_data           (rx_serial_data),           //   input,    width = 4,           rx_serial_data.rx_serial_data
 		.sync_tx                  (sync_tx)                   //   input,    width = 8,                  sync_tx.tx_sync
 	);
+
+endmodule
 
