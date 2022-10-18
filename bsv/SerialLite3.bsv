@@ -26,8 +26,7 @@
  * channels, i.e. suitable for one of the 100Gbps links on the Stratix-10 based
  * DE10Pro board.
  * 
- * WARNING: USES POSITIVE RESETS (i.e. not the default negative reset generally
- * used by Bluespec), so compile with option "-D BSV_POSITIVE_RESET"
+ * TODO: also wrap xcvr_atx_pll_s10_htile PLLs (two per SerialLite3 4-lane interface)
  */
 
 package SerialLite3;
@@ -80,6 +79,7 @@ typedef struct {
 interface SerialLite3_ExternalPins;
   method Bit #(4) qsfp28_tx_pins;
   method Action qsfp28_rx_pins (Bit #(4) x);
+  method Action xcvr_atx_pll_s10_htile_tx (Bit #(4) clk, Bit#(1) locked);
 endinterface
 
 // The SerialLite3 internal signals
@@ -183,7 +183,6 @@ interface Stratix10_SerialLite3_4Lane;
   // data transmit stream
   method Action tx(Bit#(256) data_tx, Bit#(1) start_of_burst_tx, Bit#(1) end_of_burst_tx, Bit#(8) sync_tx);
   method Bit#(4) error_tx;
-  method Bit#(1) tx_pll_locked;
   method Bit#(1) error_interrupt_tx;
   method Bit#(1) ready_tx;
   method Bit#(1) link_up_tx;
@@ -194,6 +193,7 @@ interface Stratix10_SerialLite3_4Lane;
   // export high-speed serial pins
   (* always_ready, always_enabled *) method Bit#(4) qsfp28_tx_pins;
   (* always_ready, always_enabled *) method Action qsfp28_rx_pins(Bit#(4) a);
+  (* always_ready, always_enabled *) method Action xcvr_atx_pll_s10_htile_tx (Bit #(4) clk, Bit#(1) locked);
   // test ports
   (* always_ready, always_enabled *) method Action crc_error_inject(Bit#(4) error_inject);
 endinterface
@@ -215,7 +215,6 @@ module mkStratix10_SerialLite3_4Lane (Clock tx_clk, Reset tx_rst_n, Clock qsfp_r
                  enable (valid_tx) ready (ready_tx) clocked_by(tx_clk) reset_by(tx_rst_n);
   method            error_tx error_tx()             clocked_by(tx_clk) reset_by(tx_rst_n);
   method          link_up_tx link_up_tx()           clocked_by(tx_clk) reset_by(tx_rst_n);
-  method       tx_pll_locked tx_pll_locked()        clocked_by(tx_clk) reset_by(tx_rst_n);
   method    err_interrupt_tx error_interrupt_tx()   clocked_by(tx_clk) reset_by(tx_rst_n);
   method            ready_tx ready_tx()             clocked_by(tx_clk) reset_by(tx_rst_n);
 
@@ -232,24 +231,25 @@ module mkStratix10_SerialLite3_4Lane (Clock tx_clk, Reset tx_rst_n, Clock qsfp_r
 
   // Memory mapped interface (uses the default clock and reset)
   // ***********TODO not using phy_mgmt_valid but may need to to generate phy_mgmt_read and phy_mgmt_write correctly
-  method bus_request(phy_mgmt_addr, phy_mgmt_read, phy_mgmt_write, phy_mgmt_writedata) enable(phy_mgmt_valid);
+  method bus_request(phy_mgmt_address, phy_mgmt_read, phy_mgmt_write, phy_mgmt_writedata) enable((*inhigh*) phy_mgmt_valid);
   method phy_mgmt_readdata bus_read_data();
-  method phy_mgmt_waitreques bus_waitrequest();
+  method phy_mgmt_waitrequest bus_waitrequest();
 
   // High-speed serial pins (no clock domain)
-  method qsfp28_tx_pins qsfp28_tx_pins();
-  method qsfp28_rx_pins(qsfp28_rx_pins) enable((*inhigh*) EN_rx_serial_data);
+  method tx_serial_data qsfp28_tx_pins();
+  method qsfp28_rx_pins(rx_serial_data) enable((*inhigh*) EN_rx_serial_data);
+  method xcvr_atx_pll_s10_htile_tx (tx_serial_clk, tx_pll_locked) enable((*inhigh*) EN_tx_serial_clk);
 
   // Test/monitor ports (TODO: correct clock domain?)
   method crc_error_inject(crc_error_inject) enable((*inhigh*) EN_crc_error_inject) clocked_by(tx_clk) reset_by(tx_rst_n);
 
   // Scheduling
   schedule ( data_rx, start_of_burst_rx, end_of_burst_rx, valid_rx, error_rx, link_up_rx, sync_rx, error_interrupt_rx, rx_drop
-           , link_up_rx, link_up_tx, error_tx, tx_pll_locked, error_interrupt_tx, ready_tx
-           , bus_request, bus_read_data, bus_waitrequest, crc_error_inject, tx, qsfp28_tx_pins, qsfp28_rx_pins)
+           , link_up_rx, link_up_tx, error_tx, error_interrupt_tx, ready_tx
+           , bus_request, bus_read_data, bus_waitrequest, crc_error_inject, tx, qsfp28_tx_pins, qsfp28_rx_pins, xcvr_atx_pll_s10_htile_tx)
         CF (data_rx, start_of_burst_rx, end_of_burst_rx, valid_rx, error_rx, link_up_rx, sync_rx, error_interrupt_rx, rx_drop
-           , link_up_rx, link_up_tx, error_tx, tx_pll_locked, error_interrupt_tx, ready_tx
-           , bus_request, bus_read_data, bus_waitrequest, crc_error_inject, tx, qsfp28_tx_pins, qsfp28_rx_pins);
+           , link_up_rx, link_up_tx, error_tx, error_interrupt_tx, ready_tx
+           , bus_request, bus_read_data, bus_waitrequest, crc_error_inject, tx, qsfp28_tx_pins, qsfp28_rx_pins, xcvr_atx_pll_s10_htile_tx);
 endmodule
 
 module mkSerialLite3
@@ -354,6 +354,7 @@ module mkSerialLite3
   interface SerialLite3_ExternalPins pins;
     method qsfp28_tx_pins = sl3.qsfp28_tx_pins;
     method qsfp28_rx_pins = sl3.qsfp28_rx_pins;
+    method xcvr_atx_pll_s10_htile_tx = sl3.xcvr_atx_pll_s10_htile_tx;
   endinterface
 
   interface tx = mapSink (axs2sl3, rawTX);
