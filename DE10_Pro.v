@@ -51,10 +51,10 @@
 //`define ENABLE_TEMP_I2C
 //`define ENABLE_GPIO
 //`define ENABLE_PCIE
-//`define ENABLE_QSFP28A
-`define ENABLE_QSFP28B
-`define ENABLE_QSFP28C
-//`define ENABLE_QSFP28D
+`define ENABLE_QSFP28A
+//`define ENABLE_QSFP28B
+//`define ENABLE_QSFP28C
+`define ENABLE_QSFP28D
 //`define ENABLE_HPS
 
 module DE10_Pro
@@ -314,14 +314,14 @@ module DE10_Pro
 		 reset_n_100 <= reset_n_metastable_100;
      end
    
-   wire 	htile_fast_clk_B0;
-   wire 	htile_fast_clk_B1;
-   wire 	htile_fast_lock_B0;
-   wire 	htile_fast_lock_B1;
-   wire 	htile_fast_clk_C0;
-   wire 	htile_fast_clk_C1;
-   wire 	htile_fast_lock_C0;
-   wire 	htile_fast_lock_C1;
+   wire 	htile_fast_clk_A0;
+   wire 	htile_fast_clk_A1;
+   wire 	htile_fast_lock_A0;
+   wire 	htile_fast_lock_A1;
+   wire 	htile_fast_clk_D0;
+   wire 	htile_fast_clk_D1;
+   wire 	htile_fast_lock_D0;
+   wire 	htile_fast_lock_D1;
    wire [15:0] 	status;
    reg [15:0] 	status_metastable /* synthesis preserve */; // preserve net name for timing closure
    reg [15:0] 	status_latched;
@@ -344,8 +344,12 @@ module DE10_Pro
    assign QSFP28C_SDA = 0;
    assign QSFP28C_MOD_SEL_n = 1;
 
-   assign status[7:4] = {htile_fast_lock_C1, htile_fast_lock_C0, htile_fast_lock_B1, htile_fast_lock_B0};
-   assign status[15:12] = 4'hf;
+   wire [10:0] link_status_A;
+   wire [10:0] link_status_D;
+   wire [3:0]  cal_busy;
+   assign status[10:0] = link_status_A;
+   assign status[11] = | cal_busy;
+   assign status[15:12] = {htile_fast_lock_D1, htile_fast_lock_D0, htile_fast_lock_A1, htile_fast_lock_A0};
    
    soc mainsoc
       (
@@ -353,45 +357,62 @@ module DE10_Pro
        .reset_reset(!reset_n_100),
        .pio_status_input_export                   (status_latched),                  //   input,    width = 16,                           pio_status_input.export
 
+	   .mkseriallite3_instance_0_ignore_CLK_GATE_rx_clk (),
+	   .mkseriallite3_instance_0_coe_link_status_coe_link_status (link_status_A),           // 11-bits
+	   .mkseriallite3_instance_0_coe_qsfp28_rx_pins_x_coe_qsfp28_rx_pins_x (QSFP28A_RX_p),
+	   .mkseriallite3_instance_0_coe_qsfp28_tx_pins_coe_qsfp28_tx_pins (QSFP28A_TX_p),
+	   .mkseriallite3_instance_0_csi_qsfp_refclk_clk(QSFP28A_REFCLK_p),
+	   .mkseriallite3_instance_0_conduit_xcvr_atx_pll_s10_htile_tx_clk_export({htile_fast_clk_A1,htile_fast_clk_A1,htile_fast_clk_A0,htile_fast_clk_A0}),
+	   .mkseriallite3_instance_0_conduit_xcvr_atx_pll_s10_htile_tx_locked_export(htile_fast_lock_A0 && htile_fast_lock_A1),
+
+	   .mkseriallite3_instance_1_clk_gate_rx_clk_CLK_GATE_rx_clk (),
+	   .mkseriallite3_instance_1_coe_link_status_coe_link_status (link_status_D),           // 11-bits
+	   .mkseriallite3_instance_1_coe_qsfp28_rx_pins_x_coe_qsfp28_rx_pins_x (QSFP28D_RX_p),
+	   .mkseriallite3_instance_1_coe_qsfp28_tx_pins_coe_qsfp28_tx_pins (QSFP28D_TX_p),
+	   .mkseriallite3_instance_1_csi_qsfp_refclk_clk(QSFP28D_REFCLK_p),
+	   .mkseriallite3_instance_1_conduit_xcvr_atx_pll_s10_htile_tx_clk_export({htile_fast_clk_D1,htile_fast_clk_D1,htile_fast_clk_D0,htile_fast_clk_D0}),
+	   .mkseriallite3_instance_1_conduit_xcvr_atx_pll_s10_htile_tx_locked_export(htile_fast_lock_D0 && htile_fast_lock_D1),
+
+/*
        .sl3_0_link_up_tx_tx_link_up               (status[0]),                               //  output,    width = 1,        sl3_0_link_up_tx.tx_link_up
        .sl3_0_link_up_rx_rx_link_up               (status[1]),                               //  output,    width = 1,        sl3_0_link_up_rx.rx_link_up
-//       .sl3_0_tx_serial_clk_clk                   ({htile_fast_clk_B1,htile_fast_clk_B1,htile_fast_clk_B0,htile_fast_clk_B0}), //   input,    width = 4,     sl3_0_tx_serial_clk.clk
-       .sl3_0_tx_serial_clk_clk                   ({htile_fast_clk_B0,htile_fast_clk_B0,htile_fast_clk_B1,htile_fast_clk_B1}), //   input,    width = 4,     sl3_0_tx_serial_clk.clk
+//       .sl3_0_tx_serial_clk_clk                   ({htile_fast_clk_A1,htile_fast_clk_A1,htile_fast_clk_A0,htile_fast_clk_A0}), //   input,    width = 4,     sl3_0_tx_serial_clk.clk
+       .sl3_0_tx_serial_clk_clk                   ({htile_fast_clk_A0,htile_fast_clk_A0,htile_fast_clk_A1,htile_fast_clk_A1}), //   input,    width = 4,     sl3_0_tx_serial_clk.clk
        .sl3_0_xcvr_pll_ref_clk_clk                (QSFP28B_REFCLK_p),                        //   input,    width = 1,  sl3_0_xcvr_pll_ref_clk.clk
-       .sl3_0_tx_pll_locked_pll_locked            (htile_fast_lock_B0 && htile_fast_lock_B1), //   input,    width = 1,     sl3_0_tx_pll_locked.pll_locked
+       .sl3_0_tx_pll_locked_pll_locked            (htile_fast_lock_A0 && htile_fast_lock_A1), //   input,    width = 1,     sl3_0_tx_pll_locked.pll_locked
        .sl3_0_crc_error_inject_tx_err_ins         (4'd0),                                      //   input,    width = 4,  sl3_0_crc_error_inject.tx_err_ins
        .sl3_0_tx_serial_data_tx_serial_data       (QSFP28B_TX_p),                           //  output,    width = 4,    sl3_0_tx_serial_data.tx_serial_data
        .sl3_0_rx_serial_data_rx_serial_data       (QSFP28B_RX_p),                           //   input,    width = 4,    sl3_0_rx_serial_data.rx_serial_data
 
        .sl3_1_link_up_tx_tx_link_up               (status[2]),                    //  output,    width = 1,                           sl3_1_link_up_tx.tx_link_up
        .sl3_1_link_up_rx_rx_link_up               (status[3]),                    //  output,    width = 1,                           sl3_1_link_up_rx.rx_link_up
-//       .sl3_1_tx_serial_clk_clk                   ({htile_fast_clk_C1,htile_fast_clk_C1,htile_fast_clk_C0,htile_fast_clk_C0}),                        //   input,    width = 4,                        sl3_1_tx_serial_clk.clk
-       .sl3_1_tx_serial_clk_clk                   ({htile_fast_clk_C0,htile_fast_clk_C0,htile_fast_clk_C1,htile_fast_clk_C1}),                        //   input,    width = 4,                        sl3_1_tx_serial_clk.clk
+//       .sl3_1_tx_serial_clk_clk                   ({htile_fast_clk_D1,htile_fast_clk_D1,htile_fast_clk_D0,htile_fast_clk_D0}),                        //   input,    width = 4,                        sl3_1_tx_serial_clk.clk
+       .sl3_1_tx_serial_clk_clk                   ({htile_fast_clk_D0,htile_fast_clk_D0,htile_fast_clk_D1,htile_fast_clk_D1}),                        //   input,    width = 4,                        sl3_1_tx_serial_clk.clk
        .sl3_1_xcvr_pll_ref_clk_clk                (QSFP28C_REFCLK_p),                     //   input,    width = 1,                     sl3_1_xcvr_pll_ref_clk.clk
-       .sl3_1_tx_pll_locked_pll_locked            (htile_fast_lock_C0 && htile_fast_lock_C1),                 //   input,    width = 1,                        sl3_1_tx_pll_locked.pll_locked
+       .sl3_1_tx_pll_locked_pll_locked            (htile_fast_lock_D0 && htile_fast_lock_D1),                 //   input,    width = 1,                        sl3_1_tx_pll_locked.pll_locked
        .sl3_1_crc_error_inject_tx_err_ins         (4'd0),              //   input,    width = 4,                     sl3_1_crc_error_inject.tx_err_ins
        .sl3_1_tx_serial_data_tx_serial_data       (QSFP28C_TX_p),            //  output,    width = 4,                       sl3_1_tx_serial_data.tx_serial_data
        .sl3_1_rx_serial_data_rx_serial_data       (QSFP28C_RX_p),            //   input,    width = 4,                       sl3_1_rx_serial_data.rx_serial_data
-
-       .xcvr_atx_pll_s10_htile_0_pll_refclk0_clk       (QSFP28B_REFCLK_p),                  //   input,    width = 1,                       xcvr_atx_pll_refclk0.clk
-       .xcvr_atx_pll_s10_htile_0_tx_serial_clk_gxt_clk (htile_fast_clk_B0),                 //  output,    width = 1, xcvr_atx_pll_s10_htile_0_tx_serial_clk_gxt.clk
-       .xcvr_atx_pll_s10_htile_0_pll_locked_pll_locked (htile_fast_lock_B0),                //  output,    width = 1,        xcvr_atx_pll_s10_htile_0_pll_locked.pll_locked
-       .xcvr_atx_pll_s10_htile_0_pll_cal_busy_pll_cal_busy (status[8]),                     //  output,   width = 1,      xcvr_atx_pll_s10_htile_0_pll_cal_busy.pll_cal_busy
+*/
+       .xcvr_atx_pll_s10_htile_0_pll_refclk0_clk       (QSFP28A_REFCLK_p),                  //   input,    width = 1,                       xcvr_atx_pll_refclk0.clk
+       .xcvr_atx_pll_s10_htile_0_tx_serial_clk_gxt_clk (htile_fast_clk_A0),                 //  output,    width = 1, xcvr_atx_pll_s10_htile_0_tx_serial_clk_gxt.clk
+       .xcvr_atx_pll_s10_htile_0_pll_locked_pll_locked (htile_fast_lock_A0),                //  output,    width = 1,        xcvr_atx_pll_s10_htile_0_pll_locked.pll_locked
+       .xcvr_atx_pll_s10_htile_0_pll_cal_busy_pll_cal_busy (cal_busy[0]),                     //  output,   width = 1,      xcvr_atx_pll_s10_htile_0_pll_cal_busy.pll_cal_busy
        
-       .xcvr_atx_pll_s10_htile_1_pll_refclk0_clk       (QSFP28B_REFCLK_p),                  //   input,    width = 1,       xcvr_atx_pll_s10_htile_1_pll_refclk0.clk
-       .xcvr_atx_pll_s10_htile_1_tx_serial_clk_gxt_clk (htile_fast_clk_B1),                 //  output,    width = 1, xcvr_atx_pll_s10_htile_1_tx_serial_clk_gxt.clk
-       .xcvr_atx_pll_s10_htile_1_pll_locked_pll_locked (htile_fast_lock_B1),                 //  output,    width = 1,        xcvr_atx_pll_s10_htile_0_pll_locked.pll_locked
-       .xcvr_atx_pll_s10_htile_1_pll_cal_busy_pll_cal_busy (status[9]),                     //  output,   width = 1,      xcvr_atx_pll_s10_htile_1_pll_cal_busy.pll_cal_busy
+       .xcvr_atx_pll_s10_htile_1_pll_refclk0_clk       (QSFP28A_REFCLK_p),                  //   input,    width = 1,       xcvr_atx_pll_s10_htile_1_pll_refclk0.clk
+       .xcvr_atx_pll_s10_htile_1_tx_serial_clk_gxt_clk (htile_fast_clk_A1),                 //  output,    width = 1, xcvr_atx_pll_s10_htile_1_tx_serial_clk_gxt.clk
+       .xcvr_atx_pll_s10_htile_1_pll_locked_pll_locked (htile_fast_lock_A1),                 //  output,    width = 1,        xcvr_atx_pll_s10_htile_0_pll_locked.pll_locked
+       .xcvr_atx_pll_s10_htile_1_pll_cal_busy_pll_cal_busy (cal_busy[1]),                     //  output,   width = 1,      xcvr_atx_pll_s10_htile_1_pll_cal_busy.pll_cal_busy
 
-       .xcvr_atx_pll_s10_htile_2_pll_refclk0_clk       (QSFP28C_REFCLK_p),       //   input,    width = 1,       xcvr_atx_pll_s10_htile_2_pll_refclk0.clk
-       .xcvr_atx_pll_s10_htile_2_tx_serial_clk_gxt_clk (htile_fast_clk_C0), //  output,    width = 1, xcvr_atx_pll_s10_htile_2_tx_serial_clk_gxt.clk
-       .xcvr_atx_pll_s10_htile_2_pll_locked_pll_locked (htile_fast_lock_C0), //  output,    width = 1,        xcvr_atx_pll_s10_htile_2_pll_locked.pll_locked
-       .xcvr_atx_pll_s10_htile_2_pll_cal_busy_pll_cal_busy (status[10]),                     //  output,   width = 1,      xcvr_atx_pll_s10_htile_2_pll_cal_busy.pll_cal_busy
+       .xcvr_atx_pll_s10_htile_2_pll_refclk0_clk       (QSFP28D_REFCLK_p),       //   input,    width = 1,       xcvr_atx_pll_s10_htile_2_pll_refclk0.clk
+       .xcvr_atx_pll_s10_htile_2_tx_serial_clk_gxt_clk (htile_fast_clk_D0), //  output,    width = 1, xcvr_atx_pll_s10_htile_2_tx_serial_clk_gxt.clk
+       .xcvr_atx_pll_s10_htile_2_pll_locked_pll_locked (htile_fast_lock_D0), //  output,    width = 1,        xcvr_atx_pll_s10_htile_2_pll_locked.pll_locked
+       .xcvr_atx_pll_s10_htile_2_pll_cal_busy_pll_cal_busy (cal_busy[2]),                     //  output,   width = 1,      xcvr_atx_pll_s10_htile_2_pll_cal_busy.pll_cal_busy
 
-       .xcvr_atx_pll_s10_htile_3_pll_refclk0_clk       (QSFP28C_REFCLK_p),       //   input,    width = 1,       xcvr_atx_pll_s10_htile_3_pll_refclk0.clk
-       .xcvr_atx_pll_s10_htile_3_tx_serial_clk_gxt_clk (htile_fast_clk_C1), //  output,    width = 1, xcvr_atx_pll_s10_htile_3_tx_serial_clk_gxt.clk
-       .xcvr_atx_pll_s10_htile_3_pll_locked_pll_locked (htile_fast_lock_C1),  //  output,    width = 1,        xcvr_atx_pll_s10_htile_3_pll_locked.pll_locked
-       .xcvr_atx_pll_s10_htile_3_pll_cal_busy_pll_cal_busy (status[11])                     //  output,   width = 1,      xcvr_atx_pll_s10_htile_3_pll_cal_busy.pll_cal_busy
+       .xcvr_atx_pll_s10_htile_3_pll_refclk0_clk       (QSFP28D_REFCLK_p),       //   input,    width = 1,       xcvr_atx_pll_s10_htile_3_pll_refclk0.clk
+       .xcvr_atx_pll_s10_htile_3_tx_serial_clk_gxt_clk (htile_fast_clk_D1), //  output,    width = 1, xcvr_atx_pll_s10_htile_3_tx_serial_clk_gxt.clk
+       .xcvr_atx_pll_s10_htile_3_pll_locked_pll_locked (htile_fast_lock_D1),  //  output,    width = 1,        xcvr_atx_pll_s10_htile_3_pll_locked.pll_locked
+       .xcvr_atx_pll_s10_htile_3_pll_cal_busy_pll_cal_busy (cal_busy[3])                     //  output,   width = 1,      xcvr_atx_pll_s10_htile_3_pll_cal_busy.pll_cal_busy
        );
    
    
