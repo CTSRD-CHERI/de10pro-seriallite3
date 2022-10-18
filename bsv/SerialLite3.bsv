@@ -1,3 +1,35 @@
+/*
+ * Copyright (c) 2022 Alexandre Joannou and Simon W. Moore
+ * All rights reserved.
+ *
+ * @BERI_LICENSE_HEADER_START@
+ *
+ * Licensed to BERI Open Systems C.I.C. (BERI) under one or more contributor
+ * license agreements.  See the NOTICE file distributed with this work for
+ * additional information regarding copyright ownership.  BERI licenses this
+ * file to you under the BERI Hardware-Software License, Version 1.0 (the
+ * "License"); you may not use this file except in compliance with the
+ * License.  You may obtain a copy of the License at:
+ *
+ *   http://www.beri-open-systems.org/legal/license-1-0.txt
+ *
+ * Unless required by applicable law or agreed to in writing, Work distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations under the License.
+ *
+ * @BERI_LICENSE_HEADER_END@
+ *
+ * ----------------------------------------------------------------------------
+ *
+ * Bluespec wrapper around Intel's SerialLite3 IP instantiated for four
+ * channels, i.e. suitable for one of the 100Gbps links on the Stratix-10 based
+ * DE10Pro board.
+ * 
+ * WARNING: USES POSITIVE RESETS (i.e. not the default negative reset generally
+ * used by Bluespec), so compile with option "-D BSV_POSITIVE_RESET"
+ */
+
 package SerialLite3;
 
 import BlueAXI4 :: *;
@@ -70,7 +102,7 @@ interface SerialLite3 #(
 
   // export receive stream clock
   interface Clock rx_clk;
-  interface Reset rx_rst;
+  interface Reset rx_rst_n;
 
   // link status
   (* always_ready, always_enabled *)
@@ -105,7 +137,7 @@ interface SerialLite3_Sig #(
   (* prefix = "axstrm_rx" *)
   interface AXI4Stream_Master_Sig #(0, 256, 0, 9) rx;
   interface Clock rx_clk;
-  interface Reset rx_rst;
+  interface Reset rx_rst_n;
   (* result = "coe_link_status", always_ready, always_enabled *)
   method SerialLite3_LinkStatus link_status;
   (* prefix = "axls_management" *)
@@ -117,16 +149,16 @@ interface SerialLite3_Sig #(
 endinterface
 
 module toSerialLite3_Sig #(SerialLite3 #(a,b,c,d,e,f,g) ifc
-                          , Clock tx_clk, Reset tx_rst)
+                          , Clock tx_clk, Reset tx_rst_n)
                           (SerialLite3_Sig #(a,b,c,d,e,f,g));
   let sigAXI4LitePort <- toAXI4Lite_Slave_Sig (ifc.management_subordinate);
-  let sigTXPort <- toAXI4Stream_Slave_Sig (ifc.tx, clocked_by tx_clk, reset_by tx_rst);
-  let sigRXPort <- toAXI4Stream_Master_Sig (ifc.rx, clocked_by ifc.rx_clk, reset_by ifc.rx_rst);
+  let sigTXPort <- toAXI4Stream_Slave_Sig (ifc.tx, clocked_by tx_clk, reset_by tx_rst_n);
+  let sigRXPort <- toAXI4Stream_Master_Sig (ifc.rx, clocked_by ifc.rx_clk, reset_by ifc.rx_rst_n);
   return interface SerialLite3_Sig;
     interface tx = sigTXPort;
     interface rx = sigRXPort;
     interface rx_clk = ifc.rx_clk;
-    interface rx_rst = ifc.rx_rst;
+    interface rx_rst_n = ifc.rx_rst_n;
     method link_status = ifc.link_status;
     interface management_subordinate = sigAXI4LitePort;
     interface pins = ifc.pins;
@@ -137,7 +169,7 @@ endmodule
 interface Stratix10_SerialLite3_4Lane;
   // export receive stream clock
   interface Clock rx_clk;
-  interface Reset rx_rst;
+  interface Reset rx_rst_n;
   // data received stream
   method Bit#(256) data_rx;
   method Bit#(1) start_of_burst_rx;
@@ -166,37 +198,37 @@ interface Stratix10_SerialLite3_4Lane;
   (* always_ready, always_enabled *) method Action crc_error_inject(Bit#(4) error_inject);
 endinterface
 
-import "BVI" stratix10_seriallite3_4lane =
-module mkStratix10_SerialLite3_4Lane (Clock tx_clk, Reset tx_rst, Clock qsfp_refclk, Stratix10_SerialLite3_4Lane sl3);
+import "BVI" stratix10_seriallite3_4lane_invrst =
+module mkStratix10_SerialLite3_4Lane (Clock tx_clk, Reset tx_rst_n, Clock qsfp_refclk, Stratix10_SerialLite3_4Lane sl3);
   // Clocks
   default_clock clk (phy_mgmt_clk, (*unused*) phy_mgmt_clk_gate);
-  default_reset rst (phy_mgmt_clk_reset);
+  default_reset rst_n (phy_mgmt_clk_reset_n);
   output_clock rx_clk(interface_clock_rx);
-  output_reset rx_rst(interface_clock_reset_rx) clocked_by (rx_clk);
+  output_reset rx_rst_n(interface_clock_reset_rx_n) clocked_by (rx_clk);
   input_clock (user_clock_tx, (*unused*) user_clock_tx_gate) = tx_clk;
-  input_reset tx_rst(user_clock_reset_tx) clocked_by (tx_clk) = tx_rst;
+  input_reset tx_rst_n(user_clock_reset_tx_n) clocked_by (tx_clk) = tx_rst_n;
   // High-speed transmitter clock that must be physically connected to the same H-tile as the tx/rx pins
   input_clock (xcvr_pll_ref_clk, (*unused*) xcvr_pll_ref_clk_gate) = qsfp_refclk;
 
   // Transmit stream
   method tx(data_tx, start_of_burst_tx, end_of_burst_tx, sync_tx)
-            enable (valid_tx) ready (ready_tx) clocked_by(tx_clk) reset_by(tx_rst);
-  method         error_tx error_tx()           clocked_by(tx_clk) reset_by(tx_rst);
-  method       link_up_tx link_up_tx()         clocked_by(tx_clk) reset_by(tx_rst);
-  method    tx_pll_locked tx_pll_locked()      clocked_by(tx_clk) reset_by(tx_rst);
-  method err_interrupt_tx error_interrupt_tx() clocked_by(tx_clk) reset_by(tx_rst);
-  method         ready_tx ready_tx()           clocked_by(tx_clk) reset_by(tx_rst);
+                 enable (valid_tx) ready (ready_tx) clocked_by(tx_clk) reset_by(tx_rst_n);
+  method            error_tx error_tx()             clocked_by(tx_clk) reset_by(tx_rst_n);
+  method          link_up_tx link_up_tx()           clocked_by(tx_clk) reset_by(tx_rst_n);
+  method       tx_pll_locked tx_pll_locked()        clocked_by(tx_clk) reset_by(tx_rst_n);
+  method    err_interrupt_tx error_interrupt_tx()   clocked_by(tx_clk) reset_by(tx_rst_n);
+  method            ready_tx ready_tx()             clocked_by(tx_clk) reset_by(tx_rst_n);
 
   // Receive stream
-  method             data_rx data_rx()            clocked_by(rx_clk) reset_by(rx_rst);
-  method   start_of_burst_rx start_of_burst_rx()  clocked_by(rx_clk) reset_by(rx_rst);
-  method     end_of_burst_rx end_of_burst_rx()    clocked_by(rx_clk) reset_by(rx_rst);
-  method             sync_rx sync_rx()            clocked_by(rx_clk) reset_by(rx_rst);
-  method            error_rx error_rx()           clocked_by(rx_clk) reset_by(rx_rst);
-  method          link_up_rx link_up_rx()         clocked_by(rx_clk) reset_by(rx_rst);
-  method    err_interrupt_rx error_interrupt_rx() clocked_by(rx_clk) reset_by(rx_rst);
-  method            valid_rx valid_rx()           clocked_by(rx_clk) reset_by(rx_rst);
-  method rx_drop() enable(ready_rx) ready(valid_rx) clocked_by(rx_clk) reset_by(rx_rst);
+  method             data_rx data_rx()              clocked_by(rx_clk) reset_by(rx_rst_n);
+  method   start_of_burst_rx start_of_burst_rx()    clocked_by(rx_clk) reset_by(rx_rst_n);
+  method     end_of_burst_rx end_of_burst_rx()      clocked_by(rx_clk) reset_by(rx_rst_n);
+  method             sync_rx sync_rx()              clocked_by(rx_clk) reset_by(rx_rst_n);
+  method            error_rx error_rx()             clocked_by(rx_clk) reset_by(rx_rst_n);
+  method          link_up_rx link_up_rx()           clocked_by(rx_clk) reset_by(rx_rst_n);
+  method    err_interrupt_rx error_interrupt_rx()   clocked_by(rx_clk) reset_by(rx_rst_n);
+  method            valid_rx valid_rx()             clocked_by(rx_clk) reset_by(rx_rst_n);
+  method rx_drop() enable(ready_rx) ready(valid_rx) clocked_by(rx_clk) reset_by(rx_rst_n);
 
   // Memory mapped interface (uses the default clock and reset)
   // ***********TODO not using phy_mgmt_valid but may need to to generate phy_mgmt_read and phy_mgmt_write correctly
@@ -209,7 +241,7 @@ module mkStratix10_SerialLite3_4Lane (Clock tx_clk, Reset tx_rst, Clock qsfp_ref
   method qsfp28_rx_pins(qsfp28_rx_pins) enable((*inhigh*) EN_rx_serial_data);
 
   // Test/monitor ports (TODO: correct clock domain?)
-  method crc_error_inject(crc_error_inject) enable((*inhigh*) EN_crc_error_inject) clocked_by(tx_clk) reset_by(tx_rst);
+  method crc_error_inject(crc_error_inject) enable((*inhigh*) EN_crc_error_inject) clocked_by(tx_clk) reset_by(tx_rst_n);
 
   // Scheduling
   schedule ( data_rx, start_of_burst_rx, end_of_burst_rx, valid_rx, error_rx, link_up_rx, sync_rx, error_interrupt_rx, rx_drop
@@ -222,7 +254,7 @@ endmodule
 
 module mkSerialLite3
   (
-   Clock tx_clk, Reset tx_rst, Clock qsfp_refclk,
+   Clock tx_clk, Reset tx_rst_n, Clock qsfp_refclk,
    SerialLite3#(t_addr, t_data, t_awuser, t_wuser, t_buser, t_aruser, t_ruser) sl3_ifc
   )
   provisos ( Add#(14,_na,t_addr)
@@ -230,11 +262,11 @@ module mkSerialLite3
            , Alias#(t_bus_req, Tuple4#(Bit#(14), Bit#(1), Bit#(1), Bit#(32))) );
 
   Clock local_clk <- exposeCurrentClock();
-  Stratix10_SerialLite3_4Lane sl3 <- mkStratix10_SerialLite3_4Lane(tx_clk, tx_rst, qsfp_refclk);
-  CrossingReg#(Bit#(4)) sync_error_tx <- mkNullCrossingReg(local_clk, 0, clocked_by tx_clk, reset_by tx_rst);
-  CrossingReg#(Bit#(5)) sync_error_rx <- mkNullCrossingReg(local_clk, 0, clocked_by sl3.rx_clk, reset_by sl3.rx_rst);
-  SyncBitIfc#(Bool) sync_link_up_tx <- mkSyncBitToCC(tx_clk, tx_rst);
-  SyncBitIfc#(Bool) sync_link_up_rx <- mkSyncBitToCC(sl3.rx_clk, sl3.rx_rst);
+  Stratix10_SerialLite3_4Lane sl3 <- mkStratix10_SerialLite3_4Lane(tx_clk, tx_rst_n, qsfp_refclk);
+  CrossingReg#(Bit#(4)) sync_error_tx <- mkNullCrossingReg(local_clk, 0, clocked_by tx_clk, reset_by tx_rst_n);
+  CrossingReg#(Bit#(5)) sync_error_rx <- mkNullCrossingReg(local_clk, 0, clocked_by sl3.rx_clk, reset_by sl3.rx_rst_n);
+  SyncBitIfc#(Bool) sync_link_up_tx <- mkSyncBitToCC(tx_clk, tx_rst_n);
+  SyncBitIfc#(Bool) sync_link_up_rx <- mkSyncBitToCC(sl3.rx_clk, sl3.rx_rst_n);
   AXI4Lite_Shim#( t_addr, t_data
                 , t_awuser, t_wuser, t_buser
                 , t_aruser, t_ruser) axi4LiteShim <- mkAXI4LiteShimFF;
@@ -300,24 +332,24 @@ module mkSerialLite3
 
   //----------------------------------------------------------------------------
   Sink #(SerialLite3_StreamFlit) rawTX = interface Sink;
-    method canPut = sl3.ready_tx==1; // clocked_by tx_clk reset_by tx_rst
-    method Action put(d); // clocked_by tx_clk reset_by tx_rst;
+    method canPut = sl3.ready_tx==1; // clocked_by tx_clk reset_by tx_rst_n
+    method Action put(d); // clocked_by tx_clk reset_by tx_rst_n;
       sl3.tx(d.data, pack(d.start_of_burst), pack(d.end_of_burst), d.sync);
     endmethod
   endinterface;
 
   Source #(SerialLite3_StreamFlit) rawRX = interface Source;
-    method Bool canPeek = sl3.valid_rx()==1; // clocked_by rx_clk reset_by rx_rst;
-    method SerialLite3_StreamFlit peek(); // if (sl3.valid_rx); // clocked_by rx_clk reset_by rx_rst =
+    method Bool canPeek = sl3.valid_rx()==1; // clocked_by rx_clk reset_by rx_rst_n;
+    method SerialLite3_StreamFlit peek(); // if (sl3.valid_rx); // clocked_by rx_clk reset_by rx_rst_n =
       return SerialLite3_StreamFlit{data:sl3.data_rx(), start_of_burst:sl3.start_of_burst_rx()==1, end_of_burst:sl3.end_of_burst_rx()==1, sync:sl3.sync_rx()};
     endmethod
-    method Action drop = sl3.rx_drop; // clocked_by rx_clk reset_by rx_rst;
+    method Action drop = sl3.rx_drop; // clocked_by rx_clk reset_by rx_rst_n;
   endinterface;
 
   //----------------------------------------------------------------------------
 
   interface Clock rx_clk = sl3.rx_clk;
-  interface Reset rx_rst = sl3.rx_rst;
+  interface Reset rx_rst_n = sl3.rx_rst_n;
 
   interface SerialLite3_ExternalPins pins;
     method qsfp28_tx_pins = sl3.qsfp28_tx_pins;
@@ -339,17 +371,17 @@ endmodule
 
 
 // Create a stand-alone instance that could be imported into Platform Designer as a component
-(* synthesize, default_clock_osc = "csi_clk", default_reset = "rsi_rst"
+(* synthesize, default_clock_osc = "csi_clk", default_reset = "rsi_rst_n"
              , clock_prefix = "cso", reset_prefix= "rso" *)
 module mkSerialLite3_Instance ( (* osc = "csi_tx_clk" *) Clock tx_clk
-                              , (* reset = "rsi_tx_rst" *) Reset tx_rst
+                              , (* reset = "rsi_tx_rst_n" *) Reset tx_rst_n
                               , (* osc = "csi_qsfp_refclk" *) Clock qsfp_refclk
                               , SerialLite3_Sig#(/*SerialLite3_StreamFlit, SerialLite3_StreamFlit,*/
                                                  //  t_addr, t_data, t_awuser, t_wuser, t_buser, t_aruser, t_ruser
                                                          14,     32,     0,        0,       0,       0,        0) sl3);
 
-  let sl3 <- mkSerialLite3(tx_clk, tx_rst, qsfp_refclk);
-  let sl3_sig <- toSerialLite3_Sig (sl3, tx_clk, tx_rst);
+  let sl3 <- mkSerialLite3(tx_clk, tx_rst_n, qsfp_refclk);
+  let sl3_sig <- toSerialLite3_Sig (sl3, tx_clk, tx_rst_n);
   return sl3_sig;
 
 endmodule
