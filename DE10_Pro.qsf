@@ -1619,32 +1619,6 @@ set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to LED[2] 
 set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to LED[1] -entity DE10_Pro
 set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to LED[0] -entity DE10_Pro
 set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to LED -entity DE10_Pro
-set_global_assignment -name SDC_FILE jtag.sdc
-set_global_assignment -name VERILOG_FILE DE10_Pro.v
-set_global_assignment -name SDC_FILE DE10_Pro.sdc
-set_global_assignment -name VERILOG_FILE Fan/Fan_Control.v
-set_global_assignment -name VERILOG_FILE Fan/I2C_Bus_Controller.v
-set_global_assignment -name VERILOG_FILE Fan/I2C_Config.v
-set_global_assignment -name VERILOG_FILE Fan/SEG7_LUT.v
-set_global_assignment -name IP_FILE reset_release.ip
-set_global_assignment -name IP_FILE ip/soc/soc_clock_in.ip
-set_global_assignment -name IP_FILE ip/soc/soc_reset_in.ip
-set_global_assignment -name QSYS_FILE soc.qsys
-set_global_assignment -name IP_FILE ip/soc/soc_intel_onchip_memory_0.ip
-set_global_assignment -name IP_FILE ip/soc/soc_jtag_uart_0.ip
-set_global_assignment -name IP_FILE ip/soc/soc_fifo_0.ip
-set_global_assignment -name IP_FILE ip/soc/soc_fifo_1.ip
-set_global_assignment -name IP_FILE ip/soc/soc_nios2_gen2_0.ip
-set_global_assignment -name IP_FILE ip/soc/soc_sl3_0.ip
-set_global_assignment -name IP_FILE ip/soc/soc_xcvr_atx_pll_s10_htile_0.ip
-set_global_assignment -name IP_FILE ip/soc/clock_xcvr_a.ip
-set_global_assignment -name IP_FILE ip/soc/soc_st_dc_fifo_0.ip
-set_global_assignment -name IP_FILE ip/soc/soc_pio_0.ip
-set_global_assignment -name IP_FILE ip/soc/soc_swm_tx_adapter_0.ip
-set_global_assignment -name IP_FILE ip/soc/soc_swm_rx_adapter_1.ip
-set_global_assignment -name IP_FILE ip/soc/soc_swm_tx_adapter_2.ip
-set_global_assignment -name IP_FILE ip/soc/soc_swm_rx_adapter_0.ip
-set_global_assignment -name IP_FILE ip/soc/rx_fast_fifo_0.ip
 
 
 # SWM added the following based on:
@@ -1857,3 +1831,25 @@ set_instance_assignment -name HSSI_PARAMETER "pma_tx_buf_pre_emp_switching_ctrl_
 # set_instance_assignment -name HSSI_PARAMETER "pma_tx_buf_term_sel=<value>" -to QSFP28D_TX_p[3]
 
 
+set_global_assignment -name VERILOG_FILE bsv/stratix10_seriallite3_4lane_invrst.v
+set_global_assignment -name IP_FILE bsv/stratix10_seriallite3_4lane.ip
+set_global_assignment -name SDC_FILE jtag.sdc
+set_global_assignment -name VERILOG_FILE DE10_Pro.v
+set_global_assignment -name SDC_FILE DE10_Pro.sdc
+set_global_assignment -name VERILOG_FILE Fan/Fan_Control.v
+set_global_assignment -name VERILOG_FILE Fan/I2C_Bus_Controller.v
+set_global_assignment -name VERILOG_FILE Fan/I2C_Config.v
+set_global_assignment -name VERILOG_FILE Fan/SEG7_LUT.v
+set_global_assignment -name IP_FILE reset_release.ip
+set_global_assignment -name IP_FILE ip/soc/soc_clock_in.ip
+set_global_assignment -name IP_FILE ip/soc/soc_reset_in.ip
+set_global_assignment -name QSYS_FILE soc.qsys
+set_global_assignment -name IP_FILE ip/soc/soc_intel_onchip_memory_0.ip
+set_global_assignment -name IP_FILE ip/soc/soc_jtag_uart_0.ip
+set_global_assignment -name IP_FILE ip/soc/soc_nios2_gen2_0.ip
+set_global_assignment -name IP_FILE ip/soc/soc_xcvr_atx_pll_s10_htile_0.ip
+set_global_assignment -name IP_FILE ip/soc/clock_xcvr_a.ip
+set_global_assignment -name IP_FILE ip/soc/soc_pio_0.ip
+set_global_assignment -name IP_FILE ip/soc/soc_mkSerialLite3_Instance_0.ip
+set_global_assignment -name IP_FILE ip/soc/soc_mkBERT_Instance_0.ip
+set_global_assignment -name POWER_APPLY_THERMAL_MARGIN ADDITIONAL
