@@ -427,6 +427,7 @@ https://fpgasoftware.intel.com/eula.-->
       <altera:interface_mapping altera:name="out_reset" altera:internal="reset_in.out_reset" altera:type="reset" altera:dir="start">
         <altera:port_mapping altera:name="out_reset" altera:internal="out_reset"></altera:port_mapping>
       </altera:interface_mapping>
+      <altera:interface_mapping altera:name="out_reset_1" altera:internal="reset_in.out_reset_1"></altera:interface_mapping>
     </altera:altera_interface_boundary>
     <altera:altera_has_warnings>false</altera:altera_has_warnings>
     <altera:altera_has_errors>false</altera:altera_has_errors>
