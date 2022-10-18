@@ -56,9 +56,13 @@ BSCFLAGS += -show-range-conflict
 SRC_SerialLite3 = SerialLite3.bsv
 SRC_BERT = BERT.bsv
 
-all: mkSerialLite3_Instance mkAXI4_PacketGenerator_Instance
+IP = stratix10_seriallite3_4lane
+IPDIR = $(IP)
 
-mkSerialLite3_Instance: $(SRC_SerialLite3)
+.PHONY: all
+all: mkSerialLite3_Instance mkBERT_Instance
+
+mkSerialLite3_Instance: generate_ip $(SRC_SerialLite3)
 	mkdir -p $(OUTPUTDIR)/$@-info $(BDIR)
 	$(BSC) -info-dir $(OUTPUTDIR)/$@-info -vdir $(OUTPUTDIR) -opt-undetermined-vals -unspecified-to X $(BSCFLAGS) -verilog -g mkSerialLite3_Instance -u $(SRC_SerialLite3)
 
@@ -66,8 +70,16 @@ mkBERT_Instance: $(SRC_BERT)
 	mkdir -p $(OUTPUTDIR)/$@-info $(BDIR)
 	$(BSC) -info-dir $(OUTPUTDIR)/$@-info -vdir $(OUTPUTDIR) -opt-undetermined-vals -unspecified-to X $(BSCFLAGS) -verilog -g mkBERT_Instance -u $(SRC_BERT)
 
-clean:
-	rm -f -r $(BUILDDIR)
+.PHONY: generate_ip
+generate_ip: $(IPDIR)/$(IP)_inst.v
 
+$(IPDIR)/$(IP)_inst.v: $(IP).ip
+	quartus_ipgenerate -synthesis=verilog --clear_ip_generation_dirs --generate_ip_file --ip_file=bsv/stratix10_seriallite3_4lane.ip ../DE10_Pro.qsf
+
+.PHONY: clean
+clean:
+	rm -f -r $(BUILDDIR) $(IPDIR)
+
+.PHONY: mrproper
 mrproper: clean
 	rm -f -r $(OUTPUTDIR)
