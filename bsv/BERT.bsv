@@ -82,6 +82,7 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
   AXI4Stream_Shim#(0, 256, 0, 9)            rx_fast_fifo <- mkAXI4StreamShimUGSizedFIFOF32(clocked_by csi_rx_clk, reset_by csi_rx_rst_n);
   SyncFIFOIfc#(AXI4Stream_Flit#(0,256,0,9)) rx_sync_fifo <- mkSyncFIFOToCC(32, csi_rx_clk, csi_rx_rst_n);
   AXI4Stream_Shim#(0, 256, 0, 9)                  rxfifo <- mkAXI4StreamShimUGSizedFIFOF32();
+  AXI4Stream_Shim#(0, 32, 0, 9)            loopback_fifo <- mkAXI4StreamShimUGSizedFIFOF32();
   Reg#(Bit#(32))                                 testreg <- mkReg(0);
   
   let axiShim <- mkAXI4LiteShimFF;
@@ -108,7 +109,17 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
       end
     if(r.araddr[7:3]==1)
       d = zeroExtend({pack(rxfifo.master.canPeek), pack(txfifo.slave.canPut)});
-    if(r.araddr[7:3]==5'h3)
+     
+    if((r.araddr[7:3]==2) && loopback_fifo.master.canPeek)
+      begin
+        let a = loopback_fifo.master.peek;
+	d = truncate(a.tdata);
+        loopback_fifo.master.drop;
+      end
+    if(r.araddr[7:3]==3)
+      d = zeroExtend({pack(loopback_fifo.master.canPeek), pack(loopback_fifo.slave.canPut)});
+     
+    if(r.araddr[7:3]==5'h10)
       d = testreg;
     let rsp = AXI4Lite_RFlit { rdata: d
                              , rresp: OKAY
@@ -128,8 +139,17 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
                                        , tid: ?
                                        , tdest: ?
                                        , tuser: 0} );
-    // if (aw.awaddr[1]==1'b1) - use this to control testing?
-    if (aw.awaddr[7:3]==5'h3)
+
+    if((aw.awaddr[7:3]==2) && loopback_fifo.slave.canPut())
+      loopback_fifo.slave.put(AXI4Stream_Flit{ tdata: zeroExtend(w.wdata)
+                                       , tstrb: ~0
+                                       , tkeep: ~0
+                                       , tlast: True
+                                       , tid: ?
+                                       , tdest: ?
+                                       , tuser: 0} );
+
+    if (aw.awaddr[7:3]==5'h10)
       testreg <= ~w.wdata;
     
     let rsp = AXI4Lite_BFlit { bresp: OKAY, buser: ? };
