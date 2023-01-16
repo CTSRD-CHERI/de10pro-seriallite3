@@ -24,6 +24,11 @@
  *
  * Bit Error Rate Tester (BERT)
  * Plus simple TX and RX FIFO channels
+ * 
+ * TODO:
+ *  - Check links come up
+ *  - Try transmitting and receiving data
+ *  - Check memory mapped interface to SERDES, e.g. put in loop-back mode
  */
 
 
@@ -77,6 +82,7 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
   AXI4Stream_Shim#(0, 256, 0, 9)            rx_fast_fifo <- mkAXI4StreamShimUGSizedFIFOF32(clocked_by csi_rx_clk, reset_by csi_rx_rst_n);
   SyncFIFOIfc#(AXI4Stream_Flit#(0,256,0,9)) rx_sync_fifo <- mkSyncFIFOToCC(32, csi_rx_clk, csi_rx_rst_n);
   AXI4Stream_Shim#(0, 256, 0, 9)                  rxfifo <- mkAXI4StreamShimUGSizedFIFOF32();
+  Reg#(Bit#(32))                                 testreg <- mkReg(0);
   
   let axiShim <- mkAXI4LiteShimFF;
   
@@ -94,14 +100,16 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
   rule read_req;
     let r <- get (axiShim.master.ar);
     Bit#(32) d = 32'hdeaddead;
-    if((r.araddr[2]==1'b0) && rxfifo.master.canPeek)
+    if((r.araddr[7:3]==0) && rxfifo.master.canPeek)
       begin
         let a = rxfifo.master.peek;
 	d = truncate(a.tdata);
         rxfifo.master.drop;
       end
-    if(r.araddr[2]==1'b1)
+    if(r.araddr[7:3]==1)
       d = zeroExtend({pack(rxfifo.master.canPeek), pack(txfifo.slave.canPut)});
+    if(r.araddr[7:3]==5'h3)
+      d = testreg;
     let rsp = AXI4Lite_RFlit { rdata: d
                              , rresp: OKAY
                              , ruser: ? };
@@ -112,7 +120,7 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
   rule write_req;
     let aw <- get (axiShim.master.aw);
     let w <- get (axiShim.master.w);
-    if((aw.awaddr[2]==1'b0) && txfifo.slave.canPut())
+    if((aw.awaddr[7:3]==0) && txfifo.slave.canPut())
       txfifo.slave.put(AXI4Stream_Flit{ tdata: zeroExtend(w.wdata)
                                        , tstrb: ~0
                                        , tkeep: ~0
@@ -121,6 +129,9 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
                                        , tdest: ?
                                        , tuser: 0} );
     // if (aw.awaddr[1]==1'b1) - use this to control testing?
+    if (aw.awaddr[7:3]==5'h3)
+      testreg <= ~w.wdata;
+    
     let rsp = AXI4Lite_BFlit { bresp: OKAY, buser: ? };
     axiShim.master.b.put (rsp);
   endrule
@@ -148,7 +159,7 @@ endmodule
 
 (* synthesize *)
 module mkBERT_Instance(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT_Sig#(// t_addr, t_awuser, t_wuser, t_buser, t_aruser, t_ruser
-                                                                               3,        0,       0,       0,        0,       0) pg);
+                                                                               8,        0,       0,       0,        0,       0) pg);
   let pg <- mkBERT(csi_rx_clk, csi_rx_rst_n);
   let pg_sig <- toBERT_Sig(csi_rx_clk, csi_rx_rst_n, pg);
   return pg_sig;
