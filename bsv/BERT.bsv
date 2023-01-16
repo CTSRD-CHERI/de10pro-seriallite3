@@ -128,6 +128,9 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
                                        , tid: ?
                                        , tdest: ?
                                        , tuser: 0} );
+    if(aw.awaddr[4:2]==3'b111)
+      testreg <= ~w.wdata;
+    
     // if (aw.awaddr[1]==1'b1) - use this to control testing?
     if (aw.awaddr[7:3]==5'h3)
       testreg <= ~w.wdata;
