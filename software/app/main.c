@@ -1,9 +1,9 @@
 #include "HAL/inc/sys/alt_stdio.h"
 #include "HAL/inc/io.h"
 #include "system.h"
-#include "altera_avalon_fifo.h"
-#include "altera_avalon_fifo_util.h"
-#include "altera_avalon_fifo_regs.h"
+//#include "altera_avalon_fifo.h"
+//#include "altera_avalon_fifo_util.h"
+//#include "altera_avalon_fifo_regs.h"
 #include "unistd.h"
 
 /*****************************************************************************
@@ -39,7 +39,7 @@ check_testreg(struct fifoDetails f)
 {
   int j,t,d;
   int pass=1;
-  int testreg_addr_offset=0x3*8;
+  int testreg_addr_offset=0x10*8;
   for(j=0; j<10; j++) {
     t=j;
     IOWR_32DIRECT(f.base_addr, testreg_addr_offset, ~t);
@@ -54,44 +54,44 @@ check_testreg(struct fifoDetails f)
 
 
 int
-status_fifo(struct fifoDetails f)
+status_fifo(struct fifoDetails f, int fifonum)
 {
   int status;
-  status = IORD_32DIRECT(f.base_addr,8);
-  alt_printf("DEBUG: Chan %c: status=0x%x\n", f.chan_letter, status);
+  status = IORD_32DIRECT(f.base_addr,8*(1+2*fifonum));
+  //  alt_printf("DEBUG: Chan %c: status=0x%x\n", f.chan_letter, status);
   return status;
 }
 
 
 int
-status_rx_fifo_notEmpty(struct fifoDetails f)
+status_rx_fifo_notEmpty(struct fifoDetails f, int fifonum)
 {
-  return exbit(status_fifo(f),1);
+  return exbit(status_fifo(f, fifonum),1);
 }
 
 
 int
-status_tx_fifo_notFull(struct fifoDetails f)
+status_tx_fifo_notFull(struct fifoDetails f, int fifonum)
 {
-  return exbit(status_fifo(f),0);
+  return exbit(status_fifo(f, fifonum),0);
 }
 
 
 void
-write_tx_fifo(struct fifoDetails f, int data)
+write_tx_fifo(struct fifoDetails f, int fifonum, int data)
 {
   // TODO: check FIFO isn't full!!!
-  IOWR_32DIRECT(f.base_addr, 0, data);
+  IOWR_32DIRECT(f.base_addr, 8*2*fifonum, data);
 }
 
 
 void
-read_rx_fifo(struct fifoDetails f, int chan_index, int silent)
+read_rx_fifo(struct fifoDetails f, int fifonum, int chan_index, int silent)
 {
   int data, ctr;
   ctr = 0;
-  while(status_rx_fifo_notEmpty(f)) {
-    data = IORD_32DIRECT(f.base_addr,0);
+  while(status_rx_fifo_notEmpty(f, fifonum)) {
+    data = IORD_32DIRECT(f.base_addr,8*2*fifonum);
     print_n_tabs(chan_index*3);
     if(silent==0)
       alt_printf("0x%x: RX-%c 0x%x\n",ctr,f.chan_letter,data);
@@ -104,35 +104,50 @@ int
 main(void)
 {
   const int num_chan = 2;
+  const int fifonum = 0; // 0=serial-link, 1=loopback
   struct fifoDetails fs[num_chan];
   //int phy_mgmt_addr_offset = 1<<15; // word address offset to access physical management (PMA) addresses; MSB of address bits
   //int j, d, e, status;
   int j, chan;
 
   alt_putstr("Start...\n");
+  
+  // Check testreg to ensure we're probably communicating with a BERT
   fs[0].base_addr = MKBERT_INSTANCE_0_BASE;
   fs[0].chan_letter = 'A';
   fs[1].base_addr = MKBERT_INSTANCE_1_BASE;
   fs[1].chan_letter = 'D';
-  for(j=0; j<num_chan; j++)
+  for(j=0; j<num_chan; j++) {
     alt_printf("BERT 0x%x on Chan %c at base address 0x%x\n",
 	       j,
 	       fs[j].chan_letter,
 	       fs[j].base_addr);
-
-  for(j=0; j<num_chan; j++)
     check_testreg(fs[j]);
+  }
 
+  alt_printf("Write-read tests on the channels\n");
   for(j=0; j<10; j++)
       for(chan=0; chan<num_chan; chan++) {
-	write_tx_fifo(fs[chan], (1<<16) | (j+1));
-	read_rx_fifo(fs[chan], 0, 0);
+	write_tx_fifo(fs[chan], fifonum, (1<<16) | (j+1));
+	read_rx_fifo(fs[chan], fifonum, 0, 0);
       }
   
   for(j=0; j<5; j++)
       for(chan=0; chan<num_chan; chan++)
-	read_rx_fifo(fs[chan], 0, 0);
-  
+	read_rx_fifo(fs[chan], fifonum, 0, 0);
+
+  chan=0;
+  for(j=0; j<100; j++)
+    if(status_tx_fifo_notFull(fs[chan], fifonum))
+      write_tx_fifo(fs[chan], fifonum, (1<<16) | (j+1));
+    else
+      alt_printf("Managed to fill up the tx fifo.  j=0x%x\n",j);
+
+  alt_printf("Reading all data from the FIFOs\n");
+  for(j=0; j<200; j++)
+    for(chan=0; chan<num_chan; chan++)
+      read_rx_fifo(fs[chan], fifonum, 0, 0);
+
   alt_putstr("The end\n\n");
   usleep(1000000);
 
