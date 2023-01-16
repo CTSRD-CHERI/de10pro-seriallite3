@@ -122,6 +122,10 @@ clean_vipbundle:
 program_fpga:
 	./py/flashDE10 output_files/DE10_Pro.sof
 
+.PHONY: program_fpga
+program_all_fpgas:
+	./py/progallde10pro.py output_files/DE10_Pro.sof
+
 #-----------------------------------------------------------------------------
 # build the software for the NIOS-V soft core
 .PHONY: niosv_software

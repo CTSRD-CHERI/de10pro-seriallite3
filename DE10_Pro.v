@@ -362,16 +362,16 @@ module DE10_Pro
 	   .mkseriallite3_instance_0_coe_qsfp28_rx_pins_x_coe_qsfp28_rx_pins_x (QSFP28A_RX_p),
 	   .mkseriallite3_instance_0_coe_qsfp28_tx_pins_coe_qsfp28_tx_pins (QSFP28A_TX_p),
 	   .mkseriallite3_instance_0_csi_qsfp_refclk_clk(QSFP28A_REFCLK_p),
-	   .mkseriallite3_instance_0_conduit_xcvr_atx_pll_s10_htile_tx_clk_export({htile_fast_clk_A1,htile_fast_clk_A1,htile_fast_clk_A0,htile_fast_clk_A0}),
-	   .mkseriallite3_instance_0_conduit_xcvr_atx_pll_s10_htile_tx_locked_export(htile_fast_lock_A0 && htile_fast_lock_A1),
+	   .mkseriallite3_instance_0_coe_xcvr_atx_pll_s10_htile_tx_clk_coe_xcvr_atx_pll_s10_htile_tx_clk({htile_fast_clk_A1,htile_fast_clk_A1,htile_fast_clk_A0,htile_fast_clk_A0}),
+	   .mkseriallite3_instance_0_coe_xcvr_atx_pll_s10_htile_tx_locked_coe_xcvr_atx_pll_s10_htile_tx_locked(htile_fast_lock_A0 && htile_fast_lock_A1),
 
 	   .mkseriallite3_instance_1_clk_gate_rx_clk_CLK_GATE_rx_clk (),
 	   .mkseriallite3_instance_1_coe_link_status_coe_link_status (link_status_D),           // 11-bits
 	   .mkseriallite3_instance_1_coe_qsfp28_rx_pins_x_coe_qsfp28_rx_pins_x (QSFP28D_RX_p),
 	   .mkseriallite3_instance_1_coe_qsfp28_tx_pins_coe_qsfp28_tx_pins (QSFP28D_TX_p),
 	   .mkseriallite3_instance_1_csi_qsfp_refclk_clk(QSFP28D_REFCLK_p),
-	   .mkseriallite3_instance_1_conduit_xcvr_atx_pll_s10_htile_tx_clk_export({htile_fast_clk_D1,htile_fast_clk_D1,htile_fast_clk_D0,htile_fast_clk_D0}),
-	   .mkseriallite3_instance_1_conduit_xcvr_atx_pll_s10_htile_tx_locked_export(htile_fast_lock_D0 && htile_fast_lock_D1),
+	   .mkseriallite3_instance_1_coe_xcvr_atx_pll_s10_htile_tx_clk_coe_xcvr_atx_pll_s10_htile_tx_clk({htile_fast_clk_D1,htile_fast_clk_D1,htile_fast_clk_D0,htile_fast_clk_D0}),
+	   .mkseriallite3_instance_1_coe_xcvr_atx_pll_s10_htile_tx_locked_coe_xcvr_atx_pll_s10_htile_tx_locked(htile_fast_lock_D0 && htile_fast_lock_D1),
 
 /*
        .sl3_0_link_up_tx_tx_link_up               (status[0]),                               //  output,    width = 1,        sl3_0_link_up_tx.tx_link_up
