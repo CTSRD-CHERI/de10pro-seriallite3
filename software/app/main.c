@@ -35,6 +35,26 @@ print_n_tabs(int n)
 
 
 int
+check_testreg(struct fifoDetails f)
+{
+  int j,t,d;
+  int pass=1;
+  int testreg_addr_offset=0x10*4;
+  for(j=0; j<10; j++) {
+    t=j;
+    alt_printf("DEBUG: writing to address 0x%x\n",f.base_addr+testreg_addr_offset);
+    IOWR_32DIRECT(f.base_addr, testreg_addr_offset, ~t);
+    d = IORD_32DIRECT(f.base_addr, testreg_addr_offset);
+    if(d!=t) {
+      alt_printf("Chan %c: testreg expecting 0x%x but read 0x%x - fail\n", f.chan_letter, t, d);
+      pass=0;
+    }
+  }
+  return pass;
+}
+
+
+int
 status_fifo(struct fifoDetails f)
 {
   return IORD_32DIRECT(f.base_addr,4);
@@ -74,16 +94,25 @@ read_rx_fifo(struct fifoDetails f, int chan_index, int silent)
 int
 main(void)
 {
-  const int num_chan = 1;
+  const int num_chan = 2;
   struct fifoDetails fs[num_chan];
-  int phy_mgmt_addr_offset = 1<<15; // word address offset to access physical management (PMA) addresses; MSB of address bits
-  int j, d, e, status;
+  //int phy_mgmt_addr_offset = 1<<15; // word address offset to access physical management (PMA) addresses; MSB of address bits
+  //int j, d, e, status;
+  int j;
 
   alt_putstr("Start...\n");
-  
   fs[0].base_addr = MKBERT_INSTANCE_0_BASE;
   fs[0].chan_letter = 'A';
-
+  fs[1].base_addr = MKBERT_INSTANCE_1_BASE;
+  fs[1].chan_letter = 'D';
+  for(j=0; j<num_chan; j++)
+    alt_printf("BERT 0x%x on Chan %c at base address 0x%x\n",
+	       j,
+	       fs[j].chan_letter,
+	       fs[j].base_addr);
+  for(j=0; j<num_chan; j++)
+    check_testreg(fs[j]);
+  /*
   for(j=0; j<10; j++) {
     write_tx_fifo(fs[0], (1<<16) | (j+1));
     read_rx_fifo(fs[0], 0, 0);
@@ -91,6 +120,7 @@ main(void)
   
   alt_putstr("The end\n\n");
   usleep(1000000);
+  */
   alt_putstr("\004");
   return 0;
 }
