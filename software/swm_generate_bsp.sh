@@ -2,7 +2,7 @@
 
 if ! xdpyinfo >/dev/null 2>/dev/null
 then
-    echo "ERROR: X display not available to nios2-bsp will fail.  Fix and retry"
+    echo "ERROR: X11 display not available to nios2-bsp will fail.  Fix and retry"
     exit
 fi
 

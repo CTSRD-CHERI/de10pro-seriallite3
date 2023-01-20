@@ -4751,7 +4751,7 @@ https://fpgasoftware.intel.com/eula.-->
                         &lt;/entry&gt;
                         &lt;entry&gt;
                             &lt;key&gt;associatedResetSinks&lt;/key&gt;
-                            &lt;value&gt;rsi_rst_n&lt;/value&gt;
+                            &lt;value&gt;none&lt;/value&gt;
                         &lt;/entry&gt;
                         &lt;entry&gt;
                             &lt;key&gt;synchronousEdges&lt;/key&gt;
@@ -5636,7 +5636,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;/entry&gt;
                     &lt;entry&gt;
                         &lt;key&gt;associatedResetSinks&lt;/key&gt;
-                        &lt;value&gt;rsi_rst_n&lt;/value&gt;
+                        &lt;value&gt;none&lt;/value&gt;
                     &lt;/entry&gt;
                     &lt;entry&gt;
                         &lt;key&gt;synchronousEdges&lt;/key&gt;
@@ -6568,7 +6568,7 @@ https://fpgasoftware.intel.com/eula.-->
                         &lt;/entry&gt;
                         &lt;entry&gt;
                             &lt;key&gt;associatedResetSinks&lt;/key&gt;
-                            &lt;value&gt;rsi_rst_n&lt;/value&gt;
+                            &lt;value&gt;none&lt;/value&gt;
                         &lt;/entry&gt;
                         &lt;entry&gt;
                             &lt;key&gt;synchronousEdges&lt;/key&gt;
@@ -7453,7 +7453,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;/entry&gt;
                     &lt;entry&gt;
                         &lt;key&gt;associatedResetSinks&lt;/key&gt;
-                        &lt;value&gt;rsi_rst_n&lt;/value&gt;
+                        &lt;value&gt;none&lt;/value&gt;
                     &lt;/entry&gt;
                     &lt;entry&gt;
                         &lt;key&gt;synchronousEdges&lt;/key&gt;
@@ -10634,7 +10634,7 @@ https://fpgasoftware.intel.com/eula.-->
                         &lt;name&gt;in_port&lt;/name&gt;
                         &lt;role&gt;export&lt;/role&gt;
                         &lt;direction&gt;Input&lt;/direction&gt;
-                        &lt;width&gt;16&lt;/width&gt;
+                        &lt;width&gt;32&lt;/width&gt;
                         &lt;lowerBound&gt;0&lt;/lowerBound&gt;
                         &lt;vhdlType&gt;STD_LOGIC_VECTOR&lt;/vhdlType&gt;
                         &lt;terminationValue&gt;0&lt;/terminationValue&gt;
@@ -11140,7 +11140,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;name&gt;in_port&lt;/name&gt;
                     &lt;role&gt;export&lt;/role&gt;
                     &lt;direction&gt;Input&lt;/direction&gt;
-                    &lt;width&gt;16&lt;/width&gt;
+                    &lt;width&gt;32&lt;/width&gt;
                     &lt;lowerBound&gt;0&lt;/lowerBound&gt;
                     &lt;vhdlType&gt;STD_LOGIC_VECTOR&lt;/vhdlType&gt;
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
@@ -11234,7 +11234,7 @@ https://fpgasoftware.intel.com/eula.-->
         &lt;/entry&gt;
         &lt;entry&gt;
             &lt;key&gt;embeddedsw.CMacro.DATA_WIDTH&lt;/key&gt;
-            &lt;value&gt;16&lt;/value&gt;
+            &lt;value&gt;32&lt;/value&gt;
         &lt;/entry&gt;
         &lt;entry&gt;
             &lt;key&gt;embeddedsw.CMacro.DO_TEST_BENCH_WIRING&lt;/key&gt;
@@ -11286,7 +11286,7 @@ https://fpgasoftware.intel.com/eula.-->
         &lt;/entry&gt;
         &lt;entry&gt;
             &lt;key&gt;embeddedsw.dts.params.altr,gpio-bank-width&lt;/key&gt;
-            &lt;value&gt;16&lt;/value&gt;
+            &lt;value&gt;32&lt;/value&gt;
         &lt;/entry&gt;
         &lt;entry&gt;
             &lt;key&gt;embeddedsw.dts.params.resetvalue&lt;/key&gt;

@@ -322,9 +322,9 @@ module DE10_Pro
    wire 	htile_fast_clk_D1;
    wire 	htile_fast_lock_D0;
    wire 	htile_fast_lock_D1;
-   wire [15:0] 	status;
-   reg [15:0] 	status_metastable /* synthesis preserve */; // preserve net name for timing closure
-   reg [15:0] 	status_latched;
+   wire [31:0] 	status;
+   reg [31:0] 	status_metastable /* synthesis preserve */; // preserve net name for timing closure
+   reg [31:0] 	status_latched;
 
    always @(posedge clk_100)
      begin
@@ -350,12 +350,16 @@ module DE10_Pro
    assign status[10:0] = link_status_A;
    assign status[11] = | cal_busy;
    assign status[15:12] = {htile_fast_lock_D1, htile_fast_lock_D0, htile_fast_lock_A1, htile_fast_lock_A0};
+
+   assign status[26:16] = link_status_D;
+   assign status[27] = status[11];
+   assign status[31:28] = status[15:12];
    
    soc mainsoc
       (
        .clk_clk(clk_100),
        .reset_reset(!reset_n_100),
-       .pio_status_input_export                   (status_latched),                  //   input,    width = 16,                           pio_status_input.export
+       .pio_status_input_export                   (status_latched),                  //   input,    width = 32,                           pio_status_input.export
 
 	   .mkseriallite3_instance_0_ignore_CLK_GATE_rx_clk (),
 	   .mkseriallite3_instance_0_coe_link_status_coe_link_status (link_status_A),           // 11-bits

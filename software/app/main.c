@@ -34,6 +34,43 @@ print_n_tabs(int n)
 }
 
 
+void
+print_link_status()
+{
+  int base = PIO_STATUS_BASE;
+  int status;
+  status = IORD_32DIRECT(base, 0);
+  /* From DE10pro:
+       assign status[10:0] = link_status_A;
+       assign status[11] = | cal_busy;
+       assign status[15:12] = {htile_fast_lock_D1, htile_fast_lock_D0, htile_fast_lock_A1, htile_fast_lock_A0};
+
+     Where link_status_A is defined in SerialLite3.bsv:
+       typedef struct {
+         Bit #(5) error_rx;
+	 Bit #(4) error_tx;
+	 Bool link_up_tx;
+	 Bool link_up_rx;
+       } SerialLite3_LinkStatus deriving (Bits);
+  */
+  alt_printf("Chan A: Link up: tx=%x,rx=%x;  error_tx=0x%x,  error_rx=0x%x,  calibration_busy=%x,  htile_lock (4-bits)=0x%x\n",
+	     exbit(status,0),
+	     exbit(status,1),
+	     (status>>2) & 0xf,
+	     (status>>6) & 0x1f,
+	     exbit(status,11),
+	     (status>>12) & 0xf);
+  status = status>>16;
+  alt_printf("Chan D: Link up: tx=%x,rx=%x;  error_tx=0x%x,  error_rx=0x%x,  calibration_busy=%x,  htile_lock (4-bits)=0x%x\n",
+	     exbit(status,0),
+	     exbit(status,1),
+	     (status>>2) & 0xf,
+	     (status>>6) & 0x1f,
+	     exbit(status,11),
+	     (status>>12) & 0xf);
+}
+
+
 int
 check_testreg(struct fifoDetails f)
 {
@@ -124,6 +161,8 @@ main(void)
 	       fs[j].base_addr);
     check_testreg(fs[j]);
   }
+
+  print_link_status();
 
   alt_printf("Write-read tests on the channels\n");
   for(j=0; j<10; j++)

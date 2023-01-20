@@ -716,7 +716,7 @@ https://fpgasoftware.intel.com/eula.-->
         <ipxact:parameter parameterId="associatedResetSinks" type="string">
           <ipxact:name>associatedResetSinks</ipxact:name>
           <ipxact:displayName>Associated reset sinks</ipxact:displayName>
-          <ipxact:value>rsi_rst_n</ipxact:value>
+          <ipxact:value>none</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="synchronousEdges" type="string">
           <ipxact:name>synchronousEdges</ipxact:name>
@@ -2348,7 +2348,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;/entry&gt;
                     &lt;entry&gt;
                         &lt;key&gt;associatedResetSinks&lt;/key&gt;
-                        &lt;value&gt;rsi_rst_n&lt;/value&gt;
+                        &lt;value&gt;none&lt;/value&gt;
                     &lt;/entry&gt;
                     &lt;entry&gt;
                         &lt;key&gt;synchronousEdges&lt;/key&gt;
@@ -2639,7 +2639,7 @@ https://fpgasoftware.intel.com/eula.-->
         <altera:port_mapping altera:name="axstrs_tx_tvalid" altera:internal="axstrs_tx_tvalid"></altera:port_mapping>
       </altera:interface_mapping>
     </altera:altera_interface_boundary>
-    <altera:altera_has_warnings>false</altera:altera_has_warnings>
+    <altera:altera_has_warnings>true</altera:altera_has_warnings>
     <altera:altera_has_errors>false</altera:altera_has_errors>
   </ipxact:vendorExtensions>
 </ipxact:component>

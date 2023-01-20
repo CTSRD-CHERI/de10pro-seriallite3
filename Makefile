@@ -69,7 +69,7 @@ generate_ip: $(IP_SRC) $(SERIALLITE3_HW_TCL) $(BERT_HW_TCL)
 #-----------------------------------------------------------------------------
 # get the tcl for the serial lite 3 rtl
 $(SERIALLITE3_HW_TCL): $(VIPBUNDLE) $(SERIALLITE3_RTL)
-	$(VIPBUNDLE) -f quartus_ip_tcl -o $@ $(SERIALLITE3_RTL)
+	# STOP UNTIL VIPBUNDLE FIXED     $(VIPBUNDLE) -f quartus_ip_tcl -o $@ $(SERIALLITE3_RTL)
 .PHONY: generate_seriallite3_tcl clean_seriallite3_tcl
 generate_seriallite3_tcl: $(SERIALLITE3_HW_TCL)
 clean_seriallite3_tcl:
@@ -89,7 +89,7 @@ mrproper_seriallite3_rtl:
 #-----------------------------------------------------------------------------
 # get the tcl for the bit error rate tester
 $(BERT_HW_TCL): $(VIPBUNDLE) $(BERT_RTL)
-	$(VIPBUNDLE) -f quartus_ip_tcl -o $@ $(BERT_RTL)
+	# STOP UNTIL VIPBUNDLE FIXED     $(VIPBUNDLE) -f quartus_ip_tcl -o $@ $(BERT_RTL)
 .PHONY: generate_bert_tcl clean_bert_tcl
 generate_bert_tcl: $(BERT_HW_TCL)
 clean_bert_tcl:
@@ -109,7 +109,7 @@ mrproper_bert_rtl:
 #-----------------------------------------------------------------------------
 # build vipbundle
 $(VIPBUNDLE):
-	$(MAKE) -C $(VIPBUNDLEDIR) vipbundle
+	# STOP UNTIL VIPBUNDLE FIXED     $(MAKE) -C $(VIPBUNDLEDIR) vipbundle
 
 .PHONY: vipbundle clean-vipbundle
 vipbundle: $(VIPBUNDLE)
