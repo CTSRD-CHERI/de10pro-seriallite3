@@ -200,6 +200,32 @@ test_write_read_channels(struct fifoDetails* fs, int num_chan)
 
 
 
+void
+discover_link_topology(struct fifoDetails* fs, int num_chan)
+{
+  int j, chan, data;
+  int cid0 = chip_id_lo();
+  int linkid[num_chan];
+
+  for(chan=0; chan<num_chan; chan++)
+    linkid[chan] = 0;
+  
+  alt_printf("Determininin topology.  Produces 'dot' format graph\n");
+  for(j=0; j<10; j++) {
+    for(chan=0; chan<num_chan; chan++)
+      write_tx_fifo(fs[chan], 0, cid0);
+    for(chan=0; chan<num_chan; chan++) {
+      if(read_rx_fifo(fs[chan], 0, &data))
+	linkid[chan] = data;
+    }
+    usleep(500000);
+  }
+  for(chan=0; chan<num_chan; chan++)
+    alt_printf("DOT:    \"0x%x\" -> \"0x%x\";\n", linkid[chan], cid0);
+}
+
+
+
 int
 main(void)
 {
@@ -241,6 +267,7 @@ main(void)
   fcntl(0, F_SETFL, fcntl(0, F_GETFL) | O_NONBLOCK);
 
   alt_putstr("Start tests:\n");
+  alt_putstr("   d = discover link topology (dot output)\n");
   alt_putstr("   f = flush then exit\n");
   alt_putstr("   l = loop-back\n");
   alt_putstr("   t = test\n");
@@ -251,12 +278,15 @@ main(void)
       if(c=='\004') // exit on ctl-D
 	return 0;
       alt_printf("c = 0x%x = %c\n", c, c);
-      if((c=='l') || (c=='t') || (c=='f')) flush_mode = false;
+      if((c=='d') || (c=='f') || (c=='l') || (c=='t')) flush_mode = false;
       for(chan=0; chan<num_chan; chan++)
 	report_rx_fifo(fs[chan], fifonum, chan, true);
     }
   }
 
+  if(c=='d')
+    discover_link_topology(fs, num_chan);
+  
   if(c=='l') {
     alt_putstr("Loopback mode\n");
     int cid0 = chip_id_lo();
