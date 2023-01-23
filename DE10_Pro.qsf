@@ -1831,6 +1831,8 @@ set_instance_assignment -name HSSI_PARAMETER "pma_tx_buf_pre_emp_switching_ctrl_
 # set_instance_assignment -name HSSI_PARAMETER "pma_tx_buf_term_sel=<value>" -to QSFP28D_TX_p[3]
 
 
+set_global_assignment -name POWER_APPLY_THERMAL_MARGIN ADDITIONAL
+set_global_assignment -name IP_FILE chipid.ip
 set_global_assignment -name VERILOG_FILE bsv/stratix10_seriallite3_4lane_invrst.v
 set_global_assignment -name IP_FILE bsv/stratix10_seriallite3_4lane.ip
 set_global_assignment -name SDC_FILE jtag.sdc
@@ -1852,4 +1854,4 @@ set_global_assignment -name IP_FILE ip/soc/clock_xcvr_a.ip
 set_global_assignment -name IP_FILE ip/soc/soc_pio_0.ip
 set_global_assignment -name IP_FILE ip/soc/soc_mkSerialLite3_Instance_0.ip
 set_global_assignment -name IP_FILE ip/soc/soc_mkBERT_Instance_0.ip
-set_global_assignment -name POWER_APPLY_THERMAL_MARGIN ADDITIONAL
+set_global_assignment -name IP_FILE ip/soc/soc_mkStatusDevice_Instance_0.ip
