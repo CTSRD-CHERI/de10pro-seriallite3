@@ -138,6 +138,17 @@ read_rx_fifo(struct fifoDetails f, int fifonum, int chan_index, int silent)
 
 
 int
+status_device(int csr_index)
+{
+  return IORD_32DIRECT(MKSTATUSDEVICE_INSTANCE_0_BASE, csr_index*4);
+}
+
+
+int chip_id_lo() { return status_device(4); }
+int chip_id_hi() { return status_device(5); }
+
+
+int
 main(void)
 {
   const int num_chan = 2;
@@ -148,7 +159,7 @@ main(void)
   int j, chan;
 
   alt_putstr("Start...\n");
-  
+  alt_printf("ChipID = 0x%x %x\n", chip_id_hi(), chip_id_lo());
   // Check testreg to ensure we're probably communicating with a BERT
   fs[0].base_addr = MKBERT_INSTANCE_0_BASE;
   fs[0].chan_letter = 'A';
