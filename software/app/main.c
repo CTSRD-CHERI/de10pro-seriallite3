@@ -181,7 +181,6 @@ print_link_status(struct fifoDetails f, int fifonum)
 }
 
 
-
 void
 test_write_read_channels(struct fifoDetails* fs, int num_chan)
 {
@@ -194,10 +193,46 @@ test_write_read_channels(struct fifoDetails* fs, int num_chan)
     for(chan=0; chan<num_chan; chan++) {
       report_rx_fifo(fs[chan], 0, chan, false);
     }
-    usleep(500000);
+    usleep(100000); // sleep for 0.1s
+  }
+  // report on any remaining data received
+  for(j=0; j<30; j++)
+    for(chan=0; chan<num_chan; chan++) {
+      report_rx_fifo(fs[chan], 0, chan, false);
+      usleep(100000); // sleep for 0.1s
+    }
+}
+
+
+void
+echo_links(struct fifoDetails* fs, int num_chan)
+{
+  int chan, data;
+  int cid0 = chip_id_lo();
+  alt_putstr("Echo mode\n");
+  while(1) {
+    for(chan=0; chan<num_chan; chan++) {
+      if(read_rx_fifo(fs[chan], 0, &data)) {
+	alt_printf("Echo chan %c = 0x%x\n", fs[chan].chan_letter, data);
+	write_tx_fifo(fs[chan], 0, (cid0<<16) | (data & 0xffff) );
+      }
+    }
   }
 }
 
+
+void
+flush_links(struct fifoDetails* fs, int num_chan)
+{
+  int j, chan;
+  
+  alt_printf("Flushing data left in RX FIFOs\n");
+  for(j=0; j<100; j++)
+    for(chan=0; chan<num_chan; chan++) {
+      report_rx_fifo(fs[chan], 0, chan, false);
+      usleep(100000); // wait 0.1s
+    }
+}
 
 
 void
@@ -253,10 +288,8 @@ int
 main(void)
 {
   const int num_chan = 4;
-  const int fifonum = 0; // 0=serial-link, 1=loopback
+  // const int fifonum = 0; // 0=serial-link, 1=loopback
   struct fifoDetails fs[num_chan];
-  //int phy_mgmt_addr_offset = 1<<15; // word address offset to access physical management (PMA) addresses; MSB of address bits
-  //int j, d, e, status;
   int j, chan;
   char c;
   int flush_mode = true;
@@ -292,10 +325,11 @@ main(void)
   alt_putstr("Start tests:\n");
   alt_putstr("   d = discover link topology (dot output)\n");
   alt_putstr("   f = flush then exit\n");
-  alt_putstr("   l = loop-back\n");
+  alt_putstr("   e = echo mode\n");
   alt_putstr("   o = test one link quickly\n");
   alt_putstr("   t = test\n");
   c=' ';
+
   while (flush_mode) {
     c = alt_getchar();
     if((int) c > 0) {
@@ -303,53 +337,24 @@ main(void)
 	return 0;
       if((c=='d') || (c=='f') || (c=='l') || (c=='o') || (c=='t')) flush_mode = false;
       for(chan=0; chan<num_chan; chan++)
-	report_rx_fifo(fs[chan], fifonum, chan, true);
+	report_rx_fifo(fs[chan], 0, chan, true);
     }
   }
 
   if(c=='d')
     discover_link_topology(fs, num_chan);
   
-  if(c=='l') {
-    alt_putstr("Loopback mode\n");
-    int cid0 = chip_id_lo();
-    while(1) {
-      for(chan=0; chan<num_chan; chan++) {
-	int data;
-	if(read_rx_fifo(fs[chan], fifonum, &data)) {
-	  alt_printf("Loopback chan %c = 0x%x\n", fs[chan].chan_letter, data);
-	  write_tx_fifo(fs[chan], fifonum, (cid0<<16) | (data & 0xffff) );
-	}
-      }
-    }
-  }
+  if(c=='e')
+    echo_links(fs, num_chan);
 
-  if(c=='f') {
-    alt_printf("Flushing data left in RX FIFOs\n");
-    for(j=0; j<200; j++)
-      for(chan=0; chan<num_chan; chan++)
-	report_rx_fifo(fs[chan], fifonum, chan, false);
-  }
+  if(c=='f')
+    flush_links(fs, num_chan);
 
   if(c=='o') 
     test_write_read_one_link(fs[3], fs[0]);
   
-  if(c=='t') {
-    alt_printf("Write-read tests on the channels\n");
-    for(j=0; j<10; j++) {
-      for(chan=0; chan<num_chan; chan++)
-	write_tx_fifo(fs[chan], fifonum, ((chan|0x1000)<<16) | (j+1));
-      //      write_tx_fifo(fs[chan], fifonum, (cid0<<16) | (j+1));
-      for(chan=0; chan<num_chan; chan++) {
-	alt_printf("Chan=%c\n", fs[chan].chan_letter);
-	report_rx_fifo(fs[chan], fifonum, chan, false);
-      }
-    }
-  
-    for(j=0; j<100; j++)
-      for(chan=0; chan<num_chan; chan++)
-	report_rx_fifo(fs[chan], fifonum, 0, false);
-  }
+  if(c=='t')
+    test_write_read_channels(fs, num_chan);
   
   alt_putstr("The end\n\n");
   usleep(1000000);
