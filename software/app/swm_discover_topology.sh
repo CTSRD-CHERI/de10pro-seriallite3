@@ -19,8 +19,10 @@ echo 'd' | nios2-terminal --cable 8 > log.8
 grep "DOT:" log.? > topology.txt
 cat topology.txt | ./topology2dot.py > topology.dot
 cat topology.dot
-dot -Tpdf -Glabel="Stratix 10 Topology" -Kcirco topology.dot -o topology.pdf
-echo "Created topology.pdf"
+cat topology.txt | ./topology2dot-jtagchain.py > topologyjtag.dot
+dot -Tpdf -Glabel="Stratix 10 Topology (ChipIDs)" -Kcirco topology.dot -o topology.pdf
+dot -Tpdf -Glabel="Stratix 10 Topology (JTAG chain numbers)" -Kcirco topologyjtag.dot -o topologyjtag.pdf
+echo "Created topology.pdf and topologyjtag.pdf"
 
 
 
