@@ -1855,3 +1855,6 @@ set_global_assignment -name IP_FILE ip/soc/soc_pio_0.ip
 set_global_assignment -name IP_FILE ip/soc/soc_mkSerialLite3_Instance_0.ip
 set_global_assignment -name IP_FILE ip/soc/soc_mkBERT_Instance_0.ip
 set_global_assignment -name IP_FILE ip/soc/soc_mkStatusDevice_Instance_0.ip
+set_global_assignment -name USE_SIGNALTAP_FILE stp1.stp
+set_global_assignment -name SIGNALTAP_FILE stp1.stp
+set_global_assignment -name IP_FILE ip/soc/soc_sl3_0.ip

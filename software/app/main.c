@@ -201,6 +201,29 @@ test_write_read_channels(struct fifoDetails* fs, int num_chan)
 
 
 void
+test_write_read_one_link(struct fifoDetails fwrite, struct fifoDetails fread)
+{
+  const int num_flits = 10;
+  int d[num_flits];
+  int j,t;
+  int cid0 = chip_id_lo();
+  alt_printf("Fast write-read tests from channel %c to %c\n",fwrite.chan_letter, fread.chan_letter);
+  for(j=0; j<num_flits; j++)
+      write_tx_fifo(fwrite, 0, (cid0<<16) | (j+1));
+  for(j=0; j<num_flits; j++)
+    while(!read_rx_fifo(fread, 0, &d[j])) {};
+  for(j=0; j<num_flits; j++)
+    alt_printf("d[0x%x]=0x%x\n", j, d[j]);
+  for(j=0; j<100; j++) {
+    if(read_rx_fifo(fread, 0, &t))
+      alt_printf("other data=0x%x\n",t);
+    usleep(10000);
+  }
+}
+
+
+
+void
 discover_link_topology(struct fifoDetails* fs, int num_chan)
 {
   int j, chan, data;
@@ -270,6 +293,7 @@ main(void)
   alt_putstr("   d = discover link topology (dot output)\n");
   alt_putstr("   f = flush then exit\n");
   alt_putstr("   l = loop-back\n");
+  alt_putstr("   o = test one link quickly\n");
   alt_putstr("   t = test\n");
   c=' ';
   while (flush_mode) {
@@ -277,8 +301,7 @@ main(void)
     if((int) c > 0) {
       if(c=='\004') // exit on ctl-D
 	return 0;
-      alt_printf("c = 0x%x = %c\n", c, c);
-      if((c=='d') || (c=='f') || (c=='l') || (c=='t')) flush_mode = false;
+      if((c=='d') || (c=='f') || (c=='l') || (c=='o') || (c=='t')) flush_mode = false;
       for(chan=0; chan<num_chan; chan++)
 	report_rx_fifo(fs[chan], fifonum, chan, true);
     }
@@ -308,6 +331,9 @@ main(void)
 	report_rx_fifo(fs[chan], fifonum, chan, false);
   }
 
+  if(c=='o') 
+    test_write_read_one_link(fs[3], fs[0]);
+  
   if(c=='t') {
     alt_printf("Write-read tests on the channels\n");
     for(j=0; j<10; j++) {
