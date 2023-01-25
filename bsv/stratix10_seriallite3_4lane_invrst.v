@@ -46,8 +46,9 @@ module stratix10_seriallite3_4lane_invrst (
 		.data_tx                  (data_tx),                  //   input,  width = 256,                  data_tx.tx_data
 		.valid_tx                 (valid_tx),                 //   input,    width = 1,                 valid_tx.tx_valid
 		.ready_tx                 (ready_tx),                 //  output,    width = 1,                 ready_tx.tx_ready
-		.start_of_burst_tx        (start_of_burst_tx),        //   input,    width = 1,        start_of_burst_tx.tx_start_of_burst
-		.end_of_burst_tx          (end_of_burst_tx),          //   input,    width = 1,          end_of_burst_tx.tx_end_of_burst
+  	        // SWM: start_of_burst_tx and end_of_burst_tx should only be high for 1 clock cycle and when there is valid data
+		.start_of_burst_tx        (start_of_burst_tx && valid_tx),        //   input,    width = 1,        start_of_burst_tx.tx_start_of_burst
+		.end_of_burst_tx          (end_of_burst_tx && valid_tx),          //   input,    width = 1,          end_of_burst_tx.tx_end_of_burst
 		.link_up_tx               (link_up_tx),               //  output,    width = 1,               link_up_tx.tx_link_up
 		.error_tx                 (error_tx),                 //  output,    width = 4,                 error_tx.tx_error
 		.interface_clock_rx       (interface_clock_rx),       //  output,    width = 1,       interface_clock_rx.clk
