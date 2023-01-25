@@ -138,7 +138,9 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
                                        , tlast: True
                                        , tid: ?
                                        , tdest: ?
-                                       , tuser: 0} );
+				       , tuser: 9'h100} );
+    // tuser: transfers to {start_of_burst (1b), sync_vector (8b)} of Serial Lite III link
+    //        for end_of_flit the sync_vector contains the number of INVAID 64b words sent
 
     if((aw.awaddr[7:3]==2) && loopback_fifo.slave.canPut())
       loopback_fifo.slave.put(AXI4Stream_Flit{ tdata: zeroExtend(w.wdata)
