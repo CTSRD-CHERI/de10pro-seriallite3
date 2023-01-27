@@ -29,6 +29,15 @@ exbit(int word, int bit_pos)
 }
 
 
+int
+exbitfield(int word, int base, int len)
+{
+  // assume 0<len<32 and (base+len)<=32
+  uint mask = (1<<len)-1;
+  return (word>>base) & mask;
+}
+
+
 void
 print_n_tabs(int n)
 {
@@ -38,48 +47,11 @@ print_n_tabs(int n)
 
 
 
-void
-print_link_status_old()
-{
-  int base = PIO_STATUS_BASE;
-  int status;
-  status = IORD_32DIRECT(base, 0);
-  /* From DE10pro:
-       assign status[10:0] = link_status_A;
-       assign status[11] = | cal_busy;
-       assign status[15:12] = {htile_fast_lock_D1, htile_fast_lock_D0, htile_fast_lock_A1, htile_fast_lock_A0};
-
-     Where link_status_A is defined in SerialLite3.bsv:
-       typedef struct {
-         Bit #(5) error_rx;
-	 Bit #(4) error_tx;
-	 Bool link_up_tx;
-	 Bool link_up_rx;
-       } SerialLite3_LinkStatus deriving (Bits);
-  */
-  alt_printf("Chan A: Link up: tx=%x,rx=%x;  error_tx=0x%x,  error_rx=0x%x,  calibration_busy=%x,  htile_lock (4-bits)=0x%x\n",
-	     exbit(status,0),
-	     exbit(status,1),
-	     (status>>2) & 0xf,
-	     (status>>6) & 0x1f,
-	     exbit(status,11),
-	     (status>>12) & 0xf);
-  status = status>>16;
-  alt_printf("Chan D: Link up: tx=%x,rx=%x;  error_tx=0x%x,  error_rx=0x%x,  calibration_busy=%x,  htile_lock (4-bits)=0x%x\n",
-	     exbit(status,0),
-	     exbit(status,1),
-	     (status>>2) & 0xf,
-	     (status>>6) & 0x1f,
-	     exbit(status,11),
-	     (status>>12) & 0xf);
-}
-
-
 int
 check_testreg(struct fifoDetails f)
 {
   int j,t,d;
-  int pass=1;
+  int pass=true;
   int testreg_addr_offset=0x10*word_offset;
   for(j=0; j<10; j++) {
     t=j;
@@ -87,10 +59,37 @@ check_testreg(struct fifoDetails f)
     d = IORD_32DIRECT(f.base_addr, testreg_addr_offset);
     if(d!=t) {
       alt_printf("Chan %c: testreg expecting 0x%x but read 0x%x - fail\n", f.chan_letter, t, d);
-      pass=0;
+      pass=false;
     }
   }
   return pass;
+}
+
+
+void
+print_bert_build_timestamp(struct fifoDetails f)
+{
+  int lo = IORD_32DIRECT(f.base_addr, 0x12*word_offset);
+  int hi = IORD_32DIRECT(f.base_addr, 0x13*word_offset);
+  alt_printf("Chan %c: Bluespec built on %x-%x%x-%x%x %x%x:%x%x.%x%x\n",
+	     f.chan_letter,
+	     // year
+	     exbitfield(hi,  8,16),
+	     // month
+	     exbitfield(hi,  4,4),
+	     exbitfield(hi,  0,4),
+	     // days
+	     exbitfield(lo,  28,4),
+	     exbitfield(lo,  24,4),
+	     // hours
+	     exbitfield(lo,  20,4),
+	     exbitfield(lo,  16,4),
+	     // minutes
+	     exbitfield(lo, 12,4),
+	     exbitfield(lo,  8,4),
+	     // seconds
+	     exbitfield(lo,  4,4),
+	     exbitfield(lo,  0,4));
 }
 
 
@@ -162,22 +161,33 @@ status_device(int csr_index)
 int chip_id_lo() { return status_device(4); }
 int chip_id_hi() { return status_device(5); }
 
+
 void
 print_link_status(struct fifoDetails f, int fifonum)
 {
   int status;
-  // assert 0<=fifonum<=3
   status = status_device(fifonum);
-  alt_printf("Chan %c: Link up: tx=%x,rx=%x;  error_tx=0x%x,  error_rx=0x%x,  calibration_busy (binary)=%x%x,  htile_lock (binary)=%x%x\n",
+  int link_up_tx = exbit(status,0);
+  int link_up_rx = exbit(status,1);
+  int error_tx = exbitfield(status,2,4);
+  int error_rx = exbitfield(status,6,5);
+  int calibration_busy = exbit(status,18) | exbit(status,19);
+  int htile_lock = exbit(status,16) & exbit(status,17);
+  int good = (link_up_tx==1)
+           & (link_up_rx==1)
+           & (error_tx==0)
+           & (error_rx==0)
+           & (calibration_busy==0)
+           & (htile_lock==1);
+  alt_printf("Chan %c: Link up: tx=%x,rx=%x;  error_tx=0x%x,  error_rx=0x%x,  calibration_busy (binary)=%x,  htile_lock (binary)=%x - Link is %s\n",
 	     f.chan_letter,
-	     exbit(status,0),
-	     exbit(status,1),
-	     (status>>2) & 0xf,
-	     (status>>6) & 0x1f,
-	     exbit(status,18),
-	     exbit(status,19),
-	     exbit(status,16),
-	     exbit(status,17));
+	     link_up_tx,
+	     link_up_rx,
+	     error_tx,
+	     error_rx,
+	     calibration_busy,
+	     htile_lock,
+	     good ? "GOOD" : "BAD");
 }
 
 
@@ -222,6 +232,21 @@ echo_links(struct fifoDetails* fs, int num_chan)
 
 
 void
+bert_report(struct fifoDetails* fs, int num_chan)
+{
+  int chan;
+  for(chan=0; chan<num_chan; chan++)
+    alt_printf("BERT - Channel %c:  number of errors = 0x%x 0x%x \tnumber of correct flits = 0x%x 0x%x\n",
+	       fs[chan].chan_letter,
+	       IORD_32DIRECT(fs[chan].base_addr, 7*word_offset),
+	       IORD_32DIRECT(fs[chan].base_addr, 6*word_offset),
+	       IORD_32DIRECT(fs[chan].base_addr, 5*word_offset),
+	       IORD_32DIRECT(fs[chan].base_addr, 4*word_offset)
+	       );
+}
+
+
+void
 flush_links(struct fifoDetails* fs, int num_chan)
 {
   int j, chan;
@@ -236,7 +261,7 @@ flush_links(struct fifoDetails* fs, int num_chan)
 
 
 void
-test_write_read_one_link(struct fifoDetails fwrite, struct fifoDetails fread)
+test_write_read_one_link(struct fifoDetails fwrite, struct fifoDetails fread, int fifonum)
 {
   const int num_flits = 10;
   int d[num_flits];
@@ -244,13 +269,13 @@ test_write_read_one_link(struct fifoDetails fwrite, struct fifoDetails fread)
   int cid0 = chip_id_lo();
   alt_printf("Fast write-read tests from channel %c to %c\n",fwrite.chan_letter, fread.chan_letter);
   for(j=0; j<num_flits; j++)
-      write_tx_fifo(fwrite, 0, (cid0<<16) | (j+1));
+      write_tx_fifo(fwrite, fifonum, (cid0<<16) | (j+1));
   for(j=0; j<num_flits; j++)
-    while(!read_rx_fifo(fread, 0, &d[j])) {};
+    while(!read_rx_fifo(fread, fifonum, &d[j])) {};
   for(j=0; j<num_flits; j++)
     alt_printf("d[0x%x]=0x%x\n", j, d[j]);
   for(j=0; j<100; j++) {
-    if(read_rx_fifo(fread, 0, &t))
+    if(read_rx_fifo(fread, fifonum, &t))
       alt_printf("other data=0x%x\n",t);
     usleep(10000);
   }
@@ -314,15 +339,22 @@ main(void)
     check_testreg(fs[j]);
   }
 
+  print_bert_build_timestamp(fs[0]);
+  
   for(chan=0; chan<num_chan; chan++)
     print_link_status(fs[chan], chan);
 
+  for(chan=0; chan<num_chan; chan++)
+    if(!check_testreg(fs[chan]))
+      return 1;
+  
   // test_write_read_channels(fs, num_chan);
   
   // set stdin to nonblocking to allow keyboard polling
   fcntl(0, F_SETFL, fcntl(0, F_GETFL) | O_NONBLOCK);
 
   alt_putstr("Start tests:\n");
+  alt_putstr("   b = bit error-rate test report\n");
   alt_putstr("   d = discover link topology (dot output)\n");
   alt_putstr("   f = flush then exit\n");
   alt_putstr("   e = echo mode\n");
@@ -335,12 +367,15 @@ main(void)
     if((int) c > 0) {
       if(c=='\004') // exit on ctl-D
 	return 0;
-      if((c=='d') || (c=='f') || (c=='l') || (c=='o') || (c=='t')) flush_mode = false;
+      if((c=='b') || (c=='d') || (c=='f') || (c=='l') || (c=='o') || (c=='t')) flush_mode = false;
       for(chan=0; chan<num_chan; chan++)
 	report_rx_fifo(fs[chan], 0, chan, true);
     }
   }
 
+  if(c=='b')
+    bert_report(fs, num_chan);
+  
   if(c=='d')
     discover_link_topology(fs, num_chan);
   
@@ -351,7 +386,8 @@ main(void)
     flush_links(fs, num_chan);
 
   if(c=='o') 
-    test_write_read_one_link(fs[3], fs[0]);
+    test_write_read_one_link(fs[3], fs[0], 0);
+  // Check one link in loop-back:  test_write_read_one_link(fs[0], fs[0], 1);
   
   if(c=='t')
     test_write_read_channels(fs, num_chan);
