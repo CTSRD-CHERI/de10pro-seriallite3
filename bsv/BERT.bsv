@@ -38,7 +38,10 @@ import BlueAXI4   :: *;
 import BlueBasics :: *;
 import FIFOF      :: *;
 import Clocks     :: *;
+import ConfigReg  :: *;
+import DReg       :: *;
 
+`include "TimeStamp.bsv"
 
 interface BERT#(
   numeric type t_addr
@@ -58,7 +61,6 @@ interface BERT#(
 endinterface
 
 
-
 interface BERT_Sig#(
   numeric type t_addr
 , numeric type t_awuser, numeric type t_wuser, numeric type t_buser
@@ -76,6 +78,30 @@ interface BERT_Sig#(
 endinterface
 
 
+function Bit#(256) next_bert_test_correct(Bit#(256) current);
+  Bit#(64)  prime_number = truncate(65'h1_00000000_00000000 - 65'd59); // 2^64-59 is prime
+  Bit#(256) next;
+  next[ 63:  0] = current[63:0] + prime_number;
+  next[127: 64] = next[63:0] ^ 64'hffffffff_ffffffff;
+  next[191:128] = next[63:0] & 64'haaaaaaaa_aaaaaaaa;
+  next[255:192] = next[63:0] | 64'haaaaaaaa_aaaaaaaa; // note that it is imprtant that the top byte != 0 for routing to the BERT to work
+  return next;
+endfunction
+
+//function Bit#(256) next_bert_test(Bit#(256) current) = (256'hff<<248) | 256'h12345678; // constant for initial testing
+//function Bit#(256) next_bert_test(Bit#(256) current) = (256'hff<<248) | (current[247:0]+1); // for initial testing
+
+function Bit#(256) next_bert_test(Bit#(256) current); // for initial testing
+  Bit#(256) next;
+  next[ 63:  0] = current[63:0] + 1;
+  next[127: 64] = next[63:0] ^ 64'hffffffff_ffffffff;
+  next[191:128] = next[63:0] & 64'haaaaaaaa_aaaaaaaa;
+  next[255:192] = next[63:0] | 64'haaaaaaaa_aaaaaaaa; // note that it is imprtant that the top byte != 0 for routing to the BERT to work
+  return next;
+endfunction
+
+
+
 module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wuser, t_buser, t_aruser, t_ruser) ifc);
 
   AXI4Stream_Shim#(0, 256, 0, 9)                  txfifo <- mkAXI4StreamShimUGSizedFIFOF32();
@@ -84,20 +110,61 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
   AXI4Stream_Shim#(0, 256, 0, 9)                  rxfifo <- mkAXI4StreamShimUGSizedFIFOF32();
   AXI4Stream_Shim#(0, 32, 0, 9)            loopback_fifo <- mkAXI4StreamShimUGSizedFIFOF32();
   Reg#(Bit#(32))                                 testreg <- mkReg(0);
+  FIFOF#(Bit#(256))                            bert_fifo <- mkUGFIFOF();
+  Reg#(Bit#(256))                              bert_test <- mkReg(0);
+  Reg#(Bool)                             bert_test_valid <- mkReg(False);
+  Reg#(Bit#(256))                               bert_gen <- mkReg(next_bert_test(13)); // TODO dynamically set to some "random value", e.g. based on ChipID?
+  Reg#(Bit#(64))                      bert_correct_flits <- mkConfigReg(0);
+  Reg#(Bit#(64))                        bert_error_flits <- mkConfigReg(0);
+  Reg#(Bool)                            bert_inc_correct <- mkDReg(False);
+  Reg#(Bool)                              bert_inc_error <- mkDReg(False);
   
   let axiShim <- mkAXI4LiteShimFF;
   
-  // rule runs in csi_rx_clk domain
-  rule clock_cross_rx_data(rx_fast_fifo.master.canPeek);
+  // rule runs in csi_rx_clk domain to forward data to the main clock domain
+  rule clock_cross_rx_data(rx_fast_fifo.master.canPeek());
     rx_sync_fifo.enq(rx_fast_fifo.master.peek());
     rx_fast_fifo.master.drop;
   endrule
-  
-  rule clock_crossed_rx_data_to_axi4_stream(rx_sync_fifo.notEmpty() && rxfifo.slave.canPut());
-    rxfifo.slave.put(rx_sync_fifo.first);
-    rx_sync_fifo.deq;
-  endrule
 
+  /*
+   rule clock_crossed_rx_data_to_axi4_stream(rx_sync_fifo.notEmpty());
+    AXI4Stream_Flit#(0,256,0,9) flit = rx_sync_fifo.first;
+    
+    // Always deq even if the corresponding receiving FIFO is full
+    // since we cannot stop the receiver.  Also, if the rxfifo is full
+    // we must not delay receiving BERT flits that will come
+    // afterwards otherwise we'll get BERT errors.
+    rx_sync_fifo.deq;
+    
+    // TODO: use the sync byte stored in the ruser field to stear where the flit should go?
+    // At present we're going to use the top byte of the tdata field to route the flit
+    if((flit.tdata[255:248]==8'h00) && rxfifo.slave.canPut())
+      begin
+        rxfifo.slave.put(flit); // forward to NIOS monitor port
+      end
+    if((flit.tdata[255:248]!=8'h00) && bert_fifo.notFull())
+      begin
+	bert_fifo.enq(flit.tdata); // forward to BERT checker
+      end
+  endrule
+*/
+  // Temporary hack to bypass the BERT
+   rule clock_crossed_rx_data_to_axi4_stream(rx_sync_fifo.notEmpty() && rxfifo.slave.canPut());
+     AXI4Stream_Flit#(0,256,0,9) flit = rx_sync_fifo.first;
+     rx_sync_fifo.deq;
+     rxfifo.slave.put(flit); // forward to NIOS monitor port
+   endrule    
+  
+  
+  // Temporary hack to forward all traffic to the BERT
+ /* rule clock_crossed_rx_data_to_axi4_stream(rx_sync_fifo.notEmpty && bert_fifo.notFull);
+    AXI4Stream_Flit#(0,256,0,9) flit = rx_sync_fifo.first;
+    rx_sync_fifo.deq;
+    bert_fifo.enq(flit.tdata); // forward to BERT checker
+  endrule
+  */
+  
   rule read_req;
     let r <- get (axiShim.master.ar);
     Bit#(32) d = 32'hdeaddead;
@@ -118,9 +185,20 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
       end
     if(r.araddr[7:3]==3)
       d = zeroExtend({pack(loopback_fifo.master.canPeek), pack(loopback_fifo.slave.canPut)});
-     
+    if(r.araddr[7:3]==4)
+      d = bert_correct_flits[31:0];
+    if(r.araddr[7:3]==5)
+      d = bert_correct_flits[63:32];
+    if(r.araddr[7:3]==6)
+      d = bert_error_flits[31:0];
+    if(r.araddr[7:3]==7)
+      d = bert_error_flits[63:32];
     if(r.araddr[7:3]==5'h10)
       d = testreg;
+    if(r.araddr[7:3]==5'h12)
+      d = timestamp()[31:0];
+    if(r.araddr[7:3]==5'h13)
+      d = timestamp()[63:32];
     let rsp = AXI4Lite_RFlit { rdata: d
                              , rresp: OKAY
                              , ruser: ? };
@@ -128,6 +206,10 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
   endrule
 
   // write requests handling, i.e. always ignnore write and return success
+  // stop the bert_generator on any write to multiplex access to the txfifo
+  
+  // TESTING - REMOVE PREEMPTS
+  //(* preempts = "write_req, bert_generator" *)
   rule write_req;
     let aw <- get (axiShim.master.aw);
     let w <- get (axiShim.master.w);
@@ -158,6 +240,36 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
     axiShim.master.b.put (rsp);
   endrule
 
+  /* remove for testing
+  rule bert_generator;
+    bert_gen <= next_bert_test(bert_gen);
+    txfifo.slave.put(AXI4Stream_Flit{ tdata: bert_gen
+				     , tstrb: ~0
+				     , tkeep: ~0
+                                     , tlast: True
+				     , tid: ?
+                                     , tdest: ?
+				     , tuser: 9'h100} );
+  endrule
+*/
+  
+  rule bert_tester(bert_fifo.notEmpty());
+    Bit#(256) flit = bert_fifo.first;
+    bert_fifo.deq;
+    // always update the bert_test to predict the next value
+    bert_test <= next_bert_test(flit);
+    Bool pass = flit == bert_test;
+    bert_inc_correct <= bert_test_valid &&  pass; // DReg update
+    bert_inc_error   <= bert_test_valid && !pass; // DReg update
+    bert_test_valid  <= !bert_test_valid || pass; // Reg update
+  endrule
+  // pipeine updates to counters of correct and error flits from BERT test
+  rule bert_increment_correct(bert_inc_correct);
+    bert_correct_flits <= bert_correct_flits+1;
+  endrule
+  rule bert_increment_error(bert_inc_error);
+    bert_error_flits <= bert_error_flits+1;
+  endrule  
   // interface
   interface mem_csrs = axiShim.slave;
   interface txstream = txfifo.master;
