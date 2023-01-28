@@ -46,7 +46,6 @@ print_n_tabs(int n)
 }
 
 
-
 int
 check_testreg(struct fifoDetails f)
 {
@@ -247,6 +246,15 @@ bert_report(struct fifoDetails* fs, int num_chan)
 
 
 void
+zero_bert_counters(struct fifoDetails* fs, int num_chan)
+{
+  int chan;
+  for(chan=0; chan<num_chan; chan++)
+    IOWR_32DIRECT(fs[chan].base_addr, 0x4*word_offset, 0);
+}
+
+
+void
 flush_links(struct fifoDetails* fs, int num_chan)
 {
   int j, chan;
@@ -355,6 +363,7 @@ main(void)
 
   alt_putstr("Start tests:\n");
   alt_putstr("   b = bit error-rate test report\n");
+  alt_putstr("   z = zero bit error-rate test counters\n");
   alt_putstr("   d = discover link topology (dot output)\n");
   alt_putstr("   f = flush then exit\n");
   alt_putstr("   e = echo mode\n");
@@ -367,7 +376,7 @@ main(void)
     if((int) c > 0) {
       if(c=='\004') // exit on ctl-D
 	return 0;
-      if((c=='b') || (c=='d') || (c=='f') || (c=='l') || (c=='o') || (c=='t')) flush_mode = false;
+      if((c=='b') || (c=='d') || (c=='f') || (c=='l') || (c=='o') || (c=='t') || (c=='z')) flush_mode = false;
       for(chan=0; chan<num_chan; chan++)
 	report_rx_fifo(fs[chan], 0, chan, true);
     }
@@ -391,6 +400,9 @@ main(void)
   
   if(c=='t')
     test_write_read_channels(fs, num_chan);
+
+  if(c=='z')
+    zero_bert_counters(fs, num_chan);
   
   alt_putstr("The end\n\n");
   usleep(1000000);
