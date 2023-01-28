@@ -118,6 +118,7 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
   Reg#(Bit#(64))                        bert_error_flits <- mkConfigReg(0);
   Reg#(Bool)                            bert_inc_correct <- mkDReg(False);
   Reg#(Bool)                              bert_inc_error <- mkDReg(False);
+  Reg#(Bit#(1))                        bert_gen_slowdown <- mkReg(0);  // 2-bit slowdown definitely works well, let's try 1-bit
   
   let axiShim <- mkAXI4LiteShimFF;
   
@@ -127,7 +128,6 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
     rx_fast_fifo.master.drop;
   endrule
 
-  /*
    rule clock_crossed_rx_data_to_axi4_stream(rx_sync_fifo.notEmpty());
     AXI4Stream_Flit#(0,256,0,9) flit = rx_sync_fifo.first;
     
@@ -148,14 +148,15 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
 	bert_fifo.enq(flit.tdata); // forward to BERT checker
       end
   endrule
-*/
+
+  /*
   // Temporary hack to bypass the BERT
    rule clock_crossed_rx_data_to_axi4_stream(rx_sync_fifo.notEmpty() && rxfifo.slave.canPut());
      AXI4Stream_Flit#(0,256,0,9) flit = rx_sync_fifo.first;
      rx_sync_fifo.deq;
      rxfifo.slave.put(flit); // forward to NIOS monitor port
    endrule    
-  
+  */
   
   // Temporary hack to forward all traffic to the BERT
  /* rule clock_crossed_rx_data_to_axi4_stream(rx_sync_fifo.notEmpty && bert_fifo.notFull);
@@ -208,8 +209,7 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
   // write requests handling, i.e. always ignnore write and return success
   // stop the bert_generator on any write to multiplex access to the txfifo
   
-  // TESTING - REMOVE PREEMPTS
-  //(* preempts = "write_req, bert_generator" *)
+  (* preempts = "write_req, bert_generator" *)
   rule write_req;
     let aw <- get (axiShim.master.aw);
     let w <- get (axiShim.master.w);
@@ -240,8 +240,10 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
     axiShim.master.b.put (rsp);
   endrule
 
-  /* remove for testing
-  rule bert_generator;
+  rule inc_ber_gen_slowdown;
+    bert_gen_slowdown <= bert_gen_slowdown+1;
+  endrule
+  rule bert_generator(bert_gen_slowdown == 0);
     bert_gen <= next_bert_test(bert_gen);
     txfifo.slave.put(AXI4Stream_Flit{ tdata: bert_gen
 				     , tstrb: ~0
@@ -251,7 +253,6 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
                                      , tdest: ?
 				     , tuser: 9'h100} );
   endrule
-*/
   
   rule bert_tester(bert_fifo.notEmpty());
     Bit#(256) flit = bert_fifo.first;
