@@ -324,7 +324,7 @@ discover_link_topology(struct fifoDetails* fs, int num_chan)
     usleep(500000);
   }
   for(chan=0; chan<num_chan; chan++)
-    alt_printf("DOT:    \"0x%x\" -> \"0x%x\" [label=\"%c->\"];\n", linkid[chan], cid0,fs[chan].chan_letter);
+    alt_printf("DOT:    \"0x%x\" -> \"0x%x\" [taillabel=\"%c\"];\n", linkid[chan], cid0,fs[chan].chan_letter);
 }
 
 
