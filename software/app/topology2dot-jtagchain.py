@@ -13,12 +13,14 @@ for line in sys.stdin:
     link = parts[1].replace(" ","")
     link = link.replace(";","")
     link = link.replace("\n","")
-    path = link.split("->")
+    label = link.split("[")
+    path = label[0].split("->")
+    path.append(label[1])
     arcs.append(path)
     chipid2chain[path[1]] = chain
 
 for path in arcs:
-    print("%d -> %d;" % (chipid2chain[path[0]], chipid2chain[path[1]]))
+    print("%d -> %d [%s;" % (chipid2chain[path[0]], chipid2chain[path[1]], path[2]))
         
 print("}")
 
