@@ -108,17 +108,22 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
   AXI4Stream_Shim#(0, 256, 0, 9)            rx_fast_fifo <- mkAXI4StreamShimUGSizedFIFOF32(clocked_by csi_rx_clk, reset_by csi_rx_rst_n);
   SyncFIFOIfc#(AXI4Stream_Flit#(0,256,0,9)) rx_sync_fifo <- mkSyncFIFOToCC(32, csi_rx_clk, csi_rx_rst_n);
   AXI4Stream_Shim#(0, 256, 0, 9)                  rxfifo <- mkAXI4StreamShimUGSizedFIFOF32();
+`ifdef use_loopback_channel
   AXI4Stream_Shim#(0, 32, 0, 9)            loopback_fifo <- mkAXI4StreamShimUGSizedFIFOF32();
+`endif
+  FIFOF#(Bit#(32))                            data_to_tx <- mkUGFIFOF();
   Reg#(Bit#(32))                                 testreg <- mkReg(0);
   FIFOF#(Bit#(256))                            bert_fifo <- mkUGFIFOF();
   Reg#(Bit#(256))                              bert_test <- mkReg(0);
   Reg#(Bool)                             bert_test_valid <- mkReg(False);
   Reg#(Bit#(256))                               bert_gen <- mkReg(next_bert_test(13)); // TODO dynamically set to some "random value", e.g. based on ChipID?
+  Reg#(Bool)                            bert_gen_enabled <- mkConfigReg(True);
   Reg#(Bit#(64))                      bert_correct_flits <- mkConfigReg(0);
   Reg#(Bit#(64))                        bert_error_flits <- mkConfigReg(0);
+  Reg#(Bool)                          bert_zero_counters <- mkDReg(False);
   Reg#(Bool)                            bert_inc_correct <- mkDReg(False);
   Reg#(Bool)                              bert_inc_error <- mkDReg(False);
-  Reg#(Bit#(1))                        bert_gen_slowdown <- mkReg(0);  // 2-bit slowdown definitely works well, let's try 1-bit
+  Reg#(Bit#(1))                              tx_slowdown <- mkReg(0);  // maximum send rate is every other cycle
   
   let axiShim <- mkAXI4LiteShimFF;
   
@@ -149,23 +154,6 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
       end
   endrule
 
-  /*
-  // Temporary hack to bypass the BERT
-   rule clock_crossed_rx_data_to_axi4_stream(rx_sync_fifo.notEmpty() && rxfifo.slave.canPut());
-     AXI4Stream_Flit#(0,256,0,9) flit = rx_sync_fifo.first;
-     rx_sync_fifo.deq;
-     rxfifo.slave.put(flit); // forward to NIOS monitor port
-   endrule    
-  */
-  
-  // Temporary hack to forward all traffic to the BERT
- /* rule clock_crossed_rx_data_to_axi4_stream(rx_sync_fifo.notEmpty && bert_fifo.notFull);
-    AXI4Stream_Flit#(0,256,0,9) flit = rx_sync_fifo.first;
-    rx_sync_fifo.deq;
-    bert_fifo.enq(flit.tdata); // forward to BERT checker
-  endrule
-  */
-  
   rule read_req;
     let r <- get (axiShim.master.ar);
     Bit#(32) d = 32'hdeaddead;
@@ -178,6 +166,7 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
     if(r.araddr[7:3]==1)
       d = zeroExtend({pack(rxfifo.master.canPeek), pack(txfifo.slave.canPut)});
      
+`ifdef use_loopback_channel
     if((r.araddr[7:3]==2) && loopback_fifo.master.canPeek)
       begin
         let a = loopback_fifo.master.peek;
@@ -186,6 +175,7 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
       end
     if(r.araddr[7:3]==3)
       d = zeroExtend({pack(loopback_fifo.master.canPeek), pack(loopback_fifo.slave.canPut)});
+`endif
     if(r.araddr[7:3]==4)
       d = bert_correct_flits[31:0];
     if(r.araddr[7:3]==5)
@@ -196,6 +186,8 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
       d = bert_error_flits[63:32];
     if(r.araddr[7:3]==5'h10)
       d = testreg;
+    if(r.araddr[7:3]==5'h11)
+      d = bert_gen_enabled ? 1 : 0;
     if(r.araddr[7:3]==5'h12)
       d = timestamp()[31:0];
     if(r.araddr[7:3]==5'h13)
@@ -209,21 +201,14 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
   // write requests handling, i.e. always ignnore write and return success
   // stop the bert_generator on any write to multiplex access to the txfifo
   
-  (* preempts = "write_req, bert_generator" *)
+  //(* preempts = "write_req, bert_generator" *)
   rule write_req;
     let aw <- get (axiShim.master.aw);
     let w <- get (axiShim.master.w);
-    if((aw.awaddr[7:3]==0) && txfifo.slave.canPut())
-      txfifo.slave.put(AXI4Stream_Flit{ tdata: zeroExtend(w.wdata)
-                                       , tstrb: ~0
-                                       , tkeep: ~0
-                                       , tlast: True
-                                       , tid: ?
-                                       , tdest: ?
-				       , tuser: 9'h100} );
-    // tuser: transfers to {start_of_burst (1b), sync_vector (8b)} of Serial Lite III link
-    //        for end_of_flit the sync_vector contains the number of INVAID 64b words sent
+    if((aw.awaddr[7:3]==0) && data_to_tx.notFull)
+      data_to_tx.enq(w.wdata);
 
+`ifdef use_loopback_channel
     if((aw.awaddr[7:3]==2) && loopback_fifo.slave.canPut())
       loopback_fifo.slave.put(AXI4Stream_Flit{ tdata: zeroExtend(w.wdata)
                                        , tstrb: ~0
@@ -232,27 +217,43 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
                                        , tid: ?
                                        , tdest: ?
                                        , tuser: 0} );
-
+`endif
+    
+    if((aw.awaddr[7:3]>=4) && (aw.awaddr[7:3]<=7))
+      bert_zero_counters <= True;
+    
     if (aw.awaddr[7:3]==5'h10)
       testreg <= ~w.wdata;
+    
+    if (aw.awaddr[7:3]==5'h11)
+      bert_gen_enabled <= w.wdata[0]==1;
     
     let rsp = AXI4Lite_BFlit { bresp: OKAY, buser: ? };
     axiShim.master.b.put (rsp);
   endrule
 
-  rule inc_ber_gen_slowdown;
-    bert_gen_slowdown <= bert_gen_slowdown+1;
+  rule inc_tx_slowdown;
+    tx_slowdown <= tx_slowdown+1;
   endrule
-  rule bert_generator(bert_gen_slowdown == 0);
-    bert_gen <= next_bert_test(bert_gen);
-    txfifo.slave.put(AXI4Stream_Flit{ tdata: bert_gen
-				     , tstrb: ~0
-				     , tkeep: ~0
-                                     , tlast: True
-				     , tid: ?
-                                     , tdest: ?
-				     , tuser: 9'h100} );
+
+  rule tx_data_mux(tx_slowdown==0);
+    if(data_to_tx.notEmpty)
+	data_to_tx.deq;
+    else if(bert_gen_enabled)
+	bert_gen <= next_bert_test(bert_gen);
+    
+    // tuser: transfers to {start_of_burst (1b), sync_vector (8b)} of Serial Lite III link
+    //        for end_of_flit the sync_vector contains the number of INVAID 64b words sent
+    if(data_to_tx.notEmpty || bert_gen_enabled)
+      txfifo.slave.put(AXI4Stream_Flit{ tdata: data_to_tx.notEmpty ? zeroExtend(data_to_tx.first) : bert_gen
+				      , tstrb: ~0
+				      , tkeep: ~0
+				      , tlast: True
+				      , tid: ?
+				      , tdest: ?
+				      , tuser: 9'h100} );
   endrule
+  
   
   rule bert_tester(bert_fifo.notEmpty());
     Bit#(256) flit = bert_fifo.first;
@@ -265,11 +266,11 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
     bert_test_valid  <= !bert_test_valid || pass; // Reg update
   endrule
   // pipeine updates to counters of correct and error flits from BERT test
-  rule bert_increment_correct(bert_inc_correct);
-    bert_correct_flits <= bert_correct_flits+1;
+  rule bert_increment_correct(bert_inc_correct || bert_zero_counters);
+    bert_correct_flits <= bert_zero_counters ? 0 : bert_correct_flits+1;
   endrule
-  rule bert_increment_error(bert_inc_error);
-    bert_error_flits <= bert_error_flits+1;
+  rule bert_increment_error(bert_inc_error || bert_zero_counters);
+    bert_error_flits <= bert_zero_counters ? 0 : bert_error_flits+1;
   endrule  
   // interface
   interface mem_csrs = axiShim.slave;
