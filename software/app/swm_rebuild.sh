@@ -5,4 +5,4 @@ pushd ../
 ./swm_generate_bsp.sh || exit 1
 popd
 make clean_all || exit 1
-make || exit 1
+make -j || exit 1
