@@ -5,6 +5,9 @@
 import sys
 
 print("digraph stratix10 {")
+print('graph [fontname = "Arial", fontsize="14pt"]')
+print('node [fontname = "Arial", fontsize="14pt"]')
+print('edge [fontname = "Arial", fontsize="10pt", arrowsize=0.5]')
 chipid2chain = {}
 arcs = []
 for line in sys.stdin:
