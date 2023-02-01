@@ -255,6 +255,18 @@ zero_bert_counters(struct fifoDetails* fs, int num_chan)
 
 
 void
+bert_test_generation_enable(struct fifoDetails* fs, int num_chan, int enable)
+{
+  int chan, en;
+  for(chan=0; chan<num_chan; chan++) {
+    IOWR_32DIRECT(fs[chan].base_addr, 0x11*word_offset, enable);
+    en = IORD_32DIRECT(fs[chan].base_addr, 0x11*word_offset);
+    alt_printf("Chan %c: BERT enable = %s\n", fs[chan].chan_letter, en ? "True": "False");
+  }
+}
+
+
+void
 flush_links(struct fifoDetails* fs, int num_chan)
 {
   int j, chan;
@@ -312,7 +324,7 @@ discover_link_topology(struct fifoDetails* fs, int num_chan)
     usleep(500000);
   }
   for(chan=0; chan<num_chan; chan++)
-    alt_printf("DOT:    \"0x%x\" -> \"0x%x\";\n", linkid[chan], cid0);
+    alt_printf("DOT:    \"0x%x\" -> \"0x%x\" [label=\"%c->\"];\n", linkid[chan], cid0,fs[chan].chan_letter);
 }
 
 
@@ -364,8 +376,10 @@ main(void)
   alt_putstr("Start tests:\n");
   alt_putstr("   b = bit error-rate test report\n");
   alt_putstr("   z = zero bit error-rate test counters\n");
+  alt_putstr("   0 = stop BERT test generation\n");
+  alt_putstr("   1 = start BERT test generation\n");
   alt_putstr("   d = discover link topology (dot output)\n");
-  alt_putstr("   f = flush then exit\n");
+  alt_putstr("   f = flush links then exit\n");
   alt_putstr("   e = echo mode\n");
   alt_putstr("   o = test one link quickly\n");
   alt_putstr("   t = test\n");
@@ -376,7 +390,7 @@ main(void)
     if((int) c > 0) {
       if(c=='\004') // exit on ctl-D
 	return 0;
-      if((c=='b') || (c=='d') || (c=='f') || (c=='l') || (c=='o') || (c=='t') || (c=='z')) flush_mode = false;
+      if((c=='0') || (c=='1') || (c=='b') || (c=='d') || (c=='f') || (c=='l') || (c=='o') || (c=='t') || (c=='z')) flush_mode = false;
       for(chan=0; chan<num_chan; chan++)
 	report_rx_fifo(fs[chan], 0, chan, true);
     }
@@ -403,6 +417,9 @@ main(void)
 
   if(c=='z')
     zero_bert_counters(fs, num_chan);
+
+  if((c=='0') || (c=='1'))
+    bert_test_generation_enable(fs, num_chan, c=='1' ? 1 : 0);
   
   alt_putstr("The end\n\n");
   usleep(1000000);
