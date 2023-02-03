@@ -117,7 +117,7 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
   Reg#(Bit#(256))                              bert_test <- mkReg(0);
   Reg#(Bool)                             bert_test_valid <- mkReg(False);
   Reg#(Bit#(256))                               bert_gen <- mkReg(next_bert_test(13)); // TODO dynamically set to some "random value", e.g. based on ChipID?
-  Reg#(Bool)                            bert_gen_enabled <- mkConfigReg(True);
+  Reg#(Bool)                            bert_gen_enabled <- mkConfigReg(False);
   Reg#(Bit#(64))                      bert_correct_flits <- mkConfigReg(0);
   Reg#(Bit#(64))                        bert_error_flits <- mkConfigReg(0);
   Reg#(Bool)                          bert_zero_counters <- mkDReg(False);
