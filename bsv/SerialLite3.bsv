@@ -187,7 +187,7 @@ interface Stratix10_SerialLite3_4Lane;
   method Bit#(1) ready_tx;
   method Bit#(1) link_up_tx;
   // memory mapped interface to control/status registers
-  method Action bus_request(Bit#(14) addr, Bit#(1) read_enable, Bit#(1) write_enable, Bit#(32) write_data);
+  method Action bus_request(Bit#(16) addr, Bit#(1) read_enable, Bit#(1) write_enable, Bit#(32) write_data);
   method Bit#(32) bus_read_data();
   method Bit#(1) bus_waitrequest();
   // export high-speed serial pins
@@ -231,7 +231,8 @@ module mkStratix10_SerialLite3_4Lane (Clock tx_clk, Reset tx_rst_n, Clock qsfp_r
 
   // Memory mapped interface (uses the default clock and reset)
   // ***********TODO not using phy_mgmt_valid but may need to to generate phy_mgmt_read and phy_mgmt_write correctly
-  method bus_request(phy_mgmt_address, phy_mgmt_read, phy_mgmt_write, phy_mgmt_writedata) enable((*inhigh*) phy_mgmt_valid);
+  //  - currently passing phy_mgmt_valid to the Verilog to be included in phy_mgmt_{read,write}
+  method bus_request(phy_mgmt_address, phy_mgmt_read, phy_mgmt_write, phy_mgmt_writedata) enable(phy_mgmt_valid);
   method phy_mgmt_readdata bus_read_data();
   method phy_mgmt_waitrequest bus_waitrequest();
 
@@ -257,9 +258,9 @@ module mkSerialLite3
    Clock tx_clk, Reset tx_rst_n, Clock qsfp_refclk,
    SerialLite3#(t_addr, t_data, t_awuser, t_wuser, t_buser, t_aruser, t_ruser) sl3_ifc
   )
-  provisos ( Add#(14,_na,t_addr)
+  provisos ( Add#(16,_na,t_addr)
            , Add#(32,_nd,t_data)
-           , Alias#(t_bus_req, Tuple4#(Bit#(14), Bit#(1), Bit#(1), Bit#(32))) );
+           , Alias#(t_bus_req, Tuple4#(Bit#(16), Bit#(1), Bit#(1), Bit#(32))) );
 
   Clock local_clk <- exposeCurrentClock();
   Stratix10_SerialLite3_4Lane sl3 <- mkStratix10_SerialLite3_4Lane(tx_clk, tx_rst_n, qsfp_refclk);
@@ -379,7 +380,7 @@ module mkSerialLite3_Instance ( (* osc = "csi_tx_clk" *) Clock tx_clk
                               , (* osc = "csi_qsfp_refclk" *) Clock qsfp_refclk
                               , SerialLite3_Sig#(/*SerialLite3_StreamFlit, SerialLite3_StreamFlit,*/
                                                  //  t_addr, t_data, t_awuser, t_wuser, t_buser, t_aruser, t_ruser
-                                                         14,     32,     0,        0,       0,       0,        0) sl3);
+                                                         16,     32,     0,        0,       0,       0,        0) sl3);
 
   let sl3 <- mkSerialLite3(tx_clk, tx_rst_n, qsfp_refclk);
   let sl3_sig <- toSerialLite3_Sig (sl3, tx_clk, tx_rst_n);

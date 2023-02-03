@@ -22,10 +22,11 @@ module stratix10_seriallite3_4lane_invrst (
 		input  wire         phy_mgmt_clk_reset_n,     //       phy_mgmt_clk_reset.reset_n
 		input  wire [3:0]   tx_serial_clk,            //            tx_serial_clk.clk
 		input  wire         xcvr_pll_ref_clk,         //         xcvr_pll_ref_clk.clk
-		input  wire [13:0]  phy_mgmt_address,         //                 phy_mgmt.address
+		input  wire [15:0]  phy_mgmt_address,         //                 phy_mgmt.address
 		input  wire         phy_mgmt_read,            //                         .read
 		output wire [31:0]  phy_mgmt_readdata,        //                         .readdata
 		output wire         phy_mgmt_waitrequest,     //                         .waitrequest
+                input  wire         phy_mgmt_valid,           // SWM added since valid signal provided by Bluespec
 		input  wire         phy_mgmt_write,           //                         .write
 		input  wire [31:0]  phy_mgmt_writedata,       //                         .writedata
 		input  wire         tx_pll_locked,            //            tx_pll_locked.pll_locked
@@ -65,11 +66,11 @@ module stratix10_seriallite3_4lane_invrst (
 		.phy_mgmt_clk_reset       (~phy_mgmt_clk_reset_n),       //   input,    width = 1,       phy_mgmt_clk_reset.reset
 		.tx_serial_clk            (tx_serial_clk),            //   input,    width = 4,            tx_serial_clk.clk
 		.xcvr_pll_ref_clk         (xcvr_pll_ref_clk),         //   input,    width = 1,         xcvr_pll_ref_clk.clk
-		.phy_mgmt_address         (phy_mgmt_address),         //   input,   width = 14,                 phy_mgmt.address
-		.phy_mgmt_read            (phy_mgmt_read),            //   input,    width = 1,                         .read
+		.phy_mgmt_address         (phy_mgmt_address[15:2]),         //   input,   width = 14,                 phy_mgmt.address
+		.phy_mgmt_read            (phy_mgmt_read && phy_mgmt_valid),            //   input,    width = 1,                         .read
 		.phy_mgmt_readdata        (phy_mgmt_readdata),        //  output,   width = 32,                         .readdata
 		.phy_mgmt_waitrequest     (phy_mgmt_waitrequest),     //  output,    width = 1,                         .waitrequest
-		.phy_mgmt_write           (phy_mgmt_write),           //   input,    width = 1,                         .write
+		.phy_mgmt_write           (phy_mgmt_write && phy_mgmt_valid),           //   input,    width = 1,                         .write
 		.phy_mgmt_writedata       (phy_mgmt_writedata),       //   input,   width = 32,                         .writedata
 		.tx_pll_locked            (tx_pll_locked),            //   input,    width = 1,            tx_pll_locked.pll_locked
 		.err_interrupt_tx         (err_interrupt_tx),         //  output,    width = 1,         err_interrupt_tx.irq
