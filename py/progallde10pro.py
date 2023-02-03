@@ -33,7 +33,7 @@ import sys, os, time
 import re, argparse
 
 default_num_fpgas = 8
-quartus_pgm_timeout = 60
+quartus_pgm_timeout = 90
 
 def find_de10pro_devices():
     devices = {}
@@ -146,6 +146,7 @@ def main():
         process_list = spawn_quartus_pgm(devices=devices,sof=args.sof,sequential=args.sequential)
         error_report = report_process_status(devices, process_list, args.verbose)
         any_errors = False
+        timeout = timeout-1
         for d in error_report.keys():
             if(error_report[d]):
                 print("PROGRAMMING ERROR: FPGA %s failed to program, will retry"%(d), flush=True)
