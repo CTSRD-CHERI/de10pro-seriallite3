@@ -42,6 +42,7 @@ import ConfigReg  :: *;
 import DReg       :: *;
 
 `include "TimeStamp.bsv"
+`include "QSF_Params.bsv"
 
 interface BERT#(
   numeric type t_addr
@@ -192,6 +193,10 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
       d = timestamp()[31:0];
     if(r.araddr[7:3]==5'h13)
       d = timestamp()[63:32];
+    if(r.araddr[7:3]==5'h14)
+      d = pma_tx_buf_pre_emp_switching_ctrl_pre_tap_1t();
+    if(r.araddr[7:3]==5'h15)
+      d = pma_tx_buf_pre_emp_switching_ctrl_1st_post_tap();
     let rsp = AXI4Lite_RFlit { rdata: d
                              , rresp: OKAY
                              , ruser: ? };
