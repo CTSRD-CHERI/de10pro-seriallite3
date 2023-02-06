@@ -334,10 +334,6 @@ module DE10_Pro
    wire 	htile_fast_lock_D0;
    wire 	htile_fast_lock_D1;
 
-   wire [31:0] 	status;
-   reg  [31:0] 	status_metastable /* synthesis preserve */; // preserve net name for timing closure
-   reg  [31:0] 	status_latched;
-
    wire [31:0] 	status_a;
    reg  [31:0] 	status_a_metastable /* synthesis preserve */; // preserve net name for timing closure
    reg  [31:0] 	status_a_latched;
@@ -356,17 +352,14 @@ module DE10_Pro
 
    always @(posedge clk_100)
      begin
-	status_metastable <= status;
-	status_latched <= status_metastable;
-	
-	status_a_metastable <= status;
-	status_b_metastable <= status;
-	status_c_metastable <= status;
-	status_d_metastable <= status;
-	status_a_latched <= status_metastable;
-	status_b_latched <= status_metastable;
-	status_c_latched <= status_metastable;
-	status_d_latched <= status_metastable;
+	status_a_metastable <= status_a;
+	status_b_metastable <= status_b;
+	status_c_metastable <= status_c;
+	status_d_metastable <= status_d;
+	status_a_latched <= status_a_metastable;
+	status_b_latched <= status_b_metastable;
+	status_c_latched <= status_c_metastable;
+	status_d_latched <= status_d_metastable;
      end
 
    assign QSFP28A_LP_MODE = 0;
@@ -398,16 +391,8 @@ module DE10_Pro
    wire [10:0] link_status_C;
    wire [10:0] link_status_D;
    wire [7:0]  cal_busy;
+   wire [7:0]  user_leds;
  
-   // TODO: remove status[] that goes to the old PIO in favour of using new StatusDevice
-   assign status[10:0] = link_status_A;
-   assign status[11] = | cal_busy;
-   assign status[15:12] = {htile_fast_lock_D1, htile_fast_lock_D0, htile_fast_lock_A1, htile_fast_lock_A0};
-
-   assign status[26:16] = link_status_D;
-   assign status[27] = status[11];
-   assign status[31:28] = status[15:12];
-
    // status:
    //   lower 16-bits: 5-bits zero, 11-bits link-status
    //   upper 16-bits: 12-bits zero, 4-bits clock lock info
@@ -420,7 +405,7 @@ module DE10_Pro
       (
        .clk_clk(clk_100),
        .reset_reset(!reset_n_100),
-       .pio_status_input_export                   (status_latched),                  //   input,    width = 32,                           pio_status_input.export
+       .pio_user_leds_external_connection_export(user_leds),
 
        .mkstatusdevice_instance_0_coe_status_a_coe_coe_status_a_coe (status_a_latched),
        .mkstatusdevice_instance_0_coe_status_b_coe_coe_status_b_coe (status_b_latched),
@@ -512,7 +497,7 @@ module DE10_Pro
    wire 	Fan_GPIO1;
 
    reg [25:0] 	ctr;
-   assign  LED[3:0]     = {SW[0],!BUTTON[0],ctr[24],ctr[24]};
+   assign  LED[3:0]     = ~(user_leds[3:0] & {ctr[24], ctr[24], ctr[24], ctr[24]});    // {SW[0],!BUTTON[0],ctr[24],ctr[24]};
 
    always @(posedge clk_100)
      ctr <= ctr + 26'd1;
