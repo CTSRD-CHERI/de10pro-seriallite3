@@ -63,11 +63,15 @@ IPCHIPID = chipid
 IPCHIPIDDIR = $(IPCHIPID)
 
 .PHONY: all
-all:  TimeStamp.bsv mkStatusDevice_Instance mkSerialLite3_Instance mkBERT_Instance
+all:  TimeStamp.bsv QSF_Params.bsv mkStatusDevice_Instance mkSerialLite3_Instance mkBERT_Instance
 
 .PHONY: TimeStamp.bsv
 TimeStamp.bsv:
 	./timestamp.py > TimeStamp.bsv
+
+.PHONY: QSF_Params.bsv
+QSF_Params.bsv:
+	./qsf_params.py > QSF_Params.bsv
 
 mkStatusDevice_Instance: generate_ip_chipid $(SRC_StatusDevice)
 	mkdir -p $(OUTPUTDIR)/$@-info $(BDIR)
