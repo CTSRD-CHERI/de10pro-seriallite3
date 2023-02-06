@@ -17,7 +17,8 @@ const int word_offset=8;
 
 
 struct fifoDetails {
-  alt_u32 base_addr;
+  alt_u32 bert_base_addr;
+  alt_u32 sl3_base_addr;
   char chan_letter;
 };
 
@@ -54,8 +55,8 @@ check_testreg(struct fifoDetails f)
   int testreg_addr_offset=0x10*word_offset;
   for(j=0; j<10; j++) {
     t=j;
-    IOWR_32DIRECT(f.base_addr, testreg_addr_offset, ~t);
-    d = IORD_32DIRECT(f.base_addr, testreg_addr_offset);
+    IOWR_32DIRECT(f.bert_base_addr, testreg_addr_offset, ~t);
+    d = IORD_32DIRECT(f.bert_base_addr, testreg_addr_offset);
     if(d!=t) {
       alt_printf("Chan %c: testreg expecting 0x%x but read 0x%x - fail\n", f.chan_letter, t, d);
       pass=false;
@@ -68,8 +69,8 @@ check_testreg(struct fifoDetails f)
 void
 print_bert_build_timestamp(struct fifoDetails f)
 {
-  int lo = IORD_32DIRECT(f.base_addr, 0x12*word_offset);
-  int hi = IORD_32DIRECT(f.base_addr, 0x13*word_offset);
+  int lo = IORD_32DIRECT(f.bert_base_addr, 0x12*word_offset);
+  int hi = IORD_32DIRECT(f.bert_base_addr, 0x13*word_offset);
   alt_printf("Chan %c: Bluespec built on %x-%x%x-%x%x %x%x:%x%x.%x%x\n",
 	     f.chan_letter,
 	     // year
@@ -96,7 +97,7 @@ int
 status_fifo(struct fifoDetails f, int fifonum)
 {
   int status;
-  status = IORD_32DIRECT(f.base_addr,word_offset*(1+2*fifonum));
+  status = IORD_32DIRECT(f.bert_base_addr,word_offset*(1+2*fifonum));
   //  alt_printf("DEBUG: Chan %c: status=0x%x\n", f.chan_letter, status);
   return status;
 }
@@ -120,7 +121,7 @@ void
 write_tx_fifo(struct fifoDetails f, int fifonum, int data)
 {
   // TODO: check FIFO isn't full!!!
-  IOWR_32DIRECT(f.base_addr, word_offset*2*fifonum, data);
+  IOWR_32DIRECT(f.bert_base_addr, word_offset*2*fifonum, data);
 }
 
 
@@ -128,7 +129,7 @@ int
 read_rx_fifo(struct fifoDetails f, int fifonum, int* data)
 {
   if(status_rx_fifo_notEmpty(f, fifonum)) {
-    (*data) = IORD_32DIRECT(f.base_addr,word_offset*2*fifonum);
+    (*data) = IORD_32DIRECT(f.bert_base_addr,word_offset*2*fifonum);
     return true;
   } else {
     (*data) = 0;
@@ -237,10 +238,10 @@ bert_report(struct fifoDetails* fs, int num_chan)
   for(chan=0; chan<num_chan; chan++)
     alt_printf("BERT - Channel %c:  number of errors = 0x%x 0x%x \tnumber of correct flits = 0x%x 0x%x\n",
 	       fs[chan].chan_letter,
-	       IORD_32DIRECT(fs[chan].base_addr, 7*word_offset),
-	       IORD_32DIRECT(fs[chan].base_addr, 6*word_offset),
-	       IORD_32DIRECT(fs[chan].base_addr, 5*word_offset),
-	       IORD_32DIRECT(fs[chan].base_addr, 4*word_offset)
+	       IORD_32DIRECT(fs[chan].bert_base_addr, 7*word_offset),
+	       IORD_32DIRECT(fs[chan].bert_base_addr, 6*word_offset),
+	       IORD_32DIRECT(fs[chan].bert_base_addr, 5*word_offset),
+	       IORD_32DIRECT(fs[chan].bert_base_addr, 4*word_offset)
 	       );
 }
 
@@ -250,7 +251,7 @@ zero_bert_counters(struct fifoDetails* fs, int num_chan)
 {
   int chan;
   for(chan=0; chan<num_chan; chan++)
-    IOWR_32DIRECT(fs[chan].base_addr, 0x4*word_offset, 0);
+    IOWR_32DIRECT(fs[chan].bert_base_addr, 0x4*word_offset, 0);
 }
 
 
@@ -259,8 +260,8 @@ bert_test_generation_enable(struct fifoDetails* fs, int num_chan, int enable)
 {
   int chan, en;
   for(chan=0; chan<num_chan; chan++) {
-    IOWR_32DIRECT(fs[chan].base_addr, 0x11*word_offset, enable);
-    en = IORD_32DIRECT(fs[chan].base_addr, 0x11*word_offset);
+    IOWR_32DIRECT(fs[chan].bert_base_addr, 0x11*word_offset, enable);
+    en = IORD_32DIRECT(fs[chan].bert_base_addr, 0x11*word_offset);
     alt_printf("Chan %c: BERT enable = %s\n", fs[chan].chan_letter, en ? "True": "False");
   }
 }
@@ -328,6 +329,75 @@ discover_link_topology(struct fifoDetails* fs, int num_chan)
 }
 
 
+void
+report_data_error(struct fifoDetails f)
+{
+  const int ws=4; // word-size
+  int tx_status = IORD_32DIRECT(f.sl3_base_addr, 0x090 * ws);
+  int rx_status = IORD_32DIRECT(f.sl3_base_addr, 0x0d0 * ws);
+  int rx_mac_status = IORD_32DIRECT(f.sl3_base_addr, 0x0c1 * ws);
+  int device_reg = IORD_32DIRECT(f.sl3_base_addr, 0x081 * ws);
+  int pma_rx_is_lockedtodata = IORD_32DIRECT(f.sl3_base_addr, 0x066 * ws);
+  int pma_rx_is_lockedtoref = IORD_32DIRECT(f.sl3_base_addr, 0x067 * ws);
+  int pma_calibration = IORD_32DIRECT(f.sl3_base_addr, 0x0);
+
+  alt_printf("RX-%c: tx_status = 0x%x\n", f.chan_letter, tx_status);
+  alt_printf("RX-%c: rx_status = 0x%x\n", f.chan_letter, rx_status);
+  alt_printf("RX-%c: rx_mac_status = 0x%x\n", f.chan_letter, rx_mac_status);
+  alt_printf("RX-%c: device_reg = 0x%x\n", f.chan_letter, device_reg);
+  alt_printf("RX-%c: pma_rx_is_lockedtodata = 0x%x\n", f.chan_letter, pma_rx_is_lockedtodata);
+  alt_printf("RX-%c: pma_rx_is_lockedtoref = 0x%x\n", f.chan_letter, pma_rx_is_lockedtoref);
+
+  alt_printf("RX-%c: pma_calibration = 0x%x\n", f.chan_letter, pma_calibration);
+
+
+  if(pma_rx_is_lockedtodata!=0xf)
+    alt_printf("RX-%c: ERROR - failed to lock to incoming data.  pma_rx_is_lockedtodata=0x%x\n",
+               f.chan_letter, pma_rx_is_lockedtodata);
+  if(pma_rx_is_lockedtoref!=0xf)
+    alt_printf("RX-%c: ERROR - failed to lock to reference.  pma_rx_is_lockedtoref=0x%x\n",
+               f.chan_letter, pma_rx_is_lockedtoref);
+  if(tx_status==0)
+    alt_printf("TX-%c: no errors\n", f.chan_letter);
+  else
+    alt_printf("TX-%c: TX Error status register = 0x%x\n", f.chan_letter, tx_status);
+  if(rx_status==0)
+    alt_printf("RX-%c: no errors\n", f.chan_letter);
+  else
+    {
+      alt_printf("RX-%c: RX error status register = 0x%x\n", f.chan_letter, rx_status);
+      if(exbit(rx_status, 0) == 1) alt_printf("  phy_fifo_overflow\n");
+      if(exbit(rx_status, 1) == 1) alt_printf("  rx_block_lostlock\n");
+      if(exbit(rx_status, 3) == 1) alt_printf("  rx_crc32err\n");
+      if(exbit(rx_status, 4) == 1) alt_printf("  rx_pcs_err\n");
+      if(exbit(rx_status, 5) == 1) alt_printf("  rx_align_retry_fail\n");
+      if(exbit(rx_status, 6) == 1) alt_printf("  rx_alignment_lostlock\n");
+      if(exbit(rx_status, 7) == 1) alt_printf("  adapt_fifo_overflow\n");
+      if(exbit(rx_status, 8) == 1) alt_printf("  ecc_error_corrected\n");
+      if(exbit(rx_status, 9) == 1) alt_printf("  ecc_err_fatal\n");
+      if(exbit(rx_status,10) == 1) alt_printf("  rx_deskew_fatal\n");
+      if(exbit(rx_status,11) == 1) alt_printf("  rx_data_err\n");
+    }
+  if(exbit(rx_mac_status,9) == 0)
+    alt_printf("RX-%c: ERROR: RX not aligned, LASM_misaligned_counter=0x%x, LASM_DESKEW_entered=%x  LASM_FRAME_LOCK_entered=%x\n",
+               f.chan_letter, rx_mac_status>>2, exbit(rx_mac_status,1), exbit(rx_mac_status,0) );
+  if(exbit(device_reg,27)==1)
+    alt_printf("RX-%c: ERROR: CRC32 checker error\n", f.chan_letter);
+  if(exbit(device_reg,25)==0)
+    alt_printf("RX-%c: ERROR: Frame synchronizer rx_sync_lock=0\n", f.chan_letter);
+  if(exbit(device_reg,24)==0)
+    alt_printf("RX-%c: ERROR: RX FIFO rx_word_lock=0\n", f.chan_letter);
+}
+
+
+void
+report_all_data_error(struct fifoDetails *fs, int num_chan)
+{
+  int j;
+  for(j=0; j<num_chan; j++)
+    report_data_error(fs[j]);
+}
+
 
 int
 main(void)
@@ -343,19 +413,23 @@ main(void)
 
   alt_printf("ChipID = 0x%x %x\n", chip_id_hi(), chip_id_lo());
   // Check testreg to ensure we're probably communicating with a BERT
-  fs[0].base_addr = MKBERT_INSTANCE_0_BASE;
-  fs[0].chan_letter = 'A';
-  fs[1].base_addr = MKBERT_INSTANCE_1_BASE;
-  fs[1].chan_letter = 'B';
-  fs[2].base_addr = MKBERT_INSTANCE_2_BASE;
-  fs[2].chan_letter = 'C';
-  fs[3].base_addr = MKBERT_INSTANCE_3_BASE;
-  fs[3].chan_letter = 'D';
+  fs[0].bert_base_addr = MKBERT_INSTANCE_0_BASE;
+  fs[1].bert_base_addr = MKBERT_INSTANCE_1_BASE;
+  fs[2].bert_base_addr = MKBERT_INSTANCE_2_BASE;
+  fs[3].bert_base_addr = MKBERT_INSTANCE_3_BASE;
+  fs[0].sl3_base_addr  = MKSERIALLITE3_INSTANCE_0_BASE;
+  fs[1].sl3_base_addr  = MKSERIALLITE3_INSTANCE_1_BASE;
+  fs[2].sl3_base_addr  = MKSERIALLITE3_INSTANCE_2_BASE;
+  fs[3].sl3_base_addr  = MKSERIALLITE3_INSTANCE_3_BASE;
+  fs[0].chan_letter    = 'A';
+  fs[1].chan_letter    = 'B';
+  fs[2].chan_letter    = 'C';
+  fs[3].chan_letter    = 'D';
   for(j=0; j<num_chan; j++) {
     alt_printf("BERT 0x%x on Chan %c at base address 0x%x\n",
 	       j,
 	       fs[j].chan_letter,
-	       fs[j].base_addr);
+	       fs[j].bert_base_addr);
     check_testreg(fs[j]);
   }
 
@@ -377,12 +451,14 @@ main(void)
   alt_putstr("   b = bit error-rate test report\n");
   alt_putstr("   z = zero bit error-rate test counters\n");
   alt_putstr("   0 = stop BERT test generation\n");
-  alt_putstr("   1 = start BERT test generation\n");
+  alt_putstr("   1 = start BERT test generation\n\n");
   alt_putstr("   d = discover link topology (dot output)\n");
   alt_putstr("   f = flush links then exit\n");
   alt_putstr("   e = echo mode\n");
   alt_putstr("   o = test one link quickly\n");
+  alt_putstr("   r = report all link errors\n");
   alt_putstr("   t = test\n");
+  alt_putstr("   q = quit\n");
   c=' ';
 
   while (flush_mode) {
@@ -390,7 +466,7 @@ main(void)
     if((int) c > 0) {
       if(c=='\004') // exit on ctl-D
 	return 0;
-      if((c=='0') || (c=='1') || (c=='b') || (c=='d') || (c=='f') || (c=='l') || (c=='o') || (c=='t') || (c=='z')) flush_mode = false;
+      if((c=='0') || (c=='1') || (c=='b') || (c=='d') || (c=='f') || (c=='l') || (c=='o') || (c=='r')  || (c=='q') || (c=='t') || (c=='z')) flush_mode = false;
       for(chan=0; chan<num_chan; chan++)
 	report_rx_fifo(fs[chan], 0, chan, true);
     }
@@ -412,17 +488,22 @@ main(void)
     test_write_read_one_link(fs[3], fs[0], 0);
   // Check one link in loop-back:  test_write_read_one_link(fs[0], fs[0], 1);
   
+  if(c=='r')
+    report_all_data_error(fs, num_chan);
+  
   if(c=='t')
     test_write_read_channels(fs, num_chan);
 
-  if(c=='z')
+  if(c=='z') {
     zero_bert_counters(fs, num_chan);
-
+    alt_printf("Zeroed BERT counters\n");
+  }
+  
   if((c=='0') || (c=='1'))
     bert_test_generation_enable(fs, num_chan, c=='1' ? 1 : 0);
   
   alt_putstr("The end\n\n");
-  usleep(1000000);
+  usleep(500000);
 
   alt_putstr("\004");
   return 0;
