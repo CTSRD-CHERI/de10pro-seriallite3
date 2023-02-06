@@ -63,13 +63,14 @@ output_files/DE10_Pro.sof: $(VERILOG_SRC) generate_ip
 	quartus_sh --flow compile DE10_Pro.qpf
 
 .PHONY: generate_ip
-generate_ip: $(IP_SRC) $(SERIALLITE3_HW_TCL) $(BERT_HW_TCL)
+generate_ip: $(IP_SRC) # $(SERIALLITE3_HW_TCL) $(BERT_HW_TCL)
+	$(MAKE) -C $(SERIALLITE3_BSV_DIR) all    # a bit of a hack?
 	quartus_ipgenerate --generate_project_ip_files -synthesis=verilog DE10_Pro.qpf --clear_ip_generation_dirs
 
 #-----------------------------------------------------------------------------
 # get the tcl for the serial lite 3 rtl
 $(SERIALLITE3_HW_TCL): $(VIPBUNDLE) $(SERIALLITE3_RTL)
-	# STOP UNTIL VIPBUNDLE FIXED     $(VIPBUNDLE) -f quartus_ip_tcl -o $@ $(SERIALLITE3_RTL)
+# STOP UNTIL VIPBUNDLE FIXED     $(VIPBUNDLE) -f quartus_ip_tcl -o $@ $(SERIALLITE3_RTL)
 .PHONY: generate_seriallite3_tcl clean_seriallite3_tcl
 generate_seriallite3_tcl: $(SERIALLITE3_HW_TCL)
 clean_seriallite3_tcl:
