@@ -1,7 +1,7 @@
 //
 // SPDX-License-Identifier: BSD-2-Clause
 //
-// Copyright (c) 2021 Simon W. Moore
+// Copyright (c) 2023 Simon W. Moore
 // Copyright (c) 2019 A. Theodore Markettos
 // All rights reserved.
 //
@@ -313,55 +313,8 @@ module DE10_Pro
        reset_n_metastable_100 <= reset_n;
 		 reset_n_100 <= reset_n_metastable_100;
      end
+
    
-   wire 	htile_fast_clk_A0;
-   wire 	htile_fast_clk_A1;
-   wire 	htile_fast_lock_A0;
-   wire 	htile_fast_lock_A1;
-
-   wire 	htile_fast_clk_B0;
-   wire 	htile_fast_clk_B1;
-   wire 	htile_fast_lock_B0;
-   wire 	htile_fast_lock_B1;
-
-   wire 	htile_fast_clk_C0;
-   wire 	htile_fast_clk_C1;
-   wire 	htile_fast_lock_C0;
-   wire 	htile_fast_lock_C1;
-
-   wire 	htile_fast_clk_D0;
-   wire 	htile_fast_clk_D1;
-   wire 	htile_fast_lock_D0;
-   wire 	htile_fast_lock_D1;
-
-   wire [31:0] 	status_a;
-   reg  [31:0] 	status_a_metastable /* synthesis preserve */; // preserve net name for timing closure
-   reg  [31:0] 	status_a_latched;
-
-   wire [31:0] 	status_b;
-   reg  [31:0] 	status_b_metastable /* synthesis preserve */; // preserve net name for timing closure
-   reg  [31:0] 	status_b_latched;
-
-   wire [31:0] 	status_c;
-   reg  [31:0] 	status_c_metastable /* synthesis preserve */; // preserve net name for timing closure
-   reg  [31:0] 	status_c_latched;
-
-   wire [31:0] 	status_d;
-   reg  [31:0] 	status_d_metastable /* synthesis preserve */; // preserve net name for timing closure
-   reg  [31:0] 	status_d_latched;
-
-   always @(posedge clk_100)
-     begin
-	status_a_metastable <= status_a;
-	status_b_metastable <= status_b;
-	status_c_metastable <= status_c;
-	status_d_metastable <= status_d;
-	status_a_latched <= status_a_metastable;
-	status_b_latched <= status_b_metastable;
-	status_c_latched <= status_c_metastable;
-	status_d_latched <= status_d_metastable;
-     end
-
    assign QSFP28A_LP_MODE = 0;
    assign QSFP28A_RST_n = 1;
    assign QSFP28A_SCL = 0;
@@ -386,103 +339,46 @@ module DE10_Pro
    assign QSFP28D_SDA = 0;
    assign QSFP28D_MOD_SEL_n = 1;
 
-   wire [10:0] link_status_A;
-   wire [10:0] link_status_B;
-   wire [10:0] link_status_C;
-   wire [10:0] link_status_D;
-   wire [7:0]  cal_busy;
+   wire [14:0] link_status_A;
+   wire [14:0] link_status_B;
+   wire [14:0] link_status_C;
+   wire [14:0] link_status_D;
    wire [7:0]  user_leds;
  
-   // status:
-   //   lower 16-bits: 5-bits zero, 11-bits link-status
-   //   upper 16-bits: 12-bits zero, 4-bits clock lock info
-   assign status_a = {12'h000, cal_busy[1:0], htile_fast_lock_A1, htile_fast_lock_A0, 5'b00000, link_status_A};
-   assign status_b = {12'h000, cal_busy[3:2], htile_fast_lock_B1, htile_fast_lock_B0, 5'b00000, link_status_B};
-   assign status_c = {12'h000, cal_busy[5:4], htile_fast_lock_C1, htile_fast_lock_C0, 5'b00000, link_status_C};
-   assign status_d = {12'h000, cal_busy[7:6], htile_fast_lock_D1, htile_fast_lock_D0, 5'b00000, link_status_D};
-   
    soc mainsoc
       (
        .clk_clk(clk_100),
        .reset_reset(!reset_n_100),
        .pio_user_leds_external_connection_export(user_leds),
 
-       .mkstatusdevice_instance_0_coe_status_a_coe_coe_status_a_coe (status_a_latched),
-       .mkstatusdevice_instance_0_coe_status_b_coe_coe_status_b_coe (status_b_latched),
-       .mkstatusdevice_instance_0_coe_status_c_coe_coe_status_c_coe (status_c_latched),
-       .mkstatusdevice_instance_0_coe_status_d_coe_coe_status_d_coe (status_d_latched),
-       
+       .mkstatusdevice_instance_0_coe_status_a_coe_coe_status_a_coe ({17'd0, link_status_A}),
+       .mkstatusdevice_instance_0_coe_status_b_coe_coe_status_b_coe ({17'd0, link_status_B}),
+       .mkstatusdevice_instance_0_coe_status_c_coe_coe_status_c_coe ({17'd0, link_status_C}),
+       .mkstatusdevice_instance_0_coe_status_d_coe_coe_status_d_coe ({17'd0, link_status_D}),
+
        .mkseriallite3_instance_0_clk_gate_rx_clk_CLK_GATE_rx_clk (),                        // ignore clock gate
-       .mkseriallite3_instance_0_coe_link_status_coe_link_status (link_status_A),           // 11-bits
+       .mkseriallite3_instance_0_coe_link_status_coe_link_status (link_status_A),           // 15-bits
        .mkseriallite3_instance_0_coe_qsfp28_rx_pins_x_coe_qsfp28_rx_pins_x (QSFP28A_RX_p),
        .mkseriallite3_instance_0_coe_qsfp28_tx_pins_coe_qsfp28_tx_pins (QSFP28A_TX_p),
        .mkseriallite3_instance_0_csi_qsfp_refclk_clk(QSFP28A_REFCLK_p),
-       .mkseriallite3_instance_0_coe_xcvr_atx_pll_s10_htile_tx_clk_coe_xcvr_atx_pll_s10_htile_tx_clk({htile_fast_clk_A1,htile_fast_clk_A1,htile_fast_clk_A0,htile_fast_clk_A0}),
-       .mkseriallite3_instance_0_coe_xcvr_atx_pll_s10_htile_tx_locked_coe_xcvr_atx_pll_s10_htile_tx_locked(htile_fast_lock_A0 && htile_fast_lock_A1),
 
        .mkseriallite3_instance_1_clk_gate_rx_clk_CLK_GATE_rx_clk (),                        // ignore clock gate
-       .mkseriallite3_instance_1_coe_link_status_coe_link_status (link_status_B),           // 11-bits
+       .mkseriallite3_instance_1_coe_link_status_coe_link_status (link_status_B),           // 15-bits
        .mkseriallite3_instance_1_coe_qsfp28_rx_pins_x_coe_qsfp28_rx_pins_x (QSFP28B_RX_p),
        .mkseriallite3_instance_1_coe_qsfp28_tx_pins_coe_qsfp28_tx_pins (QSFP28B_TX_p),
        .mkseriallite3_instance_1_csi_qsfp_refclk_clk(QSFP28B_REFCLK_p),
-       .mkseriallite3_instance_1_coe_xcvr_atx_pll_s10_htile_tx_clk_coe_xcvr_atx_pll_s10_htile_tx_clk({htile_fast_clk_B1,htile_fast_clk_B1,htile_fast_clk_B0,htile_fast_clk_B0}),
-       .mkseriallite3_instance_1_coe_xcvr_atx_pll_s10_htile_tx_locked_coe_xcvr_atx_pll_s10_htile_tx_locked(htile_fast_lock_B0 && htile_fast_lock_B1),
 
        .mkseriallite3_instance_2_clk_gate_rx_clk_CLK_GATE_rx_clk (),                        // ignore clock gate
-       .mkseriallite3_instance_2_coe_link_status_coe_link_status (link_status_C),           // 11-bits
+       .mkseriallite3_instance_2_coe_link_status_coe_link_status (link_status_C),           // 15-bits
        .mkseriallite3_instance_2_coe_qsfp28_rx_pins_x_coe_qsfp28_rx_pins_x (QSFP28C_RX_p),
        .mkseriallite3_instance_2_coe_qsfp28_tx_pins_coe_qsfp28_tx_pins (QSFP28C_TX_p),
        .mkseriallite3_instance_2_csi_qsfp_refclk_clk(QSFP28C_REFCLK_p),
-       .mkseriallite3_instance_2_coe_xcvr_atx_pll_s10_htile_tx_clk_coe_xcvr_atx_pll_s10_htile_tx_clk({htile_fast_clk_C1,htile_fast_clk_C1,htile_fast_clk_C0,htile_fast_clk_C0}),
-       .mkseriallite3_instance_2_coe_xcvr_atx_pll_s10_htile_tx_locked_coe_xcvr_atx_pll_s10_htile_tx_locked(htile_fast_lock_C0 && htile_fast_lock_C1),
 
        .mkseriallite3_instance_3_clk_gate_rx_clk_CLK_GATE_rx_clk (),                        // ignore clock gate
-       .mkseriallite3_instance_3_coe_link_status_coe_link_status (link_status_D),           // 11-bits
+       .mkseriallite3_instance_3_coe_link_status_coe_link_status (link_status_D),           // 15-bits
        .mkseriallite3_instance_3_coe_qsfp28_rx_pins_x_coe_qsfp28_rx_pins_x (QSFP28D_RX_p),
        .mkseriallite3_instance_3_coe_qsfp28_tx_pins_coe_qsfp28_tx_pins (QSFP28D_TX_p),
-       .mkseriallite3_instance_3_csi_qsfp_refclk_clk(QSFP28D_REFCLK_p),
-       .mkseriallite3_instance_3_coe_xcvr_atx_pll_s10_htile_tx_clk_coe_xcvr_atx_pll_s10_htile_tx_clk({htile_fast_clk_D1,htile_fast_clk_D1,htile_fast_clk_D0,htile_fast_clk_D0}),
-       .mkseriallite3_instance_3_coe_xcvr_atx_pll_s10_htile_tx_locked_coe_xcvr_atx_pll_s10_htile_tx_locked(htile_fast_lock_D0 && htile_fast_lock_D1),
-
-       .xcvr_atx_pll_s10_htile_0_pll_refclk0_clk       (QSFP28A_REFCLK_p),
-       .xcvr_atx_pll_s10_htile_0_tx_serial_clk_gxt_clk (htile_fast_clk_A0),
-       .xcvr_atx_pll_s10_htile_0_pll_locked_pll_locked (htile_fast_lock_A0),
-       .xcvr_atx_pll_s10_htile_0_pll_cal_busy_pll_cal_busy (cal_busy[0]),
-       
-       .xcvr_atx_pll_s10_htile_1_pll_refclk0_clk       (QSFP28A_REFCLK_p),
-       .xcvr_atx_pll_s10_htile_1_tx_serial_clk_gxt_clk (htile_fast_clk_A1),
-       .xcvr_atx_pll_s10_htile_1_pll_locked_pll_locked (htile_fast_lock_A1),
-       .xcvr_atx_pll_s10_htile_1_pll_cal_busy_pll_cal_busy (cal_busy[1]),
-
-       .xcvr_atx_pll_s10_htile_2_pll_refclk0_clk       (QSFP2B_REFCLK_p),
-       .xcvr_atx_pll_s10_htile_2_tx_serial_clk_gxt_clk (htile_fast_clk_B0),
-       .xcvr_atx_pll_s10_htile_2_pll_locked_pll_locked (htile_fast_lock_B0),
-       .xcvr_atx_pll_s10_htile_2_pll_cal_busy_pll_cal_busy (cal_busy[2]),
-       
-       .xcvr_atx_pll_s10_htile_3_pll_refclk0_clk       (QSFP28B_REFCLK_p),
-       .xcvr_atx_pll_s10_htile_3_tx_serial_clk_gxt_clk (htile_fast_clk_B1),
-       .xcvr_atx_pll_s10_htile_3_pll_locked_pll_locked (htile_fast_lock_B1),
-       .xcvr_atx_pll_s10_htile_3_pll_cal_busy_pll_cal_busy (cal_busy[3]),
-
-       .xcvr_atx_pll_s10_htile_4_pll_refclk0_clk       (QSFP28C_REFCLK_p),
-       .xcvr_atx_pll_s10_htile_4_tx_serial_clk_gxt_clk (htile_fast_clk_C0),
-       .xcvr_atx_pll_s10_htile_4_pll_locked_pll_locked (htile_fast_lock_C0),
-       .xcvr_atx_pll_s10_htile_4_pll_cal_busy_pll_cal_busy (cal_busy[4]),
-       
-       .xcvr_atx_pll_s10_htile_5_pll_refclk0_clk       (QSFP28C_REFCLK_p),
-       .xcvr_atx_pll_s10_htile_5_tx_serial_clk_gxt_clk (htile_fast_clk_C1),
-       .xcvr_atx_pll_s10_htile_5_pll_locked_pll_locked (htile_fast_lock_C1),
-       .xcvr_atx_pll_s10_htile_5_pll_cal_busy_pll_cal_busy (cal_busy[5]),
-
-       .xcvr_atx_pll_s10_htile_6_pll_refclk0_clk       (QSFP28D_REFCLK_p),
-       .xcvr_atx_pll_s10_htile_6_tx_serial_clk_gxt_clk (htile_fast_clk_D0),
-       .xcvr_atx_pll_s10_htile_6_pll_locked_pll_locked (htile_fast_lock_D0),
-       .xcvr_atx_pll_s10_htile_6_pll_cal_busy_pll_cal_busy (cal_busy[6]),
-
-       .xcvr_atx_pll_s10_htile_7_pll_refclk0_clk       (QSFP28D_REFCLK_p),
-       .xcvr_atx_pll_s10_htile_7_tx_serial_clk_gxt_clk (htile_fast_clk_D1),
-       .xcvr_atx_pll_s10_htile_7_pll_locked_pll_locked (htile_fast_lock_D1),
-       .xcvr_atx_pll_s10_htile_7_pll_cal_busy_pll_cal_busy (cal_busy[7])
+       .mkseriallite3_instance_3_csi_qsfp_refclk_clk(QSFP28D_REFCLK_p)
        );
    
    
