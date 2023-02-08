@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Alexandre Joannou and Simon W. Moore
+ * Copyright (c) 2023 Simon W. Moore and Alexandre Joannou
  * All rights reserved.
  *
  * @BERI_LICENSE_HEADER_START@
@@ -25,8 +25,6 @@
  * Bluespec wrapper around Intel's SerialLite3 IP instantiated for four
  * channels, i.e. suitable for one of the 100Gbps links on the Stratix-10 based
  * DE10Pro board.
- * 
- * TODO: also wrap xcvr_atx_pll_s10_htile PLLs (two per SerialLite3 4-lane interface)
  */
 
 package SerialLite3;
@@ -68,6 +66,8 @@ function AXI4Stream_Flit #(0, 256, 0, 9) sl32axs (SerialLite3_StreamFlit sl3) =
                   , tuser: {pack (sl3.start_of_burst), sl3.sync} };
 
 typedef struct {
+   Bit #(2) tx_pll_locked;
+   Bit #(2) tx_pll_cal_busy;
    Bit #(5) error_rx;
    Bit #(4) error_tx;
    Bool link_up_tx;
@@ -79,7 +79,6 @@ typedef struct {
 interface SerialLite3_ExternalPins;
   method Bit #(4) qsfp28_tx_pins;
   method Action qsfp28_rx_pins (Bit #(4) x);
-  method Action xcvr_atx_pll_s10_htile_tx (Bit #(4) clk, Bit#(1) locked);
 endinterface
 
 // The SerialLite3 internal signals
@@ -193,12 +192,39 @@ interface Stratix10_SerialLite3_4Lane;
   // export high-speed serial pins
   (* always_ready, always_enabled *) method Bit#(4) qsfp28_tx_pins;
   (* always_ready, always_enabled *) method Action qsfp28_rx_pins(Bit#(4) a);
-  (* always_ready, always_enabled *) method Action xcvr_atx_pll_s10_htile_tx (Bit #(4) clk, Bit#(1) locked);
+  // export TX PLL lock and calibration status
+  (* always_ready, always_enabled *) method Bit#(2) tx_pll_locked;
+  (* always_ready, always_enabled *) method Bit#(2) tx_pll_cal_busy;
   // test ports
   (* always_ready, always_enabled *) method Action crc_error_inject(Bit#(4) error_inject);
 endinterface
 
-import "BVI" stratix10_seriallite3_4lane_invrst =
+
+// Two D-flip-flop based syncrhoniser where we don't care about the clock domain
+// of the source.  It will synchronise on a *per bit* basis, i.e. not suitable for
+// synchronising words if all of the bits need to be synchronised in the same cycle.
+(* always_enabled, always_ready *)
+module mkTwoFlopSynchroniserCC#(a resetval, Clock sclk, Reset srst) (Reg#(a)) provisos (Bits#(a,a_width));
+  Clock dclk <- exposeCurrentClock;
+  CrossingReg#(a) clock_crossing_reg <- mkNullCrossingReg(dclk, resetval, clocked_by(sclk), reset_by(srst));
+  Reg#(a)            metastable_reg <- mkReg(resetval);
+  Reg#(a)          synchronised_reg <- mkReg(resetval);
+
+  (* fire_when_enabled *)
+  rule synchronise;
+    metastable_reg <= clock_crossing_reg.crossed;
+    synchronised_reg <= metastable_reg;
+  endrule
+  
+  method Action _write(a x);
+    clock_crossing_reg <= x;
+  endmethod
+  
+  method a _read = synchronised_reg;
+endmodule  
+  
+  
+import "BVI" stratix10_seriallite3_4lane_wrapper =
 module mkStratix10_SerialLite3_4Lane (Clock tx_clk, Reset tx_rst_n, Clock qsfp_refclk, Stratix10_SerialLite3_4Lane sl3);
   // Clocks
   default_clock clk (phy_mgmt_clk, (*unused*) phy_mgmt_clk_gate);
@@ -223,6 +249,7 @@ module mkStratix10_SerialLite3_4Lane (Clock tx_clk, Reset tx_rst_n, Clock qsfp_r
   method   start_of_burst_rx start_of_burst_rx()    clocked_by(rx_clk) reset_by(rx_rst_n);
   method     end_of_burst_rx end_of_burst_rx()      clocked_by(rx_clk) reset_by(rx_rst_n);
   method             sync_rx sync_rx()              clocked_by(rx_clk) reset_by(rx_rst_n);
+
   method            error_rx error_rx()             clocked_by(rx_clk) reset_by(rx_rst_n);
   method          link_up_rx link_up_rx()           clocked_by(rx_clk) reset_by(rx_rst_n);
   method    err_interrupt_rx error_interrupt_rx()   clocked_by(rx_clk) reset_by(rx_rst_n);
@@ -230,8 +257,6 @@ module mkStratix10_SerialLite3_4Lane (Clock tx_clk, Reset tx_rst_n, Clock qsfp_r
   method rx_drop() enable(ready_rx) ready(valid_rx) clocked_by(rx_clk) reset_by(rx_rst_n);
 
   // Memory mapped interface (uses the default clock and reset)
-  // ***********TODO not using phy_mgmt_valid but may need to to generate phy_mgmt_read and phy_mgmt_write correctly
-  //  - currently passing phy_mgmt_valid to the Verilog to be included in phy_mgmt_{read,write}
   method bus_request(phy_mgmt_address, phy_mgmt_read, phy_mgmt_write, phy_mgmt_writedata) enable(phy_mgmt_valid);
   method phy_mgmt_readdata bus_read_data();
   method phy_mgmt_waitrequest bus_waitrequest();
@@ -239,7 +264,10 @@ module mkStratix10_SerialLite3_4Lane (Clock tx_clk, Reset tx_rst_n, Clock qsfp_r
   // High-speed serial pins (no clock domain)
   method tx_serial_data qsfp28_tx_pins();
   method qsfp28_rx_pins(rx_serial_data) enable((*inhigh*) EN_rx_serial_data);
-  method xcvr_atx_pll_s10_htile_tx (tx_serial_clk, tx_pll_locked) enable((*inhigh*) EN_tx_serial_clk);
+
+  // TX PLLs - lock and calibration status 
+  method tx_pll_locked tx_pll_locked() clocked_by(tx_clk) reset_by(tx_rst_n);
+  method tx_pll_cal_busy tx_pll_cal_busy() clocked_by(tx_clk) reset_by(tx_rst_n);
 
   // Test/monitor ports (TODO: correct clock domain?)
   method crc_error_inject(crc_error_inject) enable((*inhigh*) EN_crc_error_inject) clocked_by(tx_clk) reset_by(tx_rst_n);
@@ -247,10 +275,14 @@ module mkStratix10_SerialLite3_4Lane (Clock tx_clk, Reset tx_rst_n, Clock qsfp_r
   // Scheduling
   schedule ( data_rx, start_of_burst_rx, end_of_burst_rx, valid_rx, error_rx, link_up_rx, sync_rx, error_interrupt_rx, rx_drop
            , link_up_rx, link_up_tx, error_tx, error_interrupt_tx, ready_tx
-           , bus_request, bus_read_data, bus_waitrequest, crc_error_inject, tx, qsfp28_tx_pins, qsfp28_rx_pins, xcvr_atx_pll_s10_htile_tx)
-        CF (data_rx, start_of_burst_rx, end_of_burst_rx, valid_rx, error_rx, link_up_rx, sync_rx, error_interrupt_rx, rx_drop
+           , bus_request, bus_read_data, bus_waitrequest, crc_error_inject, tx
+	   , qsfp28_tx_pins, qsfp28_rx_pins
+	   , tx_pll_locked, tx_pll_cal_busy)
+        CF ( data_rx, start_of_burst_rx, end_of_burst_rx, valid_rx, error_rx, link_up_rx, sync_rx, error_interrupt_rx, rx_drop
            , link_up_rx, link_up_tx, error_tx, error_interrupt_tx, ready_tx
-           , bus_request, bus_read_data, bus_waitrequest, crc_error_inject, tx, qsfp28_tx_pins, qsfp28_rx_pins, xcvr_atx_pll_s10_htile_tx);
+           , bus_request, bus_read_data, bus_waitrequest, crc_error_inject, tx
+	   , qsfp28_tx_pins, qsfp28_rx_pins
+	   , tx_pll_locked, tx_pll_cal_busy);
 endmodule
 
 module mkSerialLite3
@@ -262,37 +294,33 @@ module mkSerialLite3
            , Add#(32,_nd,t_data)
            , Alias#(t_bus_req, Tuple4#(Bit#(16), Bit#(1), Bit#(1), Bit#(32))) );
 
-  Clock local_clk <- exposeCurrentClock();
-  Stratix10_SerialLite3_4Lane sl3 <- mkStratix10_SerialLite3_4Lane(tx_clk, tx_rst_n, qsfp_refclk);
-  CrossingReg#(Bit#(4)) sync_error_tx <- mkNullCrossingReg(local_clk, 0, clocked_by tx_clk, reset_by tx_rst_n);
-  CrossingReg#(Bit#(5)) sync_error_rx <- mkNullCrossingReg(local_clk, 0, clocked_by sl3.rx_clk, reset_by sl3.rx_rst_n);
-  SyncBitIfc#(Bool) sync_link_up_tx <- mkSyncBitToCC(tx_clk, tx_rst_n);
-  SyncBitIfc#(Bool) sync_link_up_rx <- mkSyncBitToCC(sl3.rx_clk, sl3.rx_rst_n);
+  Stratix10_SerialLite3_4Lane       sl3 <- mkStratix10_SerialLite3_4Lane(tx_clk, tx_rst_n, qsfp_refclk);
+  Reg#(Bit#(2))      sync_tx_pll_locked <- mkTwoFlopSynchroniserCC(0, tx_clk, tx_rst_n);
+  Reg#(Bit#(2))    sync_tx_pll_cal_busy <- mkTwoFlopSynchroniserCC(0, tx_clk, tx_rst_n);
+  Reg#(Bit#(4))           sync_error_tx <- mkTwoFlopSynchroniserCC(0, tx_clk, tx_rst_n);
+  Reg#(Bit#(5))           sync_error_rx <- mkTwoFlopSynchroniserCC(0, sl3.rx_clk, sl3.rx_rst_n);
+  Reg#(Bool)            sync_link_up_tx <- mkTwoFlopSynchroniserCC(False, tx_clk, tx_rst_n);
+  Reg#(Bool)            sync_link_up_rx <- mkTwoFlopSynchroniserCC(False, sl3.rx_clk, sl3.rx_rst_n);
+
   AXI4Lite_Shim#( t_addr, t_data
                 , t_awuser, t_wuser, t_buser
                 , t_aruser, t_ruser) axi4LiteShim <- mkAXI4LiteShimFF;
 
+  rule do_sync_pll_status;
+    sync_tx_pll_locked <= sl3.tx_pll_locked();
+    sync_tx_pll_cal_busy <= sl3.tx_pll_cal_busy();
+  endrule
   rule do_sync_from_tx_clk_domain;
-    sync_link_up_tx.send(sl3.link_up_tx==1);
+    sync_link_up_tx <= sl3.link_up_tx==1;
     sync_error_tx <= sl3.error_tx;
   endrule
   rule do_sync_from_rx_clk_domain;
-    sync_link_up_rx.send(sl3.link_up_rx==1);
+    sync_link_up_rx <= sl3.link_up_rx==1;
     sync_error_rx <= sl3.error_rx[4:0];
   endrule
   rule no_crc_error_testing;
     sl3.crc_error_inject(0);
   endrule
-
-  //----------------------------------------------------------------------------
-  // TODO: need help!!!
-  // from @aj443 to @swm11:
-  // I make the assumption that
-  // - when bus_request is called for a write, there is no impact on the
-  //   behaviour of bus_read_data or bus_waitrequest
-  // - when bus_request is called for a read, bus_waitrequest goes hi on the
-  //   next cycle and goes low when the bus_read_data corresponds to the data to
-  //   be returned
 
   FIFO#(t_bus_req) busReqFF <- mkFIFO1; // for bus access from a single rule
   FIFO#(Bit#(0))   rdRspFF <- mkFIFO1; // for flow control
@@ -303,8 +331,6 @@ module mkSerialLite3
     if (rd == 1'b1) rdRspFF.enq(?);
   endrule
 
-  // XXX proposed implementation for AXI4Lite reads, rely on the bus eventually
-  //     providing a response
   (* descending_urgency = "axi4Lite_read_request, axi4Lite_write" *)
   rule axi4Lite_read_request;
     let arflit <- get (axi4LiteShim.master.ar);
@@ -318,7 +344,6 @@ module mkSerialLite3
                                              , ruser: ? });
   endrule
 
-  // XXX proposed implementation for AXI4Lite writes (fire and forget)
   rule axi4Lite_write;
     let awflit <- get (axi4LiteShim.master.aw);
     let wflit <- get (axi4LiteShim.master.w);
@@ -355,17 +380,20 @@ module mkSerialLite3
   interface SerialLite3_ExternalPins pins;
     method qsfp28_tx_pins = sl3.qsfp28_tx_pins;
     method qsfp28_rx_pins = sl3.qsfp28_rx_pins;
-    method xcvr_atx_pll_s10_htile_tx = sl3.xcvr_atx_pll_s10_htile_tx;
   endinterface
+
+  //----------------------------------------------------------------------------
 
   interface tx = mapSink (axs2sl3, rawTX);
   interface rx = mapSource (sl32axs, rawRX);
 
   method SerialLite3_LinkStatus link_status =
-    SerialLite3_LinkStatus{error_rx:sync_error_rx.crossed(),
-                           error_tx:sync_error_tx.crossed(),
-                           link_up_tx:sync_link_up_tx.read(),
-                           link_up_rx:sync_link_up_rx.read()};
+    SerialLite3_LinkStatus{tx_pll_locked:sync_tx_pll_locked,
+			   tx_pll_cal_busy:sync_tx_pll_cal_busy,
+			   error_rx:sync_error_rx,
+                           error_tx:sync_error_tx,
+                           link_up_tx:sync_link_up_tx,
+                           link_up_rx:sync_link_up_rx};
 
   interface management_subordinate = axi4LiteShim.slave;
 
