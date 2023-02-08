@@ -94,6 +94,19 @@ print_bert_build_timestamp(struct fifoDetails f)
 
 
 int
+ping(struct fifoDetails f)
+{
+  int status, wait;
+  IOWR_32DIRECT(f.bert_base_addr,word_offset*0x02,0); // start ping
+  for(status=wait=0; (status==0) && (wait<1000); wait++) {
+    status = IORD_32DIRECT(f.bert_base_addr,word_offset*0x02); // read ping time
+    usleep(1000);
+  }
+  return status;
+}
+
+
+int
 status_fifo(struct fifoDetails f, int fifonum)
 {
   int status;
@@ -163,16 +176,18 @@ int chip_id_hi() { return status_device(5); }
 
 
 void
-print_link_status(struct fifoDetails f, int fifonum)
+print_link_status(struct fifoDetails f, int channum)
 {
   int status;
-  status = status_device(fifonum);
+  // Status sent via packed structure SerialLite3_LinkStatus in SerialLite3.bsv
+  status = status_device(channum);
+  alt_printf("status = 0x%x\n", status);
   int link_up_tx = exbit(status,0);
   int link_up_rx = exbit(status,1);
   int error_tx = exbitfield(status,2,4);
   int error_rx = exbitfield(status,6,5);
-  int calibration_busy = exbit(status,18) | exbit(status,19);
-  int htile_lock = exbit(status,16) & exbit(status,17);
+  int calibration_busy = exbit(status,11) | exbit(status,12);
+  int htile_lock = exbit(status,13) | exbit(status,14);
   int good = (link_up_tx==1)
            & (link_up_rx==1)
            & (error_tx==0)
@@ -456,6 +471,7 @@ main(void)
   alt_putstr("   f = flush links then exit\n");
   alt_putstr("   e = echo mode\n");
   alt_putstr("   o = test one link quickly\n");
+  alt_putstr("   p = ping\n");
   alt_putstr("   r = report all link errors\n");
   alt_putstr("   t = test\n");
   alt_putstr("   q = quit\n");
@@ -466,7 +482,10 @@ main(void)
     if((int) c > 0) {
       if(c=='\004') // exit on ctl-D
 	return 0;
-      if((c=='0') || (c=='1') || (c=='b') || (c=='d') || (c=='f') || (c=='l') || (c=='o') || (c=='r')  || (c=='q') || (c=='t') || (c=='z')) flush_mode = false;
+      if(   (c=='0') || (c=='1') || (c=='b') || (c=='d')
+	 || (c=='f') || (c=='l') || (c=='o') || (c=='p')
+	 || (c=='r')  || (c=='q') || (c=='t') || (c=='z'))
+	flush_mode = false;
       for(chan=0; chan<num_chan; chan++)
 	report_rx_fifo(fs[chan], 0, chan, true);
     }
@@ -487,7 +506,11 @@ main(void)
   if(c=='o') 
     test_write_read_one_link(fs[3], fs[0], 0);
   // Check one link in loop-back:  test_write_read_one_link(fs[0], fs[0], 1);
-  
+
+  if(c=='p')
+    for(chan=0; chan<num_chan; chan++)
+      alt_printf("Chan %x: Ping time = 0x%x\n", fs[chan].chan_letter, ping(fs[chan]));
+
   if(c=='r')
     report_all_data_error(fs, num_chan);
   
