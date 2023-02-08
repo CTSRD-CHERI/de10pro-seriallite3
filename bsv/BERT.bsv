@@ -24,11 +24,6 @@
  *
  * Bit Error Rate Tester (BERT)
  * Plus simple TX and RX FIFO channels
- * 
- * TODO:
- *  - Check links come up
- *  - Try transmitting and receiving data
- *  - Check memory mapped interface to SERDES, e.g. put in loop-back mode
  */
 
 
@@ -125,6 +120,11 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
   Reg#(Bool)                            bert_inc_correct <- mkDReg(False);
   Reg#(Bool)                              bert_inc_error <- mkDReg(False);
   Reg#(Bit#(1))                              tx_slowdown <- mkReg(0);  // maximum send rate is every other cycle
+  FIFOF#(Bit#(0))                              ping_send <- mkUGFIFOF1;
+  FIFOF#(Bit#(0))                             ping_reply <- mkUGFIFOF1;
+  FIFOF#(Bit#(0))                         ping_in_flight <- mkUGFIFOF1;
+  FIFOF#(Bit#(0))                        ping_zero_timer <- mkUGFIFOF1;
+  Reg#(Bit#(32))                              ping_timer <- mkReg(0);
   
   let axiShim <- mkAXI4LiteShimFF;
   
@@ -134,7 +134,7 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
     rx_fast_fifo.master.drop;
   endrule
 
-   rule clock_crossed_rx_data_to_axi4_stream(rx_sync_fifo.notEmpty());
+  rule clock_crossed_rx_data_to_axi4_stream(rx_sync_fifo.notEmpty());
     AXI4Stream_Flit#(0,256,0,9) flit = rx_sync_fifo.first;
     
     // Always deq even if the corresponding receiving FIFO is full
@@ -147,12 +147,27 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
     // At present we're going to use the top byte of the tdata field to route the flit
     if((flit.tdata[255:248]==8'h00) && rxfifo.slave.canPut())
       begin
-        rxfifo.slave.put(flit); // forward to NIOS monitor port
+        if(flit.tdata[33:32]==1) // ping flit
+	    ping_reply.enq(?);
+        else if(flit.tdata[33:32]==2) // ping reply flit
+	  ping_in_flight.deq;
+	else
+	  rxfifo.slave.put(flit); // forward to NIOS monitor port
       end
-    if((flit.tdata[255:248]!=8'h00) && bert_fifo.notFull())
+    if((flit.tdata[255:248]!=8'h00) && bert_fifo.notFull)
       begin
 	bert_fifo.enq(flit.tdata); // forward to BERT checker
       end
+  endrule
+  
+  rule do_ping_timer(ping_in_flight.notEmpty || ping_zero_timer.notEmpty);
+    if(ping_zero_timer.notEmpty)
+      begin
+	ping_timer <= 0;
+	ping_zero_timer.deq;
+      end
+    else if(ping_in_flight.notEmpty)
+      ping_timer <= ping_timer+1;
   endrule
 
   rule read_req;
@@ -167,6 +182,9 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
     if(r.araddr[7:3]==1)
       d = zeroExtend({pack(rxfifo.master.canPeek), pack(txfifo.slave.canPut)});
      
+    if(r.araddr[7:3]==2)
+      d = ping_in_flight.notEmpty ? 0 : ping_timer;
+    
 `ifdef use_loopback_channel
     if((r.araddr[7:3]==2) && loopback_fifo.master.canPeek)
       begin
@@ -213,6 +231,9 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
     if((aw.awaddr[7:3]==0) && data_to_tx.notFull)
       data_to_tx.enq(w.wdata);
 
+    if(aw.awaddr[7:3]==2)
+      ping_send.enq(?);
+
 `ifdef use_loopback_channel
     if((aw.awaddr[7:3]==2) && loopback_fifo.slave.canPut())
       loopback_fifo.slave.put(AXI4Stream_Flit{ tdata: zeroExtend(w.wdata)
@@ -242,15 +263,35 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
   endrule
 
   rule tx_data_mux(tx_slowdown==0);
-    if(data_to_tx.notEmpty)
+    Maybe#(Bit#(256)) d = tagged Invalid;
+    
+    if(ping_reply.notEmpty)
+      begin
+	ping_reply.deq;
+	d = tagged Valid (2<<32);
+      end
+    else if (ping_send.notEmpty)
+      begin
+	ping_send.deq;
+	ping_in_flight.enq(?);
+	ping_zero_timer.enq(?);
+	d = tagged Valid (1<<32);
+      end
+    else if(data_to_tx.notEmpty)
+      begin
 	data_to_tx.deq;
+	d = tagged Valid zeroExtend(data_to_tx.first);
+      end
     else if(bert_gen_enabled)
+      begin
 	bert_gen <= next_bert_test(bert_gen);
+	d = tagged Valid bert_gen;
+      end
     
     // tuser: transfers to {start_of_burst (1b), sync_vector (8b)} of Serial Lite III link
     //        for end_of_flit the sync_vector contains the number of INVAID 64b words sent
-    if(data_to_tx.notEmpty || bert_gen_enabled)
-      txfifo.slave.put(AXI4Stream_Flit{ tdata: data_to_tx.notEmpty ? zeroExtend(data_to_tx.first) : bert_gen
+    if(isValid(d))
+      txfifo.slave.put(AXI4Stream_Flit{ tdata: fromMaybe(?, d)
 				      , tstrb: ~0
 				      , tkeep: ~0
 				      , tlast: True
