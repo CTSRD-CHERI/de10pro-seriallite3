@@ -98,15 +98,17 @@ endfunction
 
 
 
-module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wuser, t_buser, t_aruser, t_ruser) ifc);
+module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n,
+	      Clock csi_tx_clk, Reset csi_tx_rst_n,
+	      BERT#(t_addr, t_awuser, t_wuser, t_buser, t_aruser, t_ruser) ifc);
 
-  AXI4Stream_Shim#(0, 256, 0, 9)                  txfifo <- mkAXI4StreamShimUGSizedFIFOF32();
+  AXI4Stream_Shim#(0, 256, 0, 9)                  rxfifo <- mkAXI4StreamShimUGSizedFIFOF32();
   AXI4Stream_Shim#(0, 256, 0, 9)            rx_fast_fifo <- mkAXI4StreamShimUGSizedFIFOF32(clocked_by csi_rx_clk, reset_by csi_rx_rst_n);
   SyncFIFOIfc#(AXI4Stream_Flit#(0,256,0,9)) rx_sync_fifo <- mkSyncFIFOToCC(32, csi_rx_clk, csi_rx_rst_n);
-  AXI4Stream_Shim#(0, 256, 0, 9)                  rxfifo <- mkAXI4StreamShimUGSizedFIFOF32();
-`ifdef use_loopback_channel
-  AXI4Stream_Shim#(0, 32, 0, 9)            loopback_fifo <- mkAXI4StreamShimUGSizedFIFOF32();
-`endif
+
+  AXI4Stream_Shim#(0, 256, 0, 9)            tx_fast_fifo <- mkAXI4StreamShimUGSizedFIFOF32(clocked_by csi_tx_clk, reset_by csi_tx_rst_n);
+  SyncFIFOIfc#(AXI4Stream_Flit#(0,256,0,9)) tx_sync_fifo <- mkSyncFIFOFromCC(32, csi_tx_clk);
+
   FIFOF#(Bit#(32))                            data_to_tx <- mkUGFIFOF();
   Reg#(Bit#(32))                                 testreg <- mkReg(0);
   FIFOF#(Bit#(256))                            bert_fifo <- mkUGFIFOF();
@@ -120,6 +122,7 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
   Reg#(Bool)                            bert_inc_correct <- mkDReg(False);
   Reg#(Bool)                              bert_inc_error <- mkDReg(False);
   Reg#(Bit#(1))                              tx_slowdown <- mkReg(0);  // maximum send rate is every other cycle
+
   FIFOF#(Bit#(0))                              ping_send <- mkUGFIFOF1;
   FIFOF#(Bit#(0))                             ping_reply <- mkUGFIFOF1;
   FIFOF#(Bit#(0))                         ping_in_flight <- mkUGFIFOF1;
@@ -160,6 +163,13 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
       end
   endrule
   
+  // rule runs in csi_tx_clk domain to forward data from the main clock domain
+  rule clock_cross_tx_data(tx_sync_fifo.notEmpty);
+    tx_fast_fifo.slave.put(tx_sync_fifo.first);
+    tx_sync_fifo.deq;
+  endrule
+  
+  
   rule do_ping_timer(ping_in_flight.notEmpty || ping_zero_timer.notEmpty);
     if(ping_zero_timer.notEmpty)
       begin
@@ -180,7 +190,7 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
         rxfifo.master.drop;
       end
     if(r.araddr[7:3]==1)
-      d = zeroExtend({pack(rxfifo.master.canPeek), pack(txfifo.slave.canPut)});
+      d = zeroExtend({pack(rxfifo.master.canPeek), pack(tx_sync_fifo.notFull)});
      
     if(r.araddr[7:3]==2)
       d = ping_in_flight.notEmpty ? 0 : ping_timer;
@@ -222,7 +232,7 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
   endrule
 
   // write requests handling, i.e. always ignnore write and return success
-  // stop the bert_generator on any write to multiplex access to the txfifo
+  // stop the bert_generator on any write to multiplex access to the tx_sync_fifo
   
   //(* preempts = "write_req, bert_generator" *)
   rule write_req;
@@ -291,7 +301,7 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
     // tuser: transfers to {start_of_burst (1b), sync_vector (8b)} of Serial Lite III link
     //        for end_of_flit the sync_vector contains the number of INVAID 64b words sent
     if(isValid(d))
-      txfifo.slave.put(AXI4Stream_Flit{ tdata: fromMaybe(?, d)
+      tx_sync_fifo.enq(AXI4Stream_Flit{ tdata: fromMaybe(?, d)
 				      , tstrb: ~0
 				      , tkeep: ~0
 				      , tlast: True
@@ -320,16 +330,18 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wu
   endrule  
   // interface
   interface mem_csrs = axiShim.slave;
-  interface txstream = txfifo.master;
+  interface txstream = tx_fast_fifo.master;
   interface rxstream = rx_fast_fifo.slave;
 endmodule
 
 
 
-module toBERT_Sig#(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT#(t_addr, t_awuser, t_wuser, t_buser, t_aruser, t_ruser) ifc)
+module toBERT_Sig#(Clock csi_rx_clk, Reset csi_rx_rst_n,
+		   Clock csi_tx_clk, Reset csi_tx_rst_n,
+		   BERT#(t_addr, t_awuser, t_wuser, t_buser, t_aruser, t_ruser) ifc)
                   (BERT_Sig#(t_addr, t_awuser, t_wuser, t_buser, t_aruser, t_ruser));
   let sigAXI4LitePort <- toAXI4Lite_Slave_Sig(ifc.mem_csrs);
-  let sigTXport <- toAXI4Stream_Master_Sig(ifc.txstream);
+  let sigTXport <- toAXI4Stream_Master_Sig(ifc.txstream, clocked_by csi_tx_clk, reset_by csi_tx_rst_n);
   let sigRXport <- toAXI4Stream_Slave_Sig(ifc.rxstream, clocked_by csi_rx_clk, reset_by csi_rx_rst_n);
   return interface BERT_Sig;
     interface mem_csrs = sigAXI4LitePort;
@@ -340,10 +352,12 @@ endmodule
 
 
 (* synthesize *)
-module mkBERT_Instance(Clock csi_rx_clk, Reset csi_rx_rst_n, BERT_Sig#(// t_addr, t_awuser, t_wuser, t_buser, t_aruser, t_ruser
-                                                                               8,        0,       0,       0,        0,       0) pg);
-  let pg <- mkBERT(csi_rx_clk, csi_rx_rst_n);
-  let pg_sig <- toBERT_Sig(csi_rx_clk, csi_rx_rst_n, pg);
+module mkBERT_Instance(Clock csi_rx_clk, Reset csi_rx_rst_n,
+		       Clock csi_tx_clk, Reset csi_tx_rst_n,
+		       BERT_Sig#(// t_addr, t_awuser, t_wuser, t_buser, t_aruser, t_ruser
+                                         8,        0,       0,       0,        0,       0) pg);
+  let pg <- mkBERT(csi_rx_clk, csi_rx_rst_n, csi_tx_clk, csi_tx_rst_n);
+  let pg_sig <- toBERT_Sig(csi_rx_clk, csi_rx_rst_n, csi_tx_clk, csi_tx_rst_n, pg);
   return pg_sig;
 endmodule
 
