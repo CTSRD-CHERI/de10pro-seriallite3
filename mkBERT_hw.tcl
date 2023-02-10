@@ -82,6 +82,20 @@ add_interface_port CLK_csi_rx_clk CLK_csi_rx_clk clk Input 1
 
 
 # 
+# connection point CLK_csi_tx_clk
+# 
+add_interface CLK_csi_tx_clk clock end
+set_interface_property CLK_csi_tx_clk ENABLED true
+set_interface_property CLK_csi_tx_clk EXPORT_OF ""
+set_interface_property CLK_csi_tx_clk PORT_NAME_MAP ""
+set_interface_property CLK_csi_tx_clk CMSIS_SVD_VARIABLES ""
+set_interface_property CLK_csi_tx_clk SVD_ADDRESS_GROUP ""
+set_interface_property CLK_csi_tx_clk IPXACT_REGISTER_MAP_VARIABLES ""
+
+add_interface_port CLK_csi_tx_clk CLK_csi_tx_clk clk Input 1
+
+
+# 
 # connection point RST_N
 # 
 add_interface RST_N reset end
@@ -111,6 +125,22 @@ set_interface_property RST_N_csi_rx_rst_n SVD_ADDRESS_GROUP ""
 set_interface_property RST_N_csi_rx_rst_n IPXACT_REGISTER_MAP_VARIABLES ""
 
 add_interface_port RST_N_csi_rx_rst_n RST_N_csi_rx_rst_n reset_n Input 1
+
+
+# 
+# connection point RST_N_csi_tx_rst_n
+# 
+add_interface RST_N_csi_tx_rst_n reset end
+set_interface_property RST_N_csi_tx_rst_n associatedClock CLK_csi_rx_clk
+set_interface_property RST_N_csi_tx_rst_n synchronousEdges DEASSERT
+set_interface_property RST_N_csi_tx_rst_n ENABLED true
+set_interface_property RST_N_csi_tx_rst_n EXPORT_OF ""
+set_interface_property RST_N_csi_tx_rst_n PORT_NAME_MAP ""
+set_interface_property RST_N_csi_tx_rst_n CMSIS_SVD_VARIABLES ""
+set_interface_property RST_N_csi_tx_rst_n SVD_ADDRESS_GROUP ""
+set_interface_property RST_N_csi_tx_rst_n IPXACT_REGISTER_MAP_VARIABLES ""
+
+add_interface_port RST_N_csi_tx_rst_n RST_N_csi_tx_rst_n reset_n Input 1
 
 
 # 
@@ -177,8 +207,8 @@ add_interface_port rxstream axstrs_rxstream_tvalid tvalid Input 1
 # connection point txstream
 # 
 add_interface txstream axi4stream start
-set_interface_property txstream associatedClock CLK
-set_interface_property txstream associatedReset RST_N
+set_interface_property txstream associatedClock CLK_csi_tx_clk
+set_interface_property txstream associatedReset RST_N_csi_tx_rst_n
 set_interface_property txstream ENABLED true
 set_interface_property txstream EXPORT_OF ""
 set_interface_property txstream PORT_NAME_MAP ""
