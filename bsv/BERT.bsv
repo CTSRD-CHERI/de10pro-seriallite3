@@ -190,20 +190,8 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n,
       end
     if(r.araddr[7:3]==1)
       d = zeroExtend({pack(rxfifo.master.canPeek), pack(tx_sync_fifo.notFull)});
-     
     if(r.araddr[7:3]==2)
       d = ping_in_flight.notEmpty ? 0 : ping_timer;
-    
-`ifdef use_loopback_channel
-    if((r.araddr[7:3]==2) && loopback_fifo.master.canPeek)
-      begin
-        let a = loopback_fifo.master.peek;
-	d = truncate(a.tdata);
-        loopback_fifo.master.drop;
-      end
-    if(r.araddr[7:3]==3)
-      d = zeroExtend({pack(loopback_fifo.master.canPeek), pack(loopback_fifo.slave.canPut)});
-`endif
     if(r.araddr[7:3]==4)
       d = bert_correct_flits[31:0];
     if(r.araddr[7:3]==5)
@@ -232,8 +220,6 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n,
 
   // write requests handling, i.e. always ignnore write and return success
   // stop the bert_generator on any write to multiplex access to the tx_sync_fifo
-  
-  //(* preempts = "write_req, bert_generator" *)
   rule write_req;
     let aw <- get (axiShim.master.aw);
     let w <- get (axiShim.master.w);
@@ -243,17 +229,6 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n,
     if(aw.awaddr[7:3]==2)
       ping_send.enq(?);
 
-`ifdef use_loopback_channel
-    if((aw.awaddr[7:3]==2) && loopback_fifo.slave.canPut())
-      loopback_fifo.slave.put(AXI4Stream_Flit{ tdata: zeroExtend(w.wdata)
-                                       , tstrb: ~0
-                                       , tkeep: ~0
-                                       , tlast: True
-                                       , tid: ?
-                                       , tdest: ?
-                                       , tuser: 0} );
-`endif
-    
     if((aw.awaddr[7:3]>=4) && (aw.awaddr[7:3]<=7))
       bert_zero_counters <= True;
     
