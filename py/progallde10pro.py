@@ -33,7 +33,7 @@ import sys, os, time
 import re, argparse
 
 default_num_fpgas = 8
-quartus_pgm_timeout = 90
+quartus_pgm_timeout = 120
 
 def find_de10pro_devices():
     devices = {}
