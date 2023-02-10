@@ -57,10 +57,12 @@ SRC_StatusDevice = StatusDevice.bsv
 SRC_SerialLite3 = SerialLite3.bsv
 SRC_BERT = BERT.bsv
 
-IP = stratix10_seriallite3_4lane
-IPDIR = $(IP)
+IPSL3 = stratix10_seriallite3_4lane
+IPSL3DIR = $(IPSL3)
 IPCHIPID = chipid
 IPCHIPIDDIR = $(IPCHIPID)
+IPTXPLL = xcvr_atx_pll_s10_htile
+IPTXPLLDIR = $(IPTXPLL)
 
 .PHONY: all
 all:  TimeStamp.bsv QSF_Params.bsv mkStatusDevice_Instance mkSerialLite3_Instance mkBERT_Instance
@@ -77,7 +79,7 @@ mkStatusDevice_Instance: generate_ip_chipid $(SRC_StatusDevice)
 	mkdir -p $(OUTPUTDIR)/$@-info $(BDIR)
 	$(BSC) -info-dir $(OUTPUTDIR)/$@-info -vdir $(OUTPUTDIR) -opt-undetermined-vals -unspecified-to X $(BSCFLAGS) -verilog -g mkStatusDevice_Instance -u $(SRC_StatusDevice)
 
-mkSerialLite3_Instance: generate_ip_SerialLite3 $(SRC_SerialLite3)
+mkSerialLite3_Instance: generate_ip_SerialLite3 generate_ip_txpll $(SRC_SerialLite3)
 	mkdir -p $(OUTPUTDIR)/$@-info $(BDIR)
 	$(BSC) -info-dir $(OUTPUTDIR)/$@-info -vdir $(OUTPUTDIR) -opt-undetermined-vals -unspecified-to X $(BSCFLAGS) -verilog -g mkSerialLite3_Instance -u $(SRC_SerialLite3)
 
@@ -86,20 +88,24 @@ mkBERT_Instance: $(SRC_BERT)
 	$(BSC) -info-dir $(OUTPUTDIR)/$@-info -vdir $(OUTPUTDIR) -opt-undetermined-vals -unspecified-to X $(BSCFLAGS) -verilog -g mkBERT_Instance -u $(SRC_BERT)
 
 .PHONY: generate_ip_SerialLite3
-generate_ip_SerialLite3: $(IPDIR)/$(IP)_inst.v
-
-$(IPDIR)/$(IP)_inst.v: $(IP).ip
-	quartus_ipgenerate -synthesis=verilog --clear_ip_generation_dirs --generate_ip_file --ip_file=bsv/stratix10_seriallite3_4lane.ip ../DE10_Pro.qsf
+generate_ip_SerialLite3: $(IPSL3DIR)/$(IPSL3)_inst.v
+$(IPSL3DIR)/$(IPSL3)_inst.v: $(IPSL3).ip
+	quartus_ipgenerate -synthesis=verilog --clear_ip_generation_dirs --generate_ip_file --ip_file=bsv/$(IPSL3).ip ../DE10_Pro.qsf
 
 .PHONY: generate_ip_chipid
 generate_ip_chipid: $(IPCHIPIDDIR)/$(IPCHIPID)_inst.v
-
 $(IPCHIPIDDIR)/$(IPCHIPID)_inst.v: $(IPCHIPID).ip
-	quartus_ipgenerate -synthesis=verilog --clear_ip_generation_dirs --generate_ip_file --ip_file=bsv/chipid.ip ../DE10_Pro.qsf
+	quartus_ipgenerate -synthesis=verilog --clear_ip_generation_dirs --generate_ip_file --ip_file=bsv/$(IPCHIPID).ip ../DE10_Pro.qsf
+
+.PHONY: generate_ip_txpll
+generate_ip_txpll: $(IPTXPLLDIR)/$(IPTXPLL)_inst.v
+$(IPTXPLLDIR)/$(IPTXPLL)_inst.v: $(IPTXPLL).ip
+	quartus_ipgenerate -synthesis=verilog --clear_ip_generation_dirs --generate_ip_file --ip_file=bsv/$(IPTXPLL).ip ../DE10_Pro.qsf
+
 
 .PHONY: clean
 clean:
-	rm -f -r $(BUILDDIR) $(IPDIR)
+	rm -f -r $(BUILDDIR) $(IPSL3DIR) $(IPCHIPIDDIR) $(IPTXPLLDIR)
 
 .PHONY: mrproper
 mrproper: clean
