@@ -121,7 +121,6 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n,
   Reg#(Bool)                          bert_zero_counters <- mkDReg(False);
   Reg#(Bool)                            bert_inc_correct <- mkDReg(False);
   Reg#(Bool)                              bert_inc_error <- mkDReg(False);
-  Reg#(Bit#(1))                              tx_slowdown <- mkReg(0);  // maximum send rate is every other cycle
 
   FIFOF#(Bit#(0))                              ping_send <- mkUGFIFOF1;
   FIFOF#(Bit#(0))                             ping_reply <- mkUGFIFOF1;
@@ -268,11 +267,7 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n,
     axiShim.master.b.put (rsp);
   endrule
 
-  rule inc_tx_slowdown;
-    tx_slowdown <= tx_slowdown+1;
-  endrule
-
-  rule tx_data_mux(tx_slowdown==0);
+  rule tx_data_mux;
     Maybe#(Bit#(256)) d = tagged Invalid;
     
     if(ping_reply.notEmpty)
