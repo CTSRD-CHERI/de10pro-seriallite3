@@ -29,10 +29,12 @@
 
 package SerialLite3;
 
-import BlueAXI4 :: *;
+import BlueAXI4   :: *;
 import BlueBasics :: *;
-import Clocks :: *;
-import FIFO :: *;
+import ConfigReg  :: *;
+import Clocks     :: *;
+import FIFO       :: *;
+import DReg       :: *;
 
 // This package provides types / interfaces for the SerialLite3 interface
 // Note: the following signals are not currently provided:
@@ -295,6 +297,9 @@ module mkSerialLite3
            , Alias#(t_bus_req, Tuple4#(Bit#(16), Bit#(1), Bit#(1), Bit#(32))) );
 
   Stratix10_SerialLite3_4Lane       sl3 <- mkStratix10_SerialLite3_4Lane(tx_clk, tx_rst_n, qsfp_refclk);
+//  Reg#(Bool)                tx_slowdown <- mkDReg(False, clocked_by tx_clk, reset_by tx_rst_n);
+//  PulseWire                 tx_slowdown <- mkPulseWire(clocked_by tx_clk, reset_by tx_rst_n);
+  Reg#(Bit#(1))       tx_slowdown_timer <- mkConfigReg(0, clocked_by tx_clk, reset_by tx_rst_n);
   Reg#(Bit#(2))      sync_tx_pll_locked <- mkTwoFlopSynchroniserCC(0, tx_clk, tx_rst_n);
   Reg#(Bit#(2))    sync_tx_pll_cal_busy <- mkTwoFlopSynchroniserCC(0, tx_clk, tx_rst_n);
   Reg#(Bit#(4))           sync_error_tx <- mkTwoFlopSynchroniserCC(0, tx_clk, tx_rst_n);
@@ -326,9 +331,9 @@ module mkSerialLite3
   FIFO#(Bit#(0))   rdRspFF <- mkFIFO1; // for flow control
   rule forward_bus_req (sl3.bus_waitrequest == 1'b0);
     match {.addr, .rd, .wr, .data} = busReqFF.first;
-    busReqFF.deq;
+    busReqFF.deq; // TODO: don't deq until bus_waitrequest==0
     sl3.bus_request (addr, rd, wr, data);
-    if (rd == 1'b1) rdRspFF.enq(?);
+    if (rd == 1'b1) rdRspFF.enq(?); // TODO: latch read data if bus_waitrequest==0 and it is a read
   endrule
 
   (* descending_urgency = "axi4Lite_read_request, axi4Lite_write" *)
@@ -356,17 +361,26 @@ module mkSerialLite3
                                              , buser: ? });
   endrule
 
+  Bool tx_wait = msb(tx_slowdown_timer)==1;
+  
+  rule tx_rate_limiter(tx_wait);
+    tx_slowdown_timer <= tx_slowdown_timer<<1; // unary counter for speed of end detection
+  endrule
+  
   //----------------------------------------------------------------------------
   Sink #(SerialLite3_StreamFlit) rawTX = interface Sink;
     method canPut = sl3.ready_tx==1; // clocked_by tx_clk reset_by tx_rst_n
-    method Action put(d); // clocked_by tx_clk reset_by tx_rst_n;
+    method Action put(d) if ((sl3.ready_tx==1) && !tx_wait);  // (!tx_slowdown); // clocked_by tx_clk reset_by tx_rst_n;
       sl3.tx(d.data, pack(d.start_of_burst), pack(d.end_of_burst), d.sync);
+      if(d.end_of_burst)
+	tx_slowdown_timer <= -1;
+	//tx_slowdown <= True; // DReg to pause transmission after every end_of_burst
     endmethod
   endinterface;
 
   Source #(SerialLite3_StreamFlit) rawRX = interface Source;
     method Bool canPeek = sl3.valid_rx()==1; // clocked_by rx_clk reset_by rx_rst_n;
-    method SerialLite3_StreamFlit peek(); // if (sl3.valid_rx); // clocked_by rx_clk reset_by rx_rst_n =
+    method SerialLite3_StreamFlit peek() if (sl3.valid_rx==1); // clocked_by rx_clk reset_by rx_rst_n
       return SerialLite3_StreamFlit{data:sl3.data_rx(), start_of_burst:sl3.start_of_burst_rx()==1, end_of_burst:sl3.end_of_burst_rx()==1, sync:sl3.sync_rx()};
     endmethod
     method Action drop = sl3.rx_drop; // clocked_by rx_clk reset_by rx_rst_n;
