@@ -106,7 +106,7 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n,
   AXI4Stream_Shim#(0, 256, 0, 9)            rx_fast_fifo <- mkAXI4StreamShimUGSizedFIFOF32(clocked_by csi_rx_clk, reset_by csi_rx_rst_n);
   SyncFIFOIfc#(AXI4Stream_Flit#(0,256,0,9)) rx_sync_fifo <- mkSyncFIFOToCC(32, csi_rx_clk, csi_rx_rst_n);
 
-  AXI4Stream_Shim#(0, 256, 0, 9)            tx_fast_fifo <- mkAXI4StreamShimUGSizedFIFOF32(clocked_by csi_tx_clk, reset_by csi_tx_rst_n);
+  AXI4Stream_Shim#(0, 256, 0, 9)            tx_fast_fifo <- mkAXI4StreamShimSizedFIFOF32(clocked_by csi_tx_clk, reset_by csi_tx_rst_n);
   SyncFIFOIfc#(AXI4Stream_Flit#(0,256,0,9)) tx_sync_fifo <- mkSyncFIFOFromCC(32, csi_tx_clk);
 
   FIFOF#(Bit#(32))                            data_to_tx <- mkUGFIFOF();
@@ -121,6 +121,7 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n,
   Reg#(Bool)                          bert_zero_counters <- mkDReg(False);
   Reg#(Bool)                            bert_inc_correct <- mkDReg(False);
   Reg#(Bool)                              bert_inc_error <- mkDReg(False);
+  Reg#(Bit#(4))                            tx_rate_limit <- mkDReg(1);
 
   FIFOF#(Bit#(0))                              ping_send <- mkUGFIFOF1;
   FIFOF#(Bit#(0))                             ping_reply <- mkUGFIFOF1;
@@ -242,7 +243,7 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n,
     axiShim.master.b.put (rsp);
   endrule
 
-  rule tx_data_mux;
+  rule tx_data_mux(tx_rate_limit!=0);
     Maybe#(Bit#(256)) d = tagged Invalid;
     
     if(ping_reply.notEmpty)
@@ -271,13 +272,19 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n,
     // tuser: transfers to {start_of_burst (1b), sync_vector (8b)} of Serial Lite III link
     //        for end_of_flit the sync_vector contains the number of INVAID 64b words sent
     if(isValid(d))
-      tx_sync_fifo.enq(AXI4Stream_Flit{ tdata: fromMaybe(?, d)
-				      , tstrb: ~0
-				      , tkeep: ~0
-				      , tlast: True
-				      , tid: ?
-				      , tdest: ?
-				      , tuser: 9'h100} );
+      begin
+	tx_sync_fifo.enq(AXI4Stream_Flit{ tdata: fromMaybe(?, d)
+					, tstrb: ~0
+					, tkeep: ~0
+					, tlast: True
+				        , tid: ?
+				        , tdest: ?
+				        , tuser: 9'h100} );
+	// DReg assignment (defaults to 1) to ensure that we don't transmit every single
+	// cycle since the receiver running nominally at the same clock frequency on
+	// another FPGA may be a fraction slower.
+	tx_rate_limit <= tx_rate_limit + 1; 
+      end
   endrule
   
   
