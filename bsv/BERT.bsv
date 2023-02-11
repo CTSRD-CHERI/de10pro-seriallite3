@@ -121,7 +121,7 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n,
   Reg#(Bool)                          bert_zero_counters <- mkDReg(False);
   Reg#(Bool)                            bert_inc_correct <- mkDReg(False);
   Reg#(Bool)                              bert_inc_error <- mkDReg(False);
-  Reg#(Bit#(4))                            tx_rate_limit <- mkDReg(1);
+  Reg#(Bit#(10))                           tx_rate_limit <- mkDReg(1);
 
   FIFOF#(Bit#(0))                              ping_send <- mkUGFIFOF1;
   FIFOF#(Bit#(0))                             ping_reply <- mkUGFIFOF1;
