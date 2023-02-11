@@ -26,6 +26,9 @@
  *
  * A simple memory mapped device that allows status bits from a number of
  * 32b conduits, and to read the unique Stratix-10 ChipID.
+ * 
+ * TODO: how to get error_rx and error_tx captured since the bits change
+ * momentarily and at a higher clock frequency (TX and RX clocks)
  */
 
 
