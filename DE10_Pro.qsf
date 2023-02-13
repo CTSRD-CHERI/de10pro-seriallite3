@@ -1830,6 +1830,9 @@ set_instance_assignment -name HSSI_PARAMETER "pma_tx_buf_powermode_dc_post_tap =
 set_instance_assignment -name HSSI_PARAMETER "pma_tx_buf_pre_emp_switching_ctrl_1st_post_tap=9" -to QSFP28D_TX_p[3]
 # set_instance_assignment -name HSSI_PARAMETER "pma_tx_buf_term_sel=<value>" -to QSFP28D_TX_p[3]
 
+# SWM: add sdc file for clock crossing fifo (dcfifo)
+set_global_assignment -name VERILOG_FILE bsv/s10dcfifo.v
+set_global_assignment -name SDC_FILE bsv/s10dcfifo.sdc
 
 set_global_assignment -name POWER_APPLY_THERMAL_MARGIN ADDITIONAL
 set_global_assignment -name USE_SIGNALTAP_FILE stp1.stp
@@ -1850,12 +1853,10 @@ set_global_assignment -name QSYS_FILE soc.qsys
 set_global_assignment -name IP_FILE ip/soc/soc_intel_onchip_memory_0.ip
 set_global_assignment -name IP_FILE ip/soc/soc_jtag_uart_0.ip
 set_global_assignment -name IP_FILE ip/soc/soc_nios2_gen2_0.ip
-set_global_assignment -name IP_FILE ip/soc/soc_xcvr_atx_pll_s10_htile_0.ip
 set_global_assignment -name IP_FILE ip/soc/clock_xcvr_a.ip
-set_global_assignment -name IP_FILE ip/soc/soc_pio_0.ip
 set_global_assignment -name IP_FILE ip/soc/soc_mkSerialLite3_Instance_0.ip
 set_global_assignment -name IP_FILE ip/soc/soc_mkBERT_Instance_0.ip
 set_global_assignment -name IP_FILE ip/soc/soc_mkStatusDevice_Instance_0.ip
 set_global_assignment -name IP_FILE ip/soc/pio_user_leds.ip
-set_global_assignment -name SIGNALTAP_FILE stp1.stp
 set_global_assignment -name VERILOG_FILE bsv/stratix10_seriallite3_4lane_wrapper.v
+set_global_assignment -name IP_FILE ip/soc/soc_iopll_0.ip
