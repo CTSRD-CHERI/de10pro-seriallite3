@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Simon W. Moore
+ * Copyright (c) 2023 Simon W. Moore
  * All rights reserved.
  *
  * @BERI_LICENSE_HEADER_START@
@@ -35,6 +35,7 @@ import FIFOF      :: *;
 import Clocks     :: *;
 import ConfigReg  :: *;
 import DReg       :: *;
+import S10FIFO    :: *;
 
 `include "TimeStamp.bsv"
 `include "QSF_Params.bsv"
@@ -104,10 +105,12 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n,
 
   AXI4Stream_Shim#(0, 256, 0, 9)                  rxfifo <- mkAXI4StreamShimUGSizedFIFOF32();
   AXI4Stream_Shim#(0, 256, 0, 9)            rx_fast_fifo <- mkAXI4StreamShimUGSizedFIFOF32(clocked_by csi_rx_clk, reset_by csi_rx_rst_n);
-  SyncFIFOIfc#(AXI4Stream_Flit#(0,256,0,9)) rx_sync_fifo <- mkSyncFIFOToCC(32, csi_rx_clk, csi_rx_rst_n);
+//  SyncFIFOIfc#(AXI4Stream_Flit#(0,256,0,9)) rx_sync_fifo <- mkSyncFIFOToCC(32, csi_rx_clk, csi_rx_rst_n);
+  SyncFIFOIfc#(AXI4Stream_Flit#(0,256,0,9)) rx_sync_fifo <- mkS10DCFIFOtoCC(32, csi_rx_clk, csi_rx_rst_n);
 
   AXI4Stream_Shim#(0, 256, 0, 9)            tx_fast_fifo <- mkAXI4StreamShimSizedFIFOF32(clocked_by csi_tx_clk, reset_by csi_tx_rst_n);
-  SyncFIFOIfc#(AXI4Stream_Flit#(0,256,0,9)) tx_sync_fifo <- mkSyncFIFOFromCC(32, csi_tx_clk);
+//  SyncFIFOIfc#(AXI4Stream_Flit#(0,256,0,9)) tx_sync_fifo <- mkSyncFIFOFromCC(32, csi_tx_clk);
+    SyncFIFOIfc#(AXI4Stream_Flit#(0,256,0,9)) tx_sync_fifo <- mkS10DCFIFOfromCC(32, csi_tx_clk, csi_tx_rst_n);
 
   FIFOF#(Bit#(32))                            data_to_tx <- mkUGFIFOF();
   Reg#(Bit#(32))                                 testreg <- mkReg(0);
