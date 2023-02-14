@@ -22,7 +22,7 @@
  *
  * ----------------------------------------------------------------------------
  *
- * Bluespec wrapper around Intel's dcfifo primative, i.e. a memory based
+ * Bluespec wrapper around Intel's dcfifo primitive, i.e. a memory based
  * clock-crossing FIFO.
  * 
  * N.B. this comes with a generic constraints file (SDC file) that is needed
@@ -105,5 +105,75 @@ module mkS10DCFIFOtoCC
   return fifo;
 endmodule
 
+//----------------------------------------------------------------------------
+
+interface S10DCFIFOPipelined#(type a);
+  method Action put(a d);
+  method Action start_get();
+  method a get(); // valid for just one cycle after start_get()
+  method Bool notFull();
+  method Bool notEmpty();
+endinterface
+
+import "BVI" s10dcfifopipelined =
+module mkS10DCFIFOPipelined
+  (Integer depth,
+   Clock dClkIn, Reset dRstIn_n,
+   S10DCFIFOPipelined#(a) ifc)
+  provisos (Bits#(a,a_width));
+
+  parameter WIDTH = valueOf(a_width);
+  parameter DEPTH = depth;
+
+  default_clock sClkIn (wrclk, (*unused*) wrclk_gate);
+  default_reset sRstIn_n (wrrst_n);
+  input_clock (rdclk, (*unused*) rdclk_gate) = dClkIn;
+  input_reset (rdrst_n)  clocked_by (dClkIn) = dRstIn_n;
   
+  method put(data) enable (wrreq) ready (wrfull_n) clocked_by (sClkIn) reset_by (sRstIn_n);
+  method wrfull_n notFull() clocked_by (sClkIn) reset_by (sRstIn_n);
+  
+  method start_get() enable (rdreq) ready (rdempty_n) clocked_by (dClkIn) reset_by (dRstIn_n);
+  method q get() ready (q_valid) clocked_by (dClkIn) reset_by (dRstIn_n);
+  method rdempty_n notEmpty() clocked_by (dClkIn) reset_by (dRstIn_n);
+  
+  schedule put C put;
+  schedule notFull SB put;
+  schedule notFull CF notFull;
+  
+  schedule start_get C start_get;
+  schedule notEmpty SB start_get;
+  schedule get      CF (notEmpty, get, start_get);
+  schedule notEmpty CF notEmpty;
+    
+  schedule (put) CF (start_get, get);
+  
+endmodule
+
+
+module mkS10DCFIFOPipelinedFromCC
+ #(Integer depth)
+  (Clock dClkIn,
+   Reset dRstIn_n,
+   S10DCFIFOPipelined#(a) ifc)
+  provisos (Bits#(a,a_width));  
+
+  S10DCFIFOPipelined#(a) fifo <- mkS10DCFIFOPipelined(depth, dClkIn, dRstIn_n);
+  return fifo;
+endmodule
+
+  
+module mkS10DCFIFOPipelinedToCC
+   #(Integer depth)
+   (Clock sClkIn, Reset sRstIn_n,
+    S10DCFIFOPipelined#(a) ifc)
+  provisos (Bits#(a,a_width));  
+
+  Clock                dClkIn <- exposeCurrentClock;
+  Reset              dRstIn_n <- exposeCurrentReset;
+  S10DCFIFOPipelined#(a) fifo <- mkS10DCFIFOPipelined(depth, dClkIn, dRstIn_n, clocked_by sClkIn, reset_by sRstIn_n);
+  return fifo;
+endmodule
+
+
 endpackage
