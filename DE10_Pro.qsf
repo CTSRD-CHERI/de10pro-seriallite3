@@ -1833,9 +1833,10 @@ set_instance_assignment -name HSSI_PARAMETER "pma_tx_buf_pre_emp_switching_ctrl_
 # SWM: add sdc file for clock crossing fifo (dcfifo)
 set_global_assignment -name VERILOG_FILE bsv/s10dcfifo.v
 set_global_assignment -name SDC_FILE bsv/s10dcfifo.sdc
+set_global_assignment -name VERILOG_FILE bsv/s10dcfifopipelined.v
+set_global_assignment -name SDC_FILE bsv/s10dcfifopipelined.sdc
 
 set_global_assignment -name POWER_APPLY_THERMAL_MARGIN ADDITIONAL
-set_global_assignment -name USE_SIGNALTAP_FILE stp1.stp
 set_global_assignment -name IP_FILE bsv/xcvr_atx_pll_s10_htile.ip
 set_global_assignment -name IP_FILE chipid.ip
 set_global_assignment -name IP_FILE bsv/stratix10_seriallite3_4lane.ip
@@ -1859,4 +1860,6 @@ set_global_assignment -name IP_FILE ip/soc/soc_mkBERT_Instance_0.ip
 set_global_assignment -name IP_FILE ip/soc/soc_mkStatusDevice_Instance_0.ip
 set_global_assignment -name IP_FILE ip/soc/pio_user_leds.ip
 set_global_assignment -name VERILOG_FILE bsv/stratix10_seriallite3_4lane_wrapper.v
+set_global_assignment -name SDC_FILE bsv/stratix10_seriallite3_4lane_wrapper.sdc
+
 set_global_assignment -name IP_FILE ip/soc/soc_iopll_0.ip
