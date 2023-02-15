@@ -1,3 +1,35 @@
+/*
+ * Copyright (c) 2023 Simon W. Moore
+ * All rights reserved.
+ *
+ * @BERI_LICENSE_HEADER_START@
+ *
+ * Licensed to BERI Open Systems C.I.C. (BERI) under one or more contributor
+ * license agreements.  See the NOTICE file distributed with this work for
+ * additional information regarding copyright ownership.  BERI licenses this
+ * file to you under the BERI Hardware-Software License, Version 1.0 (the
+ * "License"); you may not use this file except in compliance with the
+ * License.  You may obtain a copy of the License at:
+ *
+ *   http://www.beri-open-systems.org/legal/license-1-0.txt
+ *
+ * Unless required by applicable law or agreed to in writing, Work distributed
+ * under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+ * CONDITIONS OF ANY KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations under the License.
+ *
+ * @BERI_LICENSE_HEADER_END@
+ *
+ * ----------------------------------------------------------------------------
+ *
+ * Wrapper around Intel's dual-clock FIFO (dcfifo) primitive in none pipeline
+ * mode.  It has the same interface as the Bluespec standard SyncFIFOIfc.
+ * 
+ * TODO: also turn off overflow and underflow checking since it should be
+ * unnecessary?
+ */
+
+
 // synopsys translate_off
 `timescale 1 ps / 1 ps
 // synopsys translate_on
@@ -5,7 +37,7 @@ module  s10dcfifo
   (
    data,
    rdclk,
-   rdrst_n, // reset ignored
+   rdrst_n, // read reset ignored but makes BSV wrapper simpler
    rdreq,
    wrclk,
    wrrst_n,
@@ -17,21 +49,21 @@ module  s10dcfifo
    parameter WIDTH=1;
    parameter DEPTH=2;
 
-   input  [WIDTH:0] data;
-   input  	    rdclk;
-   input  	    rdrst_n;
-   input  	    rdreq;
-   input  	    wrclk;
-   input            wrrst_n;
-   input   	    wrreq;
-   output [WIDTH:0] q;
-   output 	    rdempty_n;
-   output 	    wrfull_n;
+   input  [WIDTH-1:0] data;
+   input  	      rdclk;
+   input  	      rdrst_n;
+   input  	      rdreq;
+   input  	      wrclk;
+   input              wrrst_n;
+   input   	      wrreq;
+   output [WIDTH-1:0] q;
+   output 	      rdempty_n;
+   output 	      wrfull_n;
 
-   wire 	    rdempty;
-   wire 	    wrfull;
+   wire 	      rdempty;
+   wire 	      wrfull;
    assign rdempty_n = !rdempty;
-   assign wrfull_n = !wrfull;
+   assign wrfull_n  = !wrfull;
    
 /*
  `ifndef ALTERA_RESERVED_QIS
@@ -69,7 +101,7 @@ module  s10dcfifo
         dcfifo_component.intended_device_family  = "Stratix 10",
         dcfifo_component.lpm_hint  = "DISABLE_DCFIFO_EMBEDDED_TIMING_CONSTRAINT=TRUE",
         dcfifo_component.lpm_numwords  = DEPTH,
-        dcfifo_component.lpm_showahead  = "ON",
+        dcfifo_component.lpm_showahead  = "ON", // showahead allows "first" method but slows design
         dcfifo_component.lpm_type  = "dcfifo",
         dcfifo_component.lpm_width  = WIDTH,
         dcfifo_component.lpm_widthu  = 5,
