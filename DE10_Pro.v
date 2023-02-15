@@ -353,7 +353,7 @@ module DE10_Pro
        .iopll_0_reset_reset (!init_done_n),  // reset PLL after FPGA initialised
        .iopll_0_locked_export (pll_locked),
 //       .reset_controller_200mhz_reset_in0_reset (!pll_locked || !init_done), // release reset after PLL has locked
-       .reset_controller_200mhz_reset_in0_reset (!init_done), // release reset after PLL has locked
+       .reset_controller_200mhz_reset_in0_reset (!init_done_n), // release reset after PLL has locked
        
        .pio_user_leds_external_connection_export(user_leds),
 
