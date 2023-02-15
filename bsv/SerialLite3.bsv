@@ -54,7 +54,7 @@ typedef struct {
 
 function SerialLite3_StreamFlit axs2sl3 (AXI4Stream_Flit #(0, 256, 0, 9) axs) =
   SerialLite3_StreamFlit { data: axs.tdata
-                         , start_of_burst: unpack (msb (axs.tuser))
+                         , start_of_burst: axs.tuser[8]==1 // unpack (msb (axs.tuser))
                          , end_of_burst: axs.tlast
                          , sync: truncate (axs.tuser) };
 
@@ -297,9 +297,9 @@ module mkSerialLite3
            , Alias#(t_bus_req, Tuple4#(Bit#(16), Bit#(1), Bit#(1), Bit#(32))) );
 
   Stratix10_SerialLite3_4Lane       sl3 <- mkStratix10_SerialLite3_4Lane(tx_clk, tx_rst_n, qsfp_refclk);
-//  Reg#(Bool)                tx_slowdown <- mkDReg(False, clocked_by tx_clk, reset_by tx_rst_n);
+  Reg#(Bool)                    tx_wait <- mkDReg(False, clocked_by tx_clk, reset_by tx_rst_n);
 //  PulseWire                 tx_slowdown <- mkPulseWire(clocked_by tx_clk, reset_by tx_rst_n);
-  Reg#(Bit#(1))       tx_slowdown_timer <- mkConfigReg(0, clocked_by tx_clk, reset_by tx_rst_n);
+//  Reg#(Bit#(1))       tx_slowdown_timer <- mkConfigReg(0, clocked_by tx_clk, reset_by tx_rst_n);
   Reg#(Bit#(2))      sync_tx_pll_locked <- mkTwoFlopSynchroniserCC(0, tx_clk, tx_rst_n);
   Reg#(Bit#(2))    sync_tx_pll_cal_busy <- mkTwoFlopSynchroniserCC(0, tx_clk, tx_rst_n);
   Reg#(Bit#(4))           sync_error_tx <- mkTwoFlopSynchroniserCC(0, tx_clk, tx_rst_n);
@@ -361,29 +361,30 @@ module mkSerialLite3
                                              , buser: ? });
   endrule
 
-  Bool tx_wait = msb(tx_slowdown_timer)==1;
-  
-  rule tx_rate_limiter(tx_wait);
-    tx_slowdown_timer <= tx_slowdown_timer<<1; // unary counter for speed of end detection
-  endrule
+//  Bool tx_wait = msb(tx_slowdown_timer)==1;
+//  rule tx_rate_limiter(tx_wait);
+//    tx_slowdown_timer <= tx_slowdown_timer<<1; // unary counter for speed of end detection
+//  endrule
   
   //----------------------------------------------------------------------------
+  // interface clocked_by tx_clk reset_by tx_rst_n
   Sink #(SerialLite3_StreamFlit) rawTX = interface Sink;
-    method canPut = sl3.ready_tx==1; // clocked_by tx_clk reset_by tx_rst_n
-    method Action put(d) if ((sl3.ready_tx==1) && !tx_wait);  // (!tx_slowdown); // clocked_by tx_clk reset_by tx_rst_n;
+    method canPut = sl3.ready_tx==1;
+    method Action put(d) if ((sl3.ready_tx==1) && !tx_wait);
       sl3.tx(d.data, pack(d.start_of_burst), pack(d.end_of_burst), d.sync);
       if(d.end_of_burst)
-	tx_slowdown_timer <= -1;
-	//tx_slowdown <= True; // DReg to pause transmission after every end_of_burst
+	tx_wait <= True; // DReg to pause transmission after every end_of_burst
+	//tx_slowdown_timer <= -1;
     endmethod
   endinterface;
 
+  // interface clocked_by rx_clk reset_by rx_rst_n;
   Source #(SerialLite3_StreamFlit) rawRX = interface Source;
-    method Bool canPeek = sl3.valid_rx()==1; // clocked_by rx_clk reset_by rx_rst_n;
-    method SerialLite3_StreamFlit peek() if (sl3.valid_rx==1); // clocked_by rx_clk reset_by rx_rst_n
+    method Bool canPeek = sl3.valid_rx()==1; 
+    method SerialLite3_StreamFlit peek() if (sl3.valid_rx==1);
       return SerialLite3_StreamFlit{data:sl3.data_rx(), start_of_burst:sl3.start_of_burst_rx()==1, end_of_burst:sl3.end_of_burst_rx()==1, sync:sl3.sync_rx()};
     endmethod
-    method Action drop = sl3.rx_drop; // clocked_by rx_clk reset_by rx_rst_n;
+    method Action drop = sl3.rx_drop;
   endinterface;
 
   //----------------------------------------------------------------------------
