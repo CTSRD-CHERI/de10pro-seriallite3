@@ -7,7 +7,7 @@
 # Hack: generate Bluespec functions with project build parameters of interest
 # from the QSF file
 
-qsf = "../DE10_Pro.original_qsf"
+qsf = "../DE10_Pro.qsf"
 param = ("pma_tx_buf_pre_emp_switching_ctrl_pre_tap_1t",
          "pma_tx_buf_pre_emp_switching_ctrl_1st_post_tap")
 
