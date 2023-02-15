@@ -29,6 +29,12 @@
 
 package BERT;
 
+// Currently there is a bug with the pipelined FIFO version that results in
+// single flits being lodged in the FIFO.  So if the BERT is not running and
+// single flit it sent then it won't get all the way through until another
+// flit is sent.  For now we'll not use the pipelined FIFO design.
+// `define pipelined_tx_fifo
+
 import BlueAXI4   :: *;
 import BlueBasics :: *;
 import FIFOF      :: *;
@@ -110,9 +116,15 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n,
 
   AXI4Stream_Shim#(0, 256, 0, 9)            tx_fast_fifo <- mkAXI4StreamShimSizedFIFOF32(clocked_by csi_tx_clk, reset_by csi_tx_rst_n);
 //  SyncFIFOIfc#(AXI4Stream_Flit#(0,256,0,9)) tx_sync_fifo <- mkSyncFIFOFromCC(32, csi_tx_clk);
-    SyncFIFOIfc#(AXI4Stream_Flit#(0,256,0,9)) tx_sync_fifo <- mkS10DCFIFOfromCC(32, csi_tx_clk, csi_tx_rst_n);
-
-  FIFOF#(Bit#(32))                            data_to_tx <- mkUGFIFOF();
+`ifdef pipelined_tx_fifo
+  S10DCFIFOPipelined#(AXI4Stream_Flit#(0,256,0,9)) tx_sync_fifo <- mkS10DCFIFOPipelinedFromCC(32, csi_tx_clk, csi_tx_rst_n);
+`else
+  SyncFIFOIfc#(AXI4Stream_Flit#(0,256,0,9)) tx_sync_fifo <- mkS10DCFIFOfromCC(32, csi_tx_clk, csi_tx_rst_n);
+`endif
+  
+  FIFOF#(Bit#(64))                            data_to_tx <- mkUGFIFOF();
+  Reg#(Bit#(32))                        data_to_tx_upper <- mkReg(0);
+  Reg#(Bit#(32))                           rx_data_upper <- mkReg(0);
   Reg#(Bit#(32))                                 testreg <- mkReg(0);
   FIFOF#(Bit#(256))                            bert_fifo <- mkUGFIFOF();
   Reg#(Bit#(256))                              bert_test <- mkReg(0);
@@ -124,7 +136,8 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n,
   Reg#(Bool)                          bert_zero_counters <- mkDReg(False);
   Reg#(Bool)                            bert_inc_correct <- mkDReg(False);
   Reg#(Bool)                              bert_inc_error <- mkDReg(False);
-  Reg#(Bit#(10))                           tx_rate_limit <- mkDReg(1);
+  Reg#(Bit#(10))                       tx_rate_limit_ctr <- mkDReg(1);
+  Reg#(Bool)                               tx_rate_limit <- mkReg(False);
 
   FIFOF#(Bit#(0))                              ping_send <- mkUGFIFOF1;
   FIFOF#(Bit#(0))                             ping_reply <- mkUGFIFOF1;
@@ -157,7 +170,7 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n,
 	    ping_reply.enq(?);
         else if(flit.tdata[33:32]==2) // ping reply flit
 	  ping_in_flight.deq;
-	else
+	else if(rxfifo.slave.canPut)
 	  rxfifo.slave.put(flit); // forward to NIOS monitor port
       end
     if((flit.tdata[255:248]!=8'h00) && bert_fifo.notFull)
@@ -167,11 +180,20 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n,
   endrule
   
   // rule runs in csi_tx_clk domain to forward data from the main clock domain
-  rule clock_cross_tx_data(tx_sync_fifo.notEmpty);
+`ifdef pipelined_tx_fifo
+  rule clock_cross_tx_data_start(tx_sync_fifo.notEmpty && tx_fast_fifo.slave.canPut()); // TODO: canPut may be late due to the following pipelining - fix
+    tx_sync_fifo.start_get();
+  endrule
+  // collect data from pipeline
+  rule clock_cross_tx_data;
+    tx_fast_fifo.slave.put(tx_sync_fifo.get());
+  endrule
+`else
+  rule clock_cross_tx_data;
     tx_fast_fifo.slave.put(tx_sync_fifo.first);
     tx_sync_fifo.deq;
-  endrule
-  
+  endrule  
+`endif
   
   rule do_ping_timer(ping_in_flight.notEmpty || ping_zero_timer.notEmpty);
     if(ping_zero_timer.notEmpty)
@@ -190,11 +212,14 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n,
       begin
         let a = rxfifo.master.peek;
 	d = truncate(a.tdata);
+	rx_data_upper <= truncate(a.tdata>>32);
         rxfifo.master.drop;
       end
     if(r.araddr[7:3]==1)
-      d = zeroExtend({pack(rxfifo.master.canPeek), pack(tx_sync_fifo.notFull)});
+      d = rx_data_upper;
     if(r.araddr[7:3]==2)
+      d = zeroExtend({pack(rxfifo.master.canPeek), pack(tx_sync_fifo.notFull)});
+    if(r.araddr[7:3]==3)
       d = ping_in_flight.notEmpty ? 0 : ping_timer;
     if(r.araddr[7:3]==4)
       d = bert_correct_flits[31:0];
@@ -228,9 +253,11 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n,
     let aw <- get (axiShim.master.aw);
     let w <- get (axiShim.master.w);
     if((aw.awaddr[7:3]==0) && data_to_tx.notFull)
-      data_to_tx.enq(w.wdata);
+      data_to_tx.enq({data_to_tx_upper,w.wdata});
+    if(aw.awaddr[7:3]==1)
+      data_to_tx_upper <= w.wdata;
 
-    if(aw.awaddr[7:3]==2)
+    if(aw.awaddr[7:3]==3)
       ping_send.enq(?);
 
     if((aw.awaddr[7:3]>=4) && (aw.awaddr[7:3]<=7))
@@ -246,8 +273,12 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n,
     axiShim.master.b.put (rsp);
   endrule
 
-  rule tx_data_mux(tx_rate_limit!=0);
+  rule tx_rate_limit_pipeline;
+    tx_rate_limit <= tx_rate_limit_ctr==0;
+  endrule
+  rule tx_data_mux(!tx_rate_limit);
     Maybe#(Bit#(256)) d = tagged Invalid;
+    Bit#(8) user = 0;
     
     if(ping_reply.notEmpty)
       begin
@@ -265,6 +296,7 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n,
       begin
 	data_to_tx.deq;
 	d = tagged Valid zeroExtend(data_to_tx.first);
+	user = truncate(data_to_tx.first>>32);
       end
     else if(bert_gen_enabled)
       begin
@@ -276,18 +308,25 @@ module mkBERT(Clock csi_rx_clk, Reset csi_rx_rst_n,
     //        for end_of_flit the sync_vector contains the number of INVAID 64b words sent
     if(isValid(d))
       begin
-	tx_sync_fifo.enq(AXI4Stream_Flit{ tdata: fromMaybe(?, d)
-					, tstrb: ~0
-					, tkeep: ~0
-					, tlast: True
-				        , tid: ?
-				        , tdest: ?
-				        , tuser: 9'h100} );
+	let flit = AXI4Stream_Flit{  tdata: fromMaybe(?, d)
+				   , tstrb: ~0
+				   , tkeep: ~0
+				   , tlast: True
+				   , tid: ?
+				   , tdest: ?
+				   , tuser: {1'h1,user}
+				   };
+	`ifdef pipelined_tx_fifo
+        tx_sync_fifo.put(flit);
+	`else
+	tx_sync_fifo.enq(flit);
+	`endif
 	// DReg assignment (defaults to 1) to ensure that we don't transmit every single
 	// cycle since the receiver running nominally at the same clock frequency on
 	// another FPGA may be a fraction slower.
-	tx_rate_limit <= tx_rate_limit + 1; 
+	tx_rate_limit_ctr <= tx_rate_limit_ctr+1;
       end
+
   endrule
   
   
