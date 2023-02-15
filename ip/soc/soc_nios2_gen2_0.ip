@@ -1110,7 +1110,7 @@ https://fpgasoftware.intel.com/eula.-->
           <ipxact:vectors>
             <ipxact:vector>
               <ipxact:left>0</ipxact:left>
-              <ipxact:right>16</ipxact:right>
+              <ipxact:right>18</ipxact:right>
             </ipxact:vector>
           </ipxact:vectors>
           <ipxact:wireTypeDefs>
@@ -1247,7 +1247,7 @@ https://fpgasoftware.intel.com/eula.-->
           <ipxact:vectors>
             <ipxact:vector>
               <ipxact:left>0</ipxact:left>
-              <ipxact:right>16</ipxact:right>
+              <ipxact:right>18</ipxact:right>
             </ipxact:vector>
           </ipxact:vectors>
           <ipxact:wireTypeDefs>
@@ -2187,7 +2187,7 @@ https://fpgasoftware.intel.com/eula.-->
         <ipxact:parameter parameterId="instAddrWidth" type="int">
           <ipxact:name>instAddrWidth</ipxact:name>
           <ipxact:displayName>instAddrWidth</ipxact:displayName>
-          <ipxact:value>17</ipxact:value>
+          <ipxact:value>19</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="faAddrWidth" type="int">
           <ipxact:name>faAddrWidth</ipxact:name>
@@ -2197,7 +2197,7 @@ https://fpgasoftware.intel.com/eula.-->
         <ipxact:parameter parameterId="dataAddrWidth" type="int">
           <ipxact:name>dataAddrWidth</ipxact:name>
           <ipxact:displayName>dataAddrWidth</ipxact:displayName>
-          <ipxact:value>17</ipxact:value>
+          <ipxact:value>19</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="tightlyCoupledDataMaster0AddrWidth" type="int">
           <ipxact:name>tightlyCoupledDataMaster0AddrWidth</ipxact:name>
@@ -2252,7 +2252,7 @@ https://fpgasoftware.intel.com/eula.-->
         <ipxact:parameter parameterId="instSlaveMapParam" type="string">
           <ipxact:name>instSlaveMapParam</ipxact:name>
           <ipxact:displayName>instSlaveMapParam</ipxact:displayName>
-          <ipxact:value>&lt;address-map&gt;&lt;slave name='ram64k.s1' start='0x0' end='0x10000' datawidth='32' /&gt;&lt;slave name='nios2_gen2_0.debug_mem_slave' start='0x18800' end='0x19000' datawidth='32' /&gt;&lt;/address-map&gt;</ipxact:value>
+          <ipxact:value>&lt;address-map&gt;&lt;slave name='ram64k.s1' start='0x0' end='0x10000' datawidth='32' /&gt;&lt;slave name='nios2_gen2_0.debug_mem_slave' start='0x50800' end='0x51000' datawidth='32' /&gt;&lt;/address-map&gt;</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="faSlaveMapParam" type="string">
           <ipxact:name>faSlaveMapParam</ipxact:name>
@@ -2262,7 +2262,7 @@ https://fpgasoftware.intel.com/eula.-->
         <ipxact:parameter parameterId="dataSlaveMapParam" type="string">
           <ipxact:name>dataSlaveMapParam</ipxact:name>
           <ipxact:displayName>dataSlaveMapParam</ipxact:displayName>
-          <ipxact:value>&lt;address-map&gt;&lt;slave name='ram64k.s1' start='0x0' end='0x10000' datawidth='32' /&gt;&lt;slave name='mkSerialLite3_Instance_1.management' start='0x10000' end='0x14000' datawidth='32' /&gt;&lt;slave name='mkSerialLite3_Instance_0.management' start='0x14000' end='0x18000' datawidth='32' /&gt;&lt;slave name='nios2_gen2_0.debug_mem_slave' start='0x18800' end='0x19000' datawidth='32' /&gt;&lt;slave name='mkBERT_Instance_1.mem_csrs' start='0x19000' end='0x19100' datawidth='32' /&gt;&lt;slave name='mkBERT_Instance_0.mem_csrs' start='0x19100' end='0x19200' datawidth='32' /&gt;&lt;slave name='mkStatusDevice_Instance_0.mem_csrs' start='0x19200' end='0x19220' datawidth='32' /&gt;&lt;slave name='pio_status.s1' start='0x19220' end='0x19230' datawidth='32' /&gt;&lt;slave name='jtag_uart_0.avalon_jtag_slave' start='0x19230' end='0x19238' datawidth='32' /&gt;&lt;/address-map&gt;</ipxact:value>
+          <ipxact:value>&lt;address-map&gt;&lt;slave name='ram64k.s1' start='0x0' end='0x10000' datawidth='32' /&gt;&lt;slave name='mkSerialLite3_Instance_3.management' start='0x10000' end='0x20000' datawidth='32' /&gt;&lt;slave name='mkSerialLite3_Instance_2.management' start='0x20000' end='0x30000' datawidth='32' /&gt;&lt;slave name='mkSerialLite3_Instance_1.management' start='0x30000' end='0x40000' datawidth='32' /&gt;&lt;slave name='mkSerialLite3_Instance_0.management' start='0x40000' end='0x50000' datawidth='32' /&gt;&lt;slave name='nios2_gen2_0.debug_mem_slave' start='0x50800' end='0x51000' datawidth='32' /&gt;&lt;slave name='mkBERT_Instance_3.mem_csrs' start='0x51000' end='0x51100' datawidth='32' /&gt;&lt;slave name='mkBERT_Instance_2.mem_csrs' start='0x51100' end='0x51200' datawidth='32' /&gt;&lt;slave name='mkBERT_Instance_1.mem_csrs' start='0x51200' end='0x51300' datawidth='32' /&gt;&lt;slave name='mkBERT_Instance_0.mem_csrs' start='0x51300' end='0x51400' datawidth='32' /&gt;&lt;slave name='mkStatusDevice_Instance_0.mem_csrs' start='0x51400' end='0x51420' datawidth='32' /&gt;&lt;slave name='pio_user_leds.s1' start='0x51420' end='0x51430' datawidth='32' /&gt;&lt;slave name='jtag_uart_0.avalon_jtag_slave' start='0x51430' end='0x51438' datawidth='32' /&gt;&lt;/address-map&gt;</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="tightlyCoupledDataMaster0MapParam" type="string">
           <ipxact:name>tightlyCoupledDataMaster0MapParam</ipxact:name>
@@ -2367,12 +2367,12 @@ https://fpgasoftware.intel.com/eula.-->
         <ipxact:parameter parameterId="AUTO_CLK_CLOCK_DOMAIN" type="longint">
           <ipxact:name>AUTO_CLK_CLOCK_DOMAIN</ipxact:name>
           <ipxact:displayName>Auto CLOCK_DOMAIN</ipxact:displayName>
-          <ipxact:value>1</ipxact:value>
+          <ipxact:value>2</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="AUTO_CLK_RESET_DOMAIN" type="longint">
           <ipxact:name>AUTO_CLK_RESET_DOMAIN</ipxact:name>
           <ipxact:displayName>Auto RESET_DOMAIN</ipxact:displayName>
-          <ipxact:value>1</ipxact:value>
+          <ipxact:value>2</ipxact:value>
         </ipxact:parameter>
       </ipxact:parameters>
     </altera:altera_module_parameters>
@@ -2388,7 +2388,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:parameter>
         <ipxact:parameter parameterId="embeddedsw.CMacro.BREAK_ADDR" type="string">
           <ipxact:name>embeddedsw.CMacro.BREAK_ADDR</ipxact:name>
-          <ipxact:value>0x00018820</ipxact:value>
+          <ipxact:value>0x00050820</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="embeddedsw.CMacro.CPU_ARCH_NIOS2_R1" type="string">
           <ipxact:name>embeddedsw.CMacro.CPU_ARCH_NIOS2_R1</ipxact:name>
@@ -2412,7 +2412,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:parameter>
         <ipxact:parameter parameterId="embeddedsw.CMacro.DATA_ADDR_WIDTH" type="string">
           <ipxact:name>embeddedsw.CMacro.DATA_ADDR_WIDTH</ipxact:name>
-          <ipxact:value>17</ipxact:value>
+          <ipxact:value>19</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="embeddedsw.CMacro.DCACHE_BYPASS_MASK" type="string">
           <ipxact:name>embeddedsw.CMacro.DCACHE_BYPASS_MASK</ipxact:name>
@@ -2496,7 +2496,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:parameter>
         <ipxact:parameter parameterId="embeddedsw.CMacro.INST_ADDR_WIDTH" type="string">
           <ipxact:name>embeddedsw.CMacro.INST_ADDR_WIDTH</ipxact:name>
-          <ipxact:value>17</ipxact:value>
+          <ipxact:value>19</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="embeddedsw.CMacro.NUM_OF_SHADOW_REG_SETS" type="string">
           <ipxact:name>embeddedsw.CMacro.NUM_OF_SHADOW_REG_SETS</ipxact:name>
@@ -2743,7 +2743,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;name&gt;d_address&lt;/name&gt;
                     &lt;role&gt;address&lt;/role&gt;
                     &lt;direction&gt;Output&lt;/direction&gt;
-                    &lt;width&gt;17&lt;/width&gt;
+                    &lt;width&gt;19&lt;/width&gt;
                     &lt;lowerBound&gt;0&lt;/lowerBound&gt;
                     &lt;vhdlType&gt;STD_LOGIC_VECTOR&lt;/vhdlType&gt;
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
@@ -2978,7 +2978,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;name&gt;i_address&lt;/name&gt;
                     &lt;role&gt;address&lt;/role&gt;
                     &lt;direction&gt;Output&lt;/direction&gt;
-                    &lt;width&gt;17&lt;/width&gt;
+                    &lt;width&gt;19&lt;/width&gt;
                     &lt;lowerBound&gt;0&lt;/lowerBound&gt;
                     &lt;vhdlType&gt;STD_LOGIC_VECTOR&lt;/vhdlType&gt;
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
@@ -3583,7 +3583,7 @@ https://fpgasoftware.intel.com/eula.-->
                 &lt;suppliedSystemInfos&gt;
                     &lt;entry&gt;
                         &lt;key&gt;CLOCK_DOMAIN&lt;/key&gt;
-                        &lt;value&gt;1&lt;/value&gt;
+                        &lt;value&gt;2&lt;/value&gt;
                     &lt;/entry&gt;
                     &lt;entry&gt;
                         &lt;key&gt;CLOCK_RATE&lt;/key&gt;
@@ -3591,7 +3591,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;/entry&gt;
                     &lt;entry&gt;
                         &lt;key&gt;RESET_DOMAIN&lt;/key&gt;
-                        &lt;value&gt;1&lt;/value&gt;
+                        &lt;value&gt;2&lt;/value&gt;
                     &lt;/entry&gt;
                 &lt;/suppliedSystemInfos&gt;
                 &lt;consumedSystemInfos/&gt;
@@ -3617,11 +3617,11 @@ https://fpgasoftware.intel.com/eula.-->
                 &lt;suppliedSystemInfos&gt;
                     &lt;entry&gt;
                         &lt;key&gt;ADDRESS_MAP&lt;/key&gt;
-                        &lt;value&gt;&amp;lt;address-map&amp;gt;&amp;lt;slave name='ram64k.s1' start='0x0' end='0x10000' datawidth='32' /&amp;gt;&amp;lt;slave name='mkSerialLite3_Instance_1.management' start='0x10000' end='0x14000' datawidth='32' /&amp;gt;&amp;lt;slave name='mkSerialLite3_Instance_0.management' start='0x14000' end='0x18000' datawidth='32' /&amp;gt;&amp;lt;slave name='nios2_gen2_0.debug_mem_slave' start='0x18800' end='0x19000' datawidth='32' /&amp;gt;&amp;lt;slave name='mkBERT_Instance_1.mem_csrs' start='0x19000' end='0x19100' datawidth='32' /&amp;gt;&amp;lt;slave name='mkBERT_Instance_0.mem_csrs' start='0x19100' end='0x19200' datawidth='32' /&amp;gt;&amp;lt;slave name='mkStatusDevice_Instance_0.mem_csrs' start='0x19200' end='0x19220' datawidth='32' /&amp;gt;&amp;lt;slave name='pio_status.s1' start='0x19220' end='0x19230' datawidth='32' /&amp;gt;&amp;lt;slave name='jtag_uart_0.avalon_jtag_slave' start='0x19230' end='0x19238' datawidth='32' /&amp;gt;&amp;lt;/address-map&amp;gt;&lt;/value&gt;
+                        &lt;value&gt;&amp;lt;address-map&amp;gt;&amp;lt;slave name='ram64k.s1' start='0x0' end='0x10000' datawidth='32' /&amp;gt;&amp;lt;slave name='mkSerialLite3_Instance_3.management' start='0x10000' end='0x20000' datawidth='32' /&amp;gt;&amp;lt;slave name='mkSerialLite3_Instance_2.management' start='0x20000' end='0x30000' datawidth='32' /&amp;gt;&amp;lt;slave name='mkSerialLite3_Instance_1.management' start='0x30000' end='0x40000' datawidth='32' /&amp;gt;&amp;lt;slave name='mkSerialLite3_Instance_0.management' start='0x40000' end='0x50000' datawidth='32' /&amp;gt;&amp;lt;slave name='nios2_gen2_0.debug_mem_slave' start='0x50800' end='0x51000' datawidth='32' /&amp;gt;&amp;lt;slave name='mkBERT_Instance_3.mem_csrs' start='0x51000' end='0x51100' datawidth='32' /&amp;gt;&amp;lt;slave name='mkBERT_Instance_2.mem_csrs' start='0x51100' end='0x51200' datawidth='32' /&amp;gt;&amp;lt;slave name='mkBERT_Instance_1.mem_csrs' start='0x51200' end='0x51300' datawidth='32' /&amp;gt;&amp;lt;slave name='mkBERT_Instance_0.mem_csrs' start='0x51300' end='0x51400' datawidth='32' /&amp;gt;&amp;lt;slave name='mkStatusDevice_Instance_0.mem_csrs' start='0x51400' end='0x51420' datawidth='32' /&amp;gt;&amp;lt;slave name='pio_user_leds.s1' start='0x51420' end='0x51430' datawidth='32' /&amp;gt;&amp;lt;slave name='jtag_uart_0.avalon_jtag_slave' start='0x51430' end='0x51438' datawidth='32' /&amp;gt;&amp;lt;/address-map&amp;gt;&lt;/value&gt;
                     &lt;/entry&gt;
                     &lt;entry&gt;
                         &lt;key&gt;ADDRESS_WIDTH&lt;/key&gt;
-                        &lt;value&gt;17&lt;/value&gt;
+                        &lt;value&gt;19&lt;/value&gt;
                     &lt;/entry&gt;
                 &lt;/suppliedSystemInfos&gt;
                 &lt;consumedSystemInfos/&gt;
@@ -3655,11 +3655,11 @@ https://fpgasoftware.intel.com/eula.-->
                 &lt;suppliedSystemInfos&gt;
                     &lt;entry&gt;
                         &lt;key&gt;ADDRESS_MAP&lt;/key&gt;
-                        &lt;value&gt;&amp;lt;address-map&amp;gt;&amp;lt;slave name='ram64k.s1' start='0x0' end='0x10000' datawidth='32' /&amp;gt;&amp;lt;slave name='nios2_gen2_0.debug_mem_slave' start='0x18800' end='0x19000' datawidth='32' /&amp;gt;&amp;lt;/address-map&amp;gt;&lt;/value&gt;
+                        &lt;value&gt;&amp;lt;address-map&amp;gt;&amp;lt;slave name='ram64k.s1' start='0x0' end='0x10000' datawidth='32' /&amp;gt;&amp;lt;slave name='nios2_gen2_0.debug_mem_slave' start='0x50800' end='0x51000' datawidth='32' /&amp;gt;&amp;lt;/address-map&amp;gt;&lt;/value&gt;
                     &lt;/entry&gt;
                     &lt;entry&gt;
                         &lt;key&gt;ADDRESS_WIDTH&lt;/key&gt;
-                        &lt;value&gt;17&lt;/value&gt;
+                        &lt;value&gt;19&lt;/value&gt;
                     &lt;/entry&gt;
                 &lt;/suppliedSystemInfos&gt;
                 &lt;consumedSystemInfos/&gt;
