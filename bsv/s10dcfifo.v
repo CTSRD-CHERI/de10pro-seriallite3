@@ -73,29 +73,40 @@ module  s10dcfifo
 `ifndef ALTERA_RESERVED_QIS
 // synopsys translate_on
 `endif
-    wire [255:0] sub_wire0;
-    wire  sub_wire1;
-    wire  sub_wire2;
-    wire [255:0] q = sub_wire0[255:0];
-    wire  rdempty = sub_wire1;
-    wire  wrfull = sub_wire2;
 */
+
+   // synchronise the writer reset (wrrst_n) to reader clock to avoid timing violations
+   wire 	      reset;
+   altera_reset_synchronizer
+        #(
+            .DEPTH      (2),
+            .ASYNC_RESET(0)
+        )
+        alt_rst_req_sync_uq1
+        (
+            .clk        (rdclk),
+            .reset_in   (!wrrst_n),
+            .reset_out  (reset)
+        );
+
    
-    dcfifo  dcfifo_component (
-                .aclr (!wrrst_n),
-                .data (data),
-                .rdclk (rdclk),
-                .rdreq (rdreq),
-                .wrclk (wrclk),
-                .wrreq (wrreq),
-                .q (q),
-                .rdempty (rdempty),
-                .wrfull (wrfull),
-                .eccstatus (),
-                .rdfull (),
-                .rdusedw (),
-                .wrempty (),
-                .wrusedw ());
+   dcfifo  dcfifo_component
+     (
+      .aclr (reset),
+      //.aclr (!wrrst_n),
+      .data (data),
+      .rdclk (rdclk),
+      .rdreq (rdreq),
+      .wrclk (wrclk),
+      .wrreq (wrreq),
+      .q (q),
+      .rdempty (rdempty),
+      .wrfull (wrfull),
+      .eccstatus (),
+      .rdfull (),
+      .rdusedw (),
+      .wrempty (),
+      .wrusedw ());
     defparam
         dcfifo_component.enable_ecc  = "FALSE",
         dcfifo_component.intended_device_family  = "Stratix 10",
