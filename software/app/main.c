@@ -97,9 +97,9 @@ int
 ping(struct fifoDetails f)
 {
   int status, wait;
-  IOWR_32DIRECT(f.bert_base_addr,word_offset*0x02,0); // start ping
+  IOWR_32DIRECT(f.bert_base_addr,word_offset*0x03,0); // start ping
   for(status=wait=0; (status==0) && (wait<1000); wait++) {
-    status = IORD_32DIRECT(f.bert_base_addr,word_offset*0x02); // read ping time
+    status = IORD_32DIRECT(f.bert_base_addr,word_offset*0x03); // read ping time
     usleep(1000);
   }
   return status;
@@ -110,7 +110,7 @@ int
 status_fifo(struct fifoDetails f, int fifonum)
 {
   int status;
-  status = IORD_32DIRECT(f.bert_base_addr,word_offset*(1+2*fifonum));
+  status = IORD_32DIRECT(f.bert_base_addr,word_offset*(2+2*fifonum));
   //  alt_printf("DEBUG: Chan %c: status=0x%x\n", f.chan_letter, status);
   return status;
 }
@@ -131,10 +131,11 @@ status_tx_fifo_notFull(struct fifoDetails f, int fifonum)
 
 
 void
-write_tx_fifo(struct fifoDetails f, int fifonum, int data)
+write_tx_fifo(struct fifoDetails f, int fifonum, int data_lower, int data_upper)
 {
-  // TODO: check FIFO isn't full!!!
-  IOWR_32DIRECT(f.bert_base_addr, word_offset*2*fifonum, data);
+  // write upper-word first since writing to lower-word enqueues into the FIFO
+  IOWR_32DIRECT(f.bert_base_addr, 0x1*word_offset, data_upper);
+  IOWR_32DIRECT(f.bert_base_addr, 0x0*word_offset, data_lower);
 }
 
 
@@ -148,6 +149,13 @@ read_rx_fifo(struct fifoDetails f, int fifonum, int* data)
     (*data) = 0;
     return false;
   }
+}
+
+
+int
+read_rx_fifo_upper(struct fifoDetails f)
+{
+  return IORD_32DIRECT(f.bert_base_addr, 0x1*word_offset);
 }
 
 
@@ -181,7 +189,6 @@ print_link_status(struct fifoDetails f, int channum)
   int status;
   // Status sent via packed structure SerialLite3_LinkStatus in SerialLite3.bsv
   status = status_device(channum);
-  alt_printf("status = 0x%x\n", status);
   int link_up_tx = exbit(status,0);
   int link_up_rx = exbit(status,1);
   int error_tx = exbitfield(status,2,4);
@@ -214,7 +221,7 @@ test_write_read_channels(struct fifoDetails* fs, int num_chan)
   alt_printf("Write-read tests on the channels\n");
   for(j=0; j<100; j++) {
     for(chan=0; chan<num_chan; chan++)
-      write_tx_fifo(fs[chan], 0, (cid0<<16) | (j+1));
+      write_tx_fifo(fs[chan], 0, (cid0<<16) | (j+1), 0);
     for(chan=0; chan<num_chan; chan++) {
       report_rx_fifo(fs[chan], 0, chan, false);
     }
@@ -239,7 +246,7 @@ echo_links(struct fifoDetails* fs, int num_chan)
     for(chan=0; chan<num_chan; chan++) {
       if(read_rx_fifo(fs[chan], 0, &data)) {
 	alt_printf("Echo chan %c = 0x%x\n", fs[chan].chan_letter, data);
-	write_tx_fifo(fs[chan], 0, (cid0<<16) | (data & 0xffff) );
+	write_tx_fifo(fs[chan], 0, (cid0<<16) | (data & 0xffff), 0 );
       }
     }
   }
@@ -283,6 +290,32 @@ bert_test_generation_enable(struct fifoDetails* fs, int num_chan, int enable)
 
 
 void
+check_sync_byte(struct fifoDetails* fs, int num_chan)
+{
+  int chan, sync, u, l, timer;
+  //  for(sync=1; sync<256; sync+=13) {
+  for(sync=0; sync<16*4; sync+=4) {
+    chan = 0;
+    write_tx_fifo(fs[chan], 0, ~sync, sync);
+    chan = 3;
+    for(timer=100; (timer>0) && !read_rx_fifo(fs[chan], 0, &l); timer--) {
+          usleep(1000); // sleep for 1ms
+    };
+    if(timer>0) {
+      u = read_rx_fifo_upper(fs[chan]);
+      alt_printf("Chan %c: data is %s, sync is %s  tx(0x%x, 0x%x)  rx(0x%x, 0x%x)\n",
+		 fs[chan].chan_letter,
+		 l == ~sync ? "CORRECT" : "WRONG",
+		 u ==  sync ? "CORRECT" : "WRONG",
+		 ~sync, sync,
+		 l, u);
+    } else
+      alt_printf("Chan %c: timeout waiting for rx\n", fs[chan].chan_letter);
+  }
+}
+
+
+void
 flush_links(struct fifoDetails* fs, int num_chan)
 {
   int j, chan;
@@ -305,7 +338,7 @@ test_write_read_one_link(struct fifoDetails fwrite, struct fifoDetails fread, in
   int cid0 = chip_id_lo();
   alt_printf("Fast write-read tests from channel %c to %c\n",fwrite.chan_letter, fread.chan_letter);
   for(j=0; j<num_flits; j++)
-      write_tx_fifo(fwrite, fifonum, (cid0<<16) | (j+1));
+    write_tx_fifo(fwrite, fifonum, (cid0<<16) | (j+1), 0);
   for(j=0; j<num_flits; j++)
     while(!read_rx_fifo(fread, fifonum, &d[j])) {};
   for(j=0; j<num_flits; j++)
@@ -332,7 +365,7 @@ discover_link_topology(struct fifoDetails* fs, int num_chan)
   alt_printf("Determininin topology.  Produces 'dot' format graph\n");
   for(j=0; j<10; j++) {
     for(chan=0; chan<num_chan; chan++)
-      write_tx_fifo(fs[chan], 0, cid0);
+      write_tx_fifo(fs[chan], 0, cid0, 0);
     for(chan=0; chan<num_chan; chan++) {
       if(read_rx_fifo(fs[chan], 0, &data))
 	linkid[chan] = data;
@@ -414,6 +447,24 @@ report_all_data_error(struct fifoDetails *fs, int num_chan)
 }
 
 
+void
+menu(void){
+  alt_putstr("Start tests:\n");
+  alt_putstr("   b = bit error-rate test report\n");
+  alt_putstr("   z = zero bit error-rate test counters\n");
+  alt_putstr("   0 = stop BERT test generation\n");
+  alt_putstr("   1 = start BERT test generation\n\n");
+  alt_putstr("   d = discover link topology (dot output)\n");
+  alt_putstr("   f = flush links then exit\n");
+  alt_putstr("   e = echo mode\n");
+  alt_putstr("   o = test one link quickly\n");
+  alt_putstr("   p = ping\n");
+  alt_putstr("   r = report all link errors\n");
+  alt_putstr("   s = check sync byte\n");
+  alt_putstr("   t = test\n");
+  alt_putstr("   q = quit\n");
+}
+
 int
 main(void)
 {
@@ -423,6 +474,7 @@ main(void)
   int j, chan;
   char c;
   int flush_mode = true;
+  int time_menu;
 
   alt_putstr("Start...\n");
 
@@ -462,21 +514,9 @@ main(void)
   // set stdin to nonblocking to allow keyboard polling
   fcntl(0, F_SETFL, fcntl(0, F_GETFL) | O_NONBLOCK);
 
-  alt_putstr("Start tests:\n");
-  alt_putstr("   b = bit error-rate test report\n");
-  alt_putstr("   z = zero bit error-rate test counters\n");
-  alt_putstr("   0 = stop BERT test generation\n");
-  alt_putstr("   1 = start BERT test generation\n\n");
-  alt_putstr("   d = discover link topology (dot output)\n");
-  alt_putstr("   f = flush links then exit\n");
-  alt_putstr("   e = echo mode\n");
-  alt_putstr("   o = test one link quickly\n");
-  alt_putstr("   p = ping\n");
-  alt_putstr("   r = report all link errors\n");
-  alt_putstr("   t = test\n");
-  alt_putstr("   q = quit\n");
+  
   c=' ';
-
+  time_menu=1000;
   while (flush_mode) {
     c = alt_getchar();
     if((int) c > 0) {
@@ -484,10 +524,18 @@ main(void)
 	return 0;
       if(   (c=='0') || (c=='1') || (c=='b') || (c=='d')
 	 || (c=='f') || (c=='l') || (c=='o') || (c=='p')
-	 || (c=='r')  || (c=='q') || (c=='t') || (c=='z'))
+         || (c=='r') || (c=='s') || (c=='q') || (c=='t') || (c=='z'))
 	flush_mode = false;
       for(chan=0; chan<num_chan; chan++)
 	report_rx_fifo(fs[chan], 0, chan, true);
+    } else {
+      // only display the menu if we're waiting on an input character
+      if(time_menu>0) {
+	time_menu--;
+	usleep(1000); // sleep for 1ms
+      }
+      if(time_menu==1)
+	menu();
     }
   }
 
@@ -513,6 +561,9 @@ main(void)
 
   if(c=='r')
     report_all_data_error(fs, num_chan);
+
+  if(c=='s')
+    check_sync_byte(fs, num_chan);
   
   if(c=='t')
     test_write_read_channels(fs, num_chan);
