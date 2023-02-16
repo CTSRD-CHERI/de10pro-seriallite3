@@ -346,14 +346,15 @@ module DE10_Pro
    wire [14:0] link_status_D;
    wire [7:0]  user_leds;
    wire        pll_locked;
+   wire        reset = init_done_n;
     
    soc mainsoc
       (
        .clk_clk(clk_100),
-       .iopll_0_reset_reset (!init_done_n),  // reset PLL after FPGA initialised
+       .iopll_0_reset_reset (reset),  // reset PLL after FPGA initialised
        .iopll_0_locked_export (pll_locked),
 //       .reset_controller_200mhz_reset_in0_reset (!pll_locked || !init_done), // release reset after PLL has locked
-       .reset_controller_200mhz_reset_in0_reset (!init_done_n), // release reset after PLL has locked
+       .reset_controller_200mhz_reset_in0_reset (reset), // release reset after PLL has locked
        
        .pio_user_leds_external_connection_export(user_leds),
 
