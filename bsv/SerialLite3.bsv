@@ -54,7 +54,7 @@ typedef struct {
 
 function SerialLite3_StreamFlit axs2sl3 (AXI4Stream_Flit #(0, 256, 0, 9) axs) =
   SerialLite3_StreamFlit { data: axs.tdata
-                         , start_of_burst: False, // now derived from end_of_burst
+                         , start_of_burst: False  // now derived from end_of_burst
 			                          // used to be: axs.tuser[8]==1 // unpack (msb (axs.tuser))
                          , end_of_burst: axs.tlast
                          , sync: truncate (axs.tuser) };
