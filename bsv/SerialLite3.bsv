@@ -54,7 +54,8 @@ typedef struct {
 
 function SerialLite3_StreamFlit axs2sl3 (AXI4Stream_Flit #(0, 256, 0, 9) axs) =
   SerialLite3_StreamFlit { data: axs.tdata
-                         , start_of_burst: axs.tuser[8]==1 // unpack (msb (axs.tuser))
+                         , start_of_burst: False, // now derived from end_of_burst
+			                          // used to be: axs.tuser[8]==1 // unpack (msb (axs.tuser))
                          , end_of_burst: axs.tlast
                          , sync: truncate (axs.tuser) };
 
@@ -298,6 +299,7 @@ module mkSerialLite3
 
   Stratix10_SerialLite3_4Lane       sl3 <- mkStratix10_SerialLite3_4Lane(tx_clk, tx_rst_n, qsfp_refclk);
   Reg#(Bool)                    tx_wait <- mkDReg(False, clocked_by tx_clk, reset_by tx_rst_n);
+  Reg#(Bool)          tx_start_of_burst <- mkReg(True, clocked_by tx_clk, reset_by tx_rst_n);
 //  PulseWire                 tx_slowdown <- mkPulseWire(clocked_by tx_clk, reset_by tx_rst_n);
 //  Reg#(Bit#(1))       tx_slowdown_timer <- mkConfigReg(0, clocked_by tx_clk, reset_by tx_rst_n);
   Reg#(Bit#(2))      sync_tx_pll_locked <- mkTwoFlopSynchroniserCC(0, tx_clk, tx_rst_n);
@@ -306,7 +308,7 @@ module mkSerialLite3
   Reg#(Bit#(5))           sync_error_rx <- mkTwoFlopSynchroniserCC(0, sl3.rx_clk, sl3.rx_rst_n);
   Reg#(Bool)            sync_link_up_tx <- mkTwoFlopSynchroniserCC(False, tx_clk, tx_rst_n);
   Reg#(Bool)            sync_link_up_rx <- mkTwoFlopSynchroniserCC(False, sl3.rx_clk, sl3.rx_rst_n);
-
+  
   AXI4Lite_Shim#( t_addr, t_data
                 , t_awuser, t_wuser, t_buser
                 , t_aruser, t_ruser) axi4LiteShim <- mkAXI4LiteShimFF;
@@ -371,7 +373,9 @@ module mkSerialLite3
   Sink #(SerialLite3_StreamFlit) rawTX = interface Sink;
     method canPut = sl3.ready_tx==1;
     method Action put(d) if ((sl3.ready_tx==1) && !tx_wait);
-      sl3.tx(d.data, pack(d.start_of_burst), pack(d.end_of_burst), d.sync);
+      sl3.tx(d.data, pack(tx_start_of_burst), pack(d.end_of_burst), d.sync);
+      // derive start_of_burst based on whether it is the first flit after an end_of_burst
+      tx_start_of_burst <= d.end_of_burst;
       if(d.end_of_burst)
 	tx_wait <= True; // DReg to pause transmission after every end_of_burst
 	//tx_slowdown_timer <= -1;
