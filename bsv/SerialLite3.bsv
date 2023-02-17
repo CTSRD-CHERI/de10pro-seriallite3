@@ -29,12 +29,14 @@
 
 package SerialLite3;
 
-import BlueAXI4   :: *;
-import BlueBasics :: *;
-import ConfigReg  :: *;
-import Clocks     :: *;
-import FIFO       :: *;
-import DReg       :: *;
+import BlueAXI4        :: *;
+import BlueBasics      :: *;
+import ConfigReg       :: *;
+import Vector          :: *;
+import Clocks          :: *;
+import FIFO            :: *;
+import DReg            :: *;
+import S10Synchronizer :: *;
 
 // This package provides types / interfaces for the SerialLite3 interface
 // Note: the following signals are not currently provided:
@@ -207,7 +209,26 @@ endinterface
 // of the source.  It will synchronise on a *per bit* basis, i.e. not suitable for
 // synchronising words if all of the bits need to be synchronised in the same cycle.
 (* always_enabled, always_ready *)
-module mkTwoFlopSynchroniserCC#(a resetval, Clock sclk, Reset srst) (Reg#(a)) provisos (Bits#(a,a_width));
+module mkTwoFlopSynchronizerCC#(Clock sclk, Reset srst_n) (Reg#(a)) provisos (Bits#(a,a_width));
+  
+  Vector#(a_width, Reg#(Bit#(1))) crossing <- replicateM(mkS10SynchronizerCC(sclk, srst_n));
+
+  // runs in sclk clock domain
+  method Action _write(a x);
+     Bit#(SizeOf#(a)) b = pack(x);
+     for(Integer j=0; j<valueOf(a_width); j=j+1)
+       crossing[j] <= b[j];
+  endmethod
+  
+  // runs in default clock domain
+  method a _read;
+     Bit#(SizeOf#(a)) b=?;
+     for(Integer j=0; j<valueOf(a_width); j=j+1)
+       b[j] = crossing[j];
+     return unpack(b);
+  endmethod
+     
+/*
   Clock dclk <- exposeCurrentClock;
   CrossingReg#(a) clock_crossing_reg <- mkNullCrossingReg(dclk, resetval, clocked_by(sclk), reset_by(srst));
   Reg#(a)            metastable_reg <- mkReg(resetval);
@@ -224,6 +245,7 @@ module mkTwoFlopSynchroniserCC#(a resetval, Clock sclk, Reset srst) (Reg#(a)) pr
   endmethod
   
   method a _read = synchronised_reg;
+ */
 endmodule  
   
   
@@ -302,12 +324,12 @@ module mkSerialLite3
   Reg#(Bool)          tx_start_of_burst <- mkReg(True, clocked_by tx_clk, reset_by tx_rst_n);
 //  PulseWire                 tx_slowdown <- mkPulseWire(clocked_by tx_clk, reset_by tx_rst_n);
 //  Reg#(Bit#(1))       tx_slowdown_timer <- mkConfigReg(0, clocked_by tx_clk, reset_by tx_rst_n);
-  Reg#(Bit#(2))      sync_tx_pll_locked <- mkTwoFlopSynchroniserCC(0, tx_clk, tx_rst_n);
-  Reg#(Bit#(2))    sync_tx_pll_cal_busy <- mkTwoFlopSynchroniserCC(0, tx_clk, tx_rst_n);
-  Reg#(Bit#(4))           sync_error_tx <- mkTwoFlopSynchroniserCC(0, tx_clk, tx_rst_n);
-  Reg#(Bit#(5))           sync_error_rx <- mkTwoFlopSynchroniserCC(0, sl3.rx_clk, sl3.rx_rst_n);
-  Reg#(Bool)            sync_link_up_tx <- mkTwoFlopSynchroniserCC(False, tx_clk, tx_rst_n);
-  Reg#(Bool)            sync_link_up_rx <- mkTwoFlopSynchroniserCC(False, sl3.rx_clk, sl3.rx_rst_n);
+  Reg#(Bit#(2))      sync_tx_pll_locked <- mkTwoFlopSynchronizerCC(tx_clk, tx_rst_n);
+  Reg#(Bit#(2))    sync_tx_pll_cal_busy <- mkTwoFlopSynchronizerCC(tx_clk, tx_rst_n);
+  Reg#(Bit#(4))           sync_error_tx <- mkTwoFlopSynchronizerCC(tx_clk, tx_rst_n);
+  Reg#(Bit#(5))           sync_error_rx <- mkTwoFlopSynchronizerCC(sl3.rx_clk, sl3.rx_rst_n);
+  Reg#(Bool)            sync_link_up_tx <- mkTwoFlopSynchronizerCC(tx_clk, tx_rst_n);
+  Reg#(Bool)            sync_link_up_rx <- mkTwoFlopSynchronizerCC(sl3.rx_clk, sl3.rx_rst_n);
   
   AXI4Lite_Shim#( t_addr, t_data
                 , t_awuser, t_wuser, t_buser
@@ -329,13 +351,14 @@ module mkSerialLite3
     sl3.crc_error_inject(0);
   endrule
 
+  /*
   FIFO#(t_bus_req) busReqFF <- mkFIFO1; // for bus access from a single rule
   FIFO#(Bit#(0))   rdRspFF <- mkFIFO1; // for flow control
   rule forward_bus_req (sl3.bus_waitrequest == 1'b0);
     match {.addr, .rd, .wr, .data} = busReqFF.first;
-    busReqFF.deq; // TODO: don't deq until bus_waitrequest==0
+    busReqFF.deq;
     sl3.bus_request (addr, rd, wr, data);
-    if (rd == 1'b1) rdRspFF.enq(?); // TODO: latch read data if bus_waitrequest==0 and it is a read
+    if (rd == 1'b1) rdRspFF.enq(?);
   endrule
 
   (* descending_urgency = "axi4Lite_read_request, axi4Lite_write" *)
@@ -350,6 +373,36 @@ module mkSerialLite3
                                              , rresp: OKAY
                                              , ruser: ? });
   endrule
+  */
+  
+  FIFO#(t_bus_req) busReqFF <- mkFIFO1; // for bus access from a single rule
+  FIFO#(AXI4Lite_RFlit#(t_data, t_ruser)) busRspFF <- mkFIFO1; // pipeline response to meet timing
+  rule forward_bus_req;
+    match {.addr, .rd, .wr, .data} = busReqFF.first;
+    sl3.bus_request (addr, rd, wr, data);
+    // Note that bus_waitrequest arrives during the clock cycle that rd is enabled
+    // so check bus_waitrequest during this clock cycle, so this rule is not atomic
+    if ((rd == 1'b1) && (sl3.bus_waitrequest == 1'b0))
+      busRspFF.enq(AXI4Lite_RFlit {  rdata: zeroExtend (sl3.bus_read_data)
+				   , rresp: OKAY
+				   , ruser: ? });
+//      axi4LiteShim.master.r.put(AXI4Lite_RFlit { rdata: zeroExtend (sl3.bus_read_data)
+//                                               , rresp: OKAY
+//                                               , ruser: ? });
+    if(sl3.bus_waitrequest == 1'b0)
+       busReqFF.deq;
+  endrule
+  rule forward_bus_response;
+    axi4LiteShim.master.r.put(busRspFF.first);
+    busRspFF.deq;
+  endrule
+
+  (* descending_urgency = "axi4Lite_read_request, axi4Lite_write" *)
+  rule axi4Lite_read_request;
+    let arflit <- get (axi4LiteShim.master.ar);
+    // TODO assert that the requested size is indeed 32 bits?
+    busReqFF.enq (tuple4 (truncate (arflit.araddr), 1'b1, 1'b0, ?));
+  endrule
 
   rule axi4Lite_write;
     let awflit <- get (axi4LiteShim.master.aw);
@@ -362,11 +415,6 @@ module mkSerialLite3
     axi4LiteShim.master.b.put(AXI4Lite_BFlit { bresp: OKAY
                                              , buser: ? });
   endrule
-
-//  Bool tx_wait = msb(tx_slowdown_timer)==1;
-//  rule tx_rate_limiter(tx_wait);
-//    tx_slowdown_timer <= tx_slowdown_timer<<1; // unary counter for speed of end detection
-//  endrule
   
   //----------------------------------------------------------------------------
   // interface clocked_by tx_clk reset_by tx_rst_n
