@@ -205,11 +205,11 @@ interface Stratix10_SerialLite3_4Lane;
 endinterface
 
 
-// Two D-flip-flop based syncrhoniser where we don't care about the clock domain
-// of the source.  It will synchronise on a *per bit* basis, i.e. not suitable for
+// Clock synchroniser using the Quartus synchronizer (wrapped by mkS10SynchronizerCC).
+// It will synchronise on a *per bit* basis, i.e. not suitable for
 // synchronising words if all of the bits need to be synchronised in the same cycle.
 (* always_enabled, always_ready *)
-module mkTwoFlopSynchronizerCC#(Clock sclk, Reset srst_n) (Reg#(a)) provisos (Bits#(a,a_width));
+module mkGenericSynchroniserCC#(Clock sclk, Reset srst_n) (Reg#(a)) provisos (Bits#(a,a_width));
   
   Vector#(a_width, Reg#(Bit#(1))) crossing <- replicateM(mkS10SynchronizerCC(sclk, srst_n));
 
@@ -227,26 +227,56 @@ module mkTwoFlopSynchronizerCC#(Clock sclk, Reset srst_n) (Reg#(a)) provisos (Bi
        b[j] = crossing[j];
      return unpack(b);
   endmethod
-     
-/*
-  Clock dclk <- exposeCurrentClock;
-  CrossingReg#(a) clock_crossing_reg <- mkNullCrossingReg(dclk, resetval, clocked_by(sclk), reset_by(srst));
-  Reg#(a)            metastable_reg <- mkReg(resetval);
-  Reg#(a)          synchronised_reg <- mkReg(resetval);
-
-  (* fire_when_enabled *)
-  rule synchronise;
-    metastable_reg <= clock_crossing_reg.crossed;
-    synchronised_reg <= metastable_reg;
+endmodule
+  
+// Every time an input event goes high the output remains high for 2^timersize cycles
+// in order to ensure that a status but going from a fast clock domain will be seen
+// in a slower clock domain.
+//module mkPersistEvent#(numeric type timersize)(Reg#(Bit#(1)) ifc);
+module mkPersistEvent(Reg#(Bit#(1)) ifc);
+  Reg#(Bit#(1))    d <- mkReg(0);   // data store
+  Reg#(Bit#(4))    t <- mkReg(0);   // timer - TODO: make the width of the timer perameterisable
+  Reg#(Bit#(1))    e <- mkDReg(0);  // event signal
+  
+  rule timer;
+    if(e==1)
+      begin
+	d <= 1;
+	t <= ~0;
+      end
+    else
+      if(t>0)
+	t <= t-1;
+    else
+      d <= 0;
   endrule
   
-  method Action _write(a x);
-    clock_crossing_reg <= x;
+  method Action _write(Bit#(1) x);
+    e <= x;
   endmethod
   
-  method a _read = synchronised_reg;
- */
+  method Bit#(1) _read = d;
 endmodule  
+
+  
+// persist events from faster clocked source to slower destination (default clock domain)
+module mkPersistEventClockCrosserCC#(Integer timersize, Clock sclk, Reset srst_n) (Reg#(a)) provisos (Bits#(a, a_width));
+  Vector#(a_width, Reg#(Bit#(1)))  persist <- replicateM(mkPersistEvent(clocked_by sclk, reset_by srst_n));
+  Vector#(a_width, Reg#(Bit#(1))) crossing <- replicateM(mkS10SynchronizerCC(sclk, srst_n));
+
+  // runs in sclk clock domain
+  method Action _write(a x);
+     Bit#(SizeOf#(a)) b = pack(x);
+     for(Integer j=0; j<valueOf(a_width); j=j+1)
+       begin
+	 persist[j] <= b[j];
+	 crossing[j] <= persist[j];
+       end
+  endmethod
+  
+  // runs in default clock domain
+  method a _read = unpack(pack(readVReg(crossing)));
+endmodule
   
   
 import "BVI" stratix10_seriallite3_4lane_wrapper =
@@ -324,12 +354,12 @@ module mkSerialLite3
   Reg#(Bool)          tx_start_of_burst <- mkReg(True, clocked_by tx_clk, reset_by tx_rst_n);
 //  PulseWire                 tx_slowdown <- mkPulseWire(clocked_by tx_clk, reset_by tx_rst_n);
 //  Reg#(Bit#(1))       tx_slowdown_timer <- mkConfigReg(0, clocked_by tx_clk, reset_by tx_rst_n);
-  Reg#(Bit#(2))      sync_tx_pll_locked <- mkTwoFlopSynchronizerCC(tx_clk, tx_rst_n);
-  Reg#(Bit#(2))    sync_tx_pll_cal_busy <- mkTwoFlopSynchronizerCC(tx_clk, tx_rst_n);
-  Reg#(Bit#(4))           sync_error_tx <- mkTwoFlopSynchronizerCC(tx_clk, tx_rst_n);
-  Reg#(Bit#(5))           sync_error_rx <- mkTwoFlopSynchronizerCC(sl3.rx_clk, sl3.rx_rst_n);
-  Reg#(Bool)            sync_link_up_tx <- mkTwoFlopSynchronizerCC(tx_clk, tx_rst_n);
-  Reg#(Bool)            sync_link_up_rx <- mkTwoFlopSynchronizerCC(sl3.rx_clk, sl3.rx_rst_n);
+  Reg#(Bit#(2))      sync_tx_pll_locked <- mkGenericSynchroniserCC(tx_clk, tx_rst_n);
+  Reg#(Bit#(2))    sync_tx_pll_cal_busy <- mkGenericSynchroniserCC(tx_clk, tx_rst_n);
+  Reg#(Bit#(4))           sync_error_tx <- mkPersistEventClockCrosserCC(8, tx_clk, tx_rst_n);
+  Reg#(Bit#(5))           sync_error_rx <- mkPersistEventClockCrosserCC(8, sl3.rx_clk, sl3.rx_rst_n);
+  Reg#(Bool)            sync_link_up_tx <- mkPersistEventClockCrosserCC(8, tx_clk, tx_rst_n);
+  Reg#(Bool)            sync_link_up_rx <- mkPersistEventClockCrosserCC(8, sl3.rx_clk, sl3.rx_rst_n);
   
   AXI4Lite_Shim#( t_addr, t_data
                 , t_awuser, t_wuser, t_buser
