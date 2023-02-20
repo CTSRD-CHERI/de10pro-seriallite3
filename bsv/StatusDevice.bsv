@@ -36,6 +36,7 @@ package StatusDevice;
 
 import Vector     :: *;
 import GetPut     :: *;
+import DReg       :: *;
 import BlueAXI4   :: *;
 import BlueBasics :: *;
 import ChipID     :: *;
@@ -84,6 +85,8 @@ endinterface
 module mkStatusDevice(StatusDevice#(t_addr, t_awuser, t_wuser, t_buser, t_aruser, t_ruser) ifc);
 
   Vector#(4, Reg#(Bit#(32))) status_regs <- replicateM(mkReg(0));
+  Vector#(4, Reg#(Bit#(32))) status_regs_latch <- replicateM(mkReg(0));
+  Vector#(4, Reg#(Bool)) zero_status_reg <- replicateM(mkDReg(False));
   Reg#(Bit#(64))                 chip_id <- mkReg(0);
   Reg#(Bool)               chip_id_valid <- mkReg(False);
   Get#(Bit#(64))             get_chip_id <- mkChipID;
@@ -96,12 +99,23 @@ module mkStatusDevice(StatusDevice#(t_addr, t_awuser, t_wuser, t_buser, t_aruser
     chip_id <= result_get_chip_id;
   endrule
   
+  for(Integer j=0; j<4; j=j+1)
+    rule record_status_errors;
+      if(zero_status_reg[j])
+	status_regs_latch[j] <= 0;
+      else
+	status_regs_latch[j] <= status_regs_latch[j] | status_regs[j];
+    endrule
+  
   rule read_req;
     let r <- get (axiShim.master.ar);
     Bit#(32) d = 32'hdeaddead;
     Bit#(3) word_addr =r.araddr[4:2];
     if(word_addr[2]==0) // word_addr<4
-      d = status_regs[word_addr[1:0]];
+      begin
+	d = status_regs[word_addr[1:0]];
+	zero_status_reg[word_addr[1:0]] <= True;
+      end
     if(word_addr==4)
       d = chip_id[31:0];
     if(word_addr==5)
