@@ -2355,7 +2355,7 @@ https://fpgasoftware.intel.com/eula.-->
         <ipxact:parameter parameterId="set_capability_reg_enable" type="bit">
           <ipxact:name>set_capability_reg_enable</ipxact:name>
           <ipxact:displayName>Enable capability registers</ipxact:displayName>
-          <ipxact:value>false</ipxact:value>
+          <ipxact:value>true</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="set_user_identifier" type="int">
           <ipxact:name>set_user_identifier</ipxact:name>
@@ -2365,12 +2365,12 @@ https://fpgasoftware.intel.com/eula.-->
         <ipxact:parameter parameterId="set_csr_soft_logic_enable" type="bit">
           <ipxact:name>set_csr_soft_logic_enable</ipxact:name>
           <ipxact:displayName>Enable control and status registers</ipxact:displayName>
-          <ipxact:value>false</ipxact:value>
+          <ipxact:value>true</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="set_prbs_soft_logic_enable" type="bit">
           <ipxact:name>set_prbs_soft_logic_enable</ipxact:name>
           <ipxact:displayName>Enable PRBS soft accumulators</ipxact:displayName>
-          <ipxact:value>false</ipxact:value>
+          <ipxact:value>true</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="die_types" type="string">
           <ipxact:name>die_types</ipxact:name>
