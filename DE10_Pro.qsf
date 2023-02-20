@@ -1833,8 +1833,11 @@ set_instance_assignment -name HSSI_PARAMETER "pma_tx_buf_pre_emp_switching_ctrl_
 # SWM: add sdc file for clock crossing fifo (dcfifo)
 set_global_assignment -name VERILOG_FILE bsv/s10dcfifo.v
 set_global_assignment -name SDC_FILE bsv/s10dcfifo.sdc
-set_global_assignment -name VERILOG_FILE bsv/s10dcfifopipelined.v
-set_global_assignment -name SDC_FILE bsv/s10dcfifopipelined.sdc
+#set_global_assignment -name VERILOG_FILE bsv/s10dcfifopipelined.v
+#set_global_assignment -name SDC_FILE bsv/s10dcfifopipelined.sdc
+
+# SWM: add synchronizer
+set_global_assignment -name VERILOG_FILE bsv/s10syncronizer.v
 
 # SWM: Serial Lite III advanced clocking scheme requires the following (from the ug_slite3_streaming.pdf manual):
 set_instance_assignment -name GLOBAL_SIGNAL OFF -to "*seriallite_iii_streaming*clock_gen:sink_clock_gen|dp_sync:coreclkin_reset_sync|dp_sync_regstage:dp_sync_stage_2*o*" -entity DE10_Pro
