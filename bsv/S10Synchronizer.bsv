@@ -29,7 +29,7 @@ import "BVI" s10synchronizer =
   module mkS10SynchronizerCC(Clock src_clk, Reset src_rst_n, Reg#(Bit#(1)) ifc);
     // destination clock and reset
     default_clock dest_clk (dclk, (*unused*) dclk_gate);
-    default_reset dest_rst_n (drst);
+    default_reset dest_rst_n (drst_n);
     // source clock and reset
     input_clock (sclk, (*unused*) sclk_gate) = src_clk;
     input_reset src_rst_n(srst_n) clocked_by (src_clk) = src_rst_n;
