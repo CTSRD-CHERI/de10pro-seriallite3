@@ -26,10 +26,14 @@
  * PLLs for the Stratix 10 FPGA, specifically the DE10pro board from
  * Terasic that supports four 100Gbps links (four 25Gbps links bonded
  * together on each QSFP+ port). 
+ * 
+ * Timing:
+ * Serial Lite III advanced clocking scheme requires the following (from the ug_slite3_streaming.pdf manual):
+ * to be placed in the projet QSF file (not the SDC file!)
+ *  set_instance_assignment -name GLOBAL_SIGNAL OFF -to *seriallite_iii_streaming*clock_gen:sink_clock_gen|dp_sync:coreclkin_reset_sync|dp_sync_regstage:dp_sync_stage_2*o*
  */
 
-
-module stratix10_seriallite3_4lane_wrapper
+module s10_seriallite3_4lane_wrapper
   (
    input  wire 	       user_clock_tx, //            user_clock_tx.clk
    input  wire 	       user_clock_reset_tx_n, //      user_clock_reset_tx.reset_n
@@ -75,7 +79,7 @@ module stratix10_seriallite3_4lane_wrapper
    assign      interface_clock_reset_rx_n = ~interface_clock_reset_rx;
    wire  [1:0] tx_pll_clk_gtx;        
 
-   stratix10_seriallite3_4lane sl3
+   s10_seriallite3_4lane sl3
      (
       .user_clock_tx            (user_clock_tx),            //   input,    width = 1,            user_clock_tx.clk
       .user_clock_reset_tx      (~user_clock_reset_tx_n),   //   input,    width = 1,      user_clock_reset_tx.reset
