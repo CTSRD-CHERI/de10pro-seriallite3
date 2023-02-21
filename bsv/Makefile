@@ -57,7 +57,7 @@ SRC_StatusDevice = StatusDevice.bsv
 SRC_SerialLite3 = SerialLite3.bsv
 SRC_BERT = BERT.bsv
 
-IPSL3 = stratix10_seriallite3_4lane
+IPSL3 = s10_seriallite3_4lane
 IPSL3DIR = $(IPSL3)
 IPCHIPID = chipid
 IPCHIPIDDIR = $(IPCHIPID)

@@ -14,7 +14,7 @@ refer to the applicable agreement for further details, at
 https://fpgasoftware.intel.com/eula.-->
 <ipxact:component xmlns:altera="http://www.altera.com/XMLSchema/IPXact2014/extensions" xmlns:ipxact="http://www.accellera.org/XMLSchema/IPXACT/1685-2014">
   <ipxact:vendor>Intel Corporation</ipxact:vendor>
-  <ipxact:library>stratix10_seriallite3_4lane</ipxact:library>
+  <ipxact:library>s10_seriallite3_4lane</ipxact:library>
   <ipxact:name>sl3_0</ipxact:name>
   <ipxact:version>19.3.0</ipxact:version>
   <ipxact:busInterfaces>
@@ -1393,7 +1393,7 @@ https://fpgasoftware.intel.com/eula.-->
         <ipxact:parameter parameterId="associatedAddressablePoint" type="string">
           <ipxact:name>associatedAddressablePoint</ipxact:name>
           <ipxact:displayName>Associated addressable interface</ipxact:displayName>
-          <ipxact:value>stratix10_seriallite3_4lane.phy_mgmt</ipxact:value>
+          <ipxact:value>s10_seriallite3_4lane.phy_mgmt</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="associatedClock" type="string">
           <ipxact:name>associatedClock</ipxact:name>
@@ -1445,7 +1445,7 @@ https://fpgasoftware.intel.com/eula.-->
         <ipxact:parameter parameterId="associatedAddressablePoint" type="string">
           <ipxact:name>associatedAddressablePoint</ipxact:name>
           <ipxact:displayName>Associated addressable interface</ipxact:displayName>
-          <ipxact:value>stratix10_seriallite3_4lane.phy_mgmt</ipxact:value>
+          <ipxact:value>s10_seriallite3_4lane.phy_mgmt</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="associatedClock" type="string">
           <ipxact:name>associatedClock</ipxact:name>
@@ -2186,7 +2186,7 @@ https://fpgasoftware.intel.com/eula.-->
   <ipxact:vendorExtensions>
     <altera:entity_info>
       <ipxact:vendor>Intel Corporation</ipxact:vendor>
-      <ipxact:library>stratix10_seriallite3_4lane</ipxact:library>
+      <ipxact:library>s10_seriallite3_4lane</ipxact:library>
       <ipxact:name>altera_sl3</ipxact:name>
       <ipxact:version>19.3.0</ipxact:version>
     </altera:entity_info>

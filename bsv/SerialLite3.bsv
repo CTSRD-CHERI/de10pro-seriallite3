@@ -170,7 +170,7 @@ module toSerialLite3_Sig #(SerialLite3 #(a,b,c,d,e,f,g) ifc
 endmodule
 
 // Interface to Stratix 10 SerialLite3 IP block insantiated with 4 lanes
-interface Stratix10_SerialLite3_4Lane;
+interface S10_SerialLite3_4Lane;
   // export receive stream clock
   interface Clock rx_clk;
   interface Reset rx_rst_n;
@@ -279,8 +279,8 @@ module mkPersistEventClockCrosserCC#(Integer timersize, Clock sclk, Reset srst_n
 endmodule
   
   
-import "BVI" stratix10_seriallite3_4lane_wrapper =
-module mkStratix10_SerialLite3_4Lane (Clock tx_clk, Reset tx_rst_n, Clock qsfp_refclk, Stratix10_SerialLite3_4Lane sl3);
+import "BVI" s10_seriallite3_4lane_wrapper =
+module mkS10_SerialLite3_4Lane (Clock tx_clk, Reset tx_rst_n, Clock qsfp_refclk, S10_SerialLite3_4Lane sl3);
   // Clocks
   default_clock clk (phy_mgmt_clk, (*unused*) phy_mgmt_clk_gate);
   default_reset rst_n (phy_mgmt_clk_reset_n);
@@ -349,7 +349,7 @@ module mkSerialLite3
            , Add#(32,_nd,t_data)
            , Alias#(t_bus_req, Tuple4#(Bit#(16), Bit#(1), Bit#(1), Bit#(32))) );
 
-  Stratix10_SerialLite3_4Lane       sl3 <- mkStratix10_SerialLite3_4Lane(tx_clk, tx_rst_n, qsfp_refclk);
+  S10_SerialLite3_4Lane             sl3 <- mkS10_SerialLite3_4Lane(tx_clk, tx_rst_n, qsfp_refclk);
   Reg#(Bool)                    tx_wait <- mkDReg(False, clocked_by tx_clk, reset_by tx_rst_n);
   Reg#(Bool)          tx_start_of_burst <- mkReg(True, clocked_by tx_clk, reset_by tx_rst_n);
 //  PulseWire                 tx_slowdown <- mkPulseWire(clocked_by tx_clk, reset_by tx_rst_n);
