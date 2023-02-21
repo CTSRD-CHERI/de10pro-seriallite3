@@ -1625,7 +1625,7 @@ set_instance_assignment -name CURRENT_STRENGTH_NEW "MAXIMUM CURRENT" -to LED -en
 #  https://www.intel.com/content/www/us/en/docs/programmable/683621/current/analog-pma-settings-parameters.html
 # and parameters determined from a sweep using  system console
 # pre-emphasis first pre-tap = -12
-# pre-emphasis first post-tap polarity = -6
+# pre-emphasis first post-tap polarity = -9
 
 ############################## TX-A
 
@@ -1845,7 +1845,7 @@ set_instance_assignment -name GLOBAL_SIGNAL OFF -to "*seriallite_iii_streaming*c
 set_global_assignment -name POWER_APPLY_THERMAL_MARGIN ADDITIONAL
 set_global_assignment -name IP_FILE bsv/xcvr_atx_pll_s10_htile.ip
 set_global_assignment -name IP_FILE chipid.ip
-set_global_assignment -name IP_FILE bsv/stratix10_seriallite3_4lane.ip
+set_global_assignment -name IP_FILE bsv/s10_seriallite3_4lane.ip
 set_global_assignment -name SDC_FILE jtag.sdc
 set_global_assignment -name VERILOG_FILE DE10_Pro.v
 set_global_assignment -name SDC_FILE DE10_Pro.sdc
@@ -1865,10 +1865,13 @@ set_global_assignment -name IP_FILE ip/soc/soc_mkSerialLite3_Instance_0.ip
 set_global_assignment -name IP_FILE ip/soc/soc_mkBERT_Instance_0.ip
 set_global_assignment -name IP_FILE ip/soc/soc_mkStatusDevice_Instance_0.ip
 set_global_assignment -name IP_FILE ip/soc/pio_user_leds.ip
-set_global_assignment -name VERILOG_FILE bsv/stratix10_seriallite3_4lane_wrapper.v
-set_global_assignment -name SDC_FILE bsv/stratix10_seriallite3_4lane_wrapper.sdc
+#set_global_assignment -name VERILOG_FILE bsv/s10_seriallite3_4lane_wrapper.v
+# SWM: the following SDC file isn't used:
+#set_global_assignment -name SDC_FILE bsv/s10_seriallite3_4lane.sdc
 
 set_global_assignment -name IP_FILE ip/soc/soc_iopll_0.ip
 #set_global_assignment -name IP_FILE tmpdcfifo.ip
 set_global_assignment -name IP_FILE ip/soc/soc_reset_controller_200MHz.ip
 set_global_assignment -name IP_FILE ip/soc/soc_reset_controller_100MHz.ip
+set_global_assignment -name SEARCH_PATH bsv/output
+set_global_assignment -name SEARCH_PATH bsv
