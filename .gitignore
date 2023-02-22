@@ -1,4 +1,4 @@
 *_hw.tcl
 qdb/
-bsv/build/
-bsv/output/
+S10FPGA/build/
+S10FPGA/output/

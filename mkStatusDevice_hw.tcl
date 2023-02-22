@@ -40,7 +40,7 @@ add_fileset mkStatusDevice_Instance_fileset QUARTUS_SYNTH "" ""
 set_fileset_property mkStatusDevice_Instance_fileset TOP_LEVEL mkStatusDevice_Instance
 set_fileset_property mkStatusDevice_Instance_fileset ENABLE_RELATIVE_INCLUDE_PATHS false
 set_fileset_property mkStatusDevice_Instance_fileset ENABLE_FILE_OVERWRITE_MODE true
-add_fileset_file mkStatusDevice_Instance.v VERILOG PATH bsv/output/mkStatusDevice_Instance.v TOP_LEVEL_FILE
+add_fileset_file mkStatusDevice_Instance.v VERILOG PATH S10FPGA/output/mkStatusDevice_Instance.v TOP_LEVEL_FILE
 
 
 # 

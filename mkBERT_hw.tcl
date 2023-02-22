@@ -40,7 +40,7 @@ add_fileset mkBERT_Instance_fileset QUARTUS_SYNTH "" ""
 set_fileset_property mkBERT_Instance_fileset TOP_LEVEL mkBERT_Instance
 set_fileset_property mkBERT_Instance_fileset ENABLE_RELATIVE_INCLUDE_PATHS false
 set_fileset_property mkBERT_Instance_fileset ENABLE_FILE_OVERWRITE_MODE true
-add_fileset_file mkBERT_Instance.v VERILOG PATH bsv/output/mkBERT_Instance.v TOP_LEVEL_FILE
+add_fileset_file mkBERT_Instance.v VERILOG PATH S10FPGA/output/mkBERT_Instance.v TOP_LEVEL_FILE
 
 
 # 
