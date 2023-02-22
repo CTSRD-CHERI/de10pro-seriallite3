@@ -1,14 +1,33 @@
 # DE10Pro/Stratix 10 Test of Serial Lite III
 
-## Notes
+## Overview
 
-* Main system under test is a Platform Designer project soc.qsys
+This repository contains an exploration of high-speed serial links
+(100Gbps) on the Terasic DE10Pro Stratix-10 FPGA board.  A Bluespec
+SystemVerilog (BSV) wrapper around the SerialLite III IP was developed
+in this repo and has now been migrated to the S10FPGA repo, which is
+now a submodule of this repo.
 
-## Software for Nios-II processor
+Other components include a bit error-rate tester (BERT) and status device.
 
-* Two helper scripts are in the repository to be run in software/app :
-  * **swm_rebuild.sh** - programs the FPGA, rebuilds the BSP (board support package) and the application.
-  * **swm_run.sh** - does a make and then downloads the software to the NIOS-II soft core and starts a jtag terminal.
+
+## Building the project
+
+* Checkout this repository and all of its submodules.
+* The design has been tested with Quartus 22.1pro
+* In the root of the repository: `make fpga_image`
+* For one of our server boxes with eight FPGAs, the boards can be programmed using: `./py/progallde10pro.py output_files/DE10_Pro.sof`
+* The project contains a NIOS II processor
+  * `cd software/app/`
+  * `./swm_rebuild.sh` - to rebuild the board support package (BSP) and build the application
+* There are a number of simple scripts in the `software/app` directory to run tests
+  * `swm_run.sh <chain_number>` - start the test application and run a nios2-terminal.  You are presented with a menu of tests.
+  * `swm_bert_8.sh` - report on bit error-rate tests on 8 FPGAs
+  * `swm_enable_berts_8.sh` - enable the bit error-rate testers on 8 FPGAs
+  * `swm_disable_berts_8.sh` - disable the bit error-rate testers on 8 FPGAs
+  * `swm_zero_berts_8.sh` - zero the bit error-rate counters on 8 FPGAs
+  * `swm_ping_8.sh` - run a ping latency test on all links for all 8 FPGAs
+  * `swm_discover_topology.sh` - topology discovery
 
 ## Tuning Serial Links
 
@@ -18,7 +37,7 @@ parameters are included in the DE10Pro.qsf file.
 
 [![Link Tuning Video](https://img.youtube.com/vi/y_UbtNqbIaM/default.jpg)](https://youtu.be/y_UbtNqbIaM)
 
-## SerialLite III Signals and Mappings
+## Notes on SerialLite III Signals and Mappings
 
 | Signal name | input/output | width | mapping |
 |:--|:-:|--:|:--|
@@ -73,11 +92,3 @@ parameters are included in the DE10Pro.qsf file.
   * [N]: Loss of alignment
   * [N-1:0]: PCS sync header, multiframe, or CRC-32 error
 
-## Platform Designer
-
-The components of the design are captured in Platform Designer.
-Currently this is rather verbose since many of the Serial Lite III
-interfaces are conduits rather than being bundles into higher-level
-interfaces linke Avalon Streaming.
-
-![Platform Designer Screen Shot](seriallite3-platform-designer.png)
