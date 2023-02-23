@@ -1,6 +1,3 @@
-[submodule "BlueStuff"]
-	path = BlueStuff
-	url = git@github.com:CTSRD-CHERI/BlueStuff.git
 [submodule "vipbundle"]
 	path = vipbundle
 	url = https://github.com/CTSRD-CHERI/vipbundle.git
