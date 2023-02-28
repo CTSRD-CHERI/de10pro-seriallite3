@@ -37,6 +37,9 @@ SERIALLITE3_RTL = $(SERIALLITE3_BSV_DIR)/output/mkSerialLite3_Instance.v
 BERT_HW_TCL = $(CURDIR)/mkBERT_hw.tcl
 BERT_BSV_DIR = $(CURDIR)/S10FPGA
 BERT_RTL = $(BERT_BSV_DIR)/output/mkBERT_Instance.v
+STATUSDEV_HW_TCL = $(CURDIR)/mkStatusDevice_hw.tcl
+STATUSDEV_BSV_DIR = $(CURDIR)/S10FPGA
+STATUSDEV_RTL = $(STATUSDEV_BSV_DIR)/output/mkStatusDevice_Instance.v
 
 .PHONY: help
 help:
@@ -63,7 +66,7 @@ output_files/DE10_Pro.sof: $(VERILOG_SRC) generate_ip
 	quartus_sh --flow compile DE10_Pro.qpf
 
 .PHONY: generate_ip
-generate_ip: $(IP_SRC) # $(SERIALLITE3_HW_TCL) $(BERT_HW_TCL)
+generate_ip: $(IP_SRC) $(STATUSDEV_HW_TCL) # $(SERIALLITE3_HW_TCL) $(BERT_HW_TCL)
 	$(MAKE) -C $(SERIALLITE3_BSV_DIR) all    # a bit of a hack?
 	quartus_ipgenerate --generate_project_ip_files -synthesis=verilog DE10_Pro.qpf --clear_ip_generation_dirs
 
@@ -108,9 +111,30 @@ mrproper_bert_rtl:
 	$(MAKE) -C $(BERT_BSV_DIR) mrproper
 
 #-----------------------------------------------------------------------------
+# get the tcl for the status device
+$(STATUSDEV_HW_TCL): $(VIPBUNDLE) $(STATUSDEV_RTL)
+	$(VIPBUNDLE) -f quartus_ip_tcl -o $@ $(STATUSDEV_RTL)
+.PHONY: generate_status_dev_tcl clean_status_dev_tcl
+generate_status_dev_tcl: $(STATUSDEV_HW_TCL)
+clean_status_dev_tcl:
+	rm -f $(STATUSDEV_HW_TCL)
+
+#-----------------------------------------------------------------------------
+# Build the RTL for the status device
+$(STATUSDEV_RTL):
+	$(MAKE) -C $(STATUSDEV_BSV_DIR) mkStatusDevice_Instance
+.PHONY: generate_status_dev_rtl clean_status_dev_rtl mrproper_status_dev_rtl
+generate_status_dev_rtl: $(STATUSDEV_RTL)
+clean_status_dev_rtl:
+	$(MAKE) -C $(STATUSDEV_BSV_DIR) clean
+mrproper_status_dev_rtl:
+	$(MAKE) -C $(STATUSDEV_BSV_DIR) mrproper
+
+
+#-----------------------------------------------------------------------------
 # build vipbundle
 $(VIPBUNDLE):
-	# STOP UNTIL VIPBUNDLE FIXED     $(MAKE) -C $(VIPBUNDLEDIR) vipbundle
+	$(MAKE) -C $(VIPBUNDLEDIR) vipbundle
 
 .PHONY: vipbundle clean-vipbundle
 vipbundle: $(VIPBUNDLE)
