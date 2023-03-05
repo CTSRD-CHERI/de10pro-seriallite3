@@ -66,7 +66,7 @@ output_files/DE10_Pro.sof: $(VERILOG_SRC) generate_ip
 	quartus_sh --flow compile DE10_Pro.qpf
 
 .PHONY: generate_ip
-generate_ip: $(IP_SRC) $(STATUSDEV_HW_TCL) # $(SERIALLITE3_HW_TCL) $(BERT_HW_TCL)
+generate_ip: $(IP_SRC) $(STATUSDEV_HW_TCL) $(BERT_HW_TCL) # $(SERIALLITE3_HW_TCL)
 	$(MAKE) -C $(SERIALLITE3_BSV_DIR) all    # a bit of a hack?
 	quartus_ipgenerate --generate_project_ip_files -synthesis=verilog DE10_Pro.qpf --clear_ip_generation_dirs
 
@@ -93,7 +93,7 @@ mrproper_seriallite3_rtl:
 #-----------------------------------------------------------------------------
 # get the tcl for the bit error rate tester
 $(BERT_HW_TCL): $(VIPBUNDLE) $(BERT_RTL)
-	# STOP UNTIL VIPBUNDLE FIXED     $(VIPBUNDLE) -f quartus_ip_tcl -o $@ $(BERT_RTL)
+	$(VIPBUNDLE) -f quartus_ip_tcl -o $@ $(BERT_RTL)
 .PHONY: generate_bert_tcl clean_bert_tcl
 generate_bert_tcl: $(BERT_HW_TCL)
 clean_bert_tcl:
