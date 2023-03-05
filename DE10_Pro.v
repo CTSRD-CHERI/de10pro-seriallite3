@@ -363,25 +363,21 @@ module DE10_Pro
        .mkstatusdevice_instance_0_coe_status_c_coe_coe_status_c_coe ({17'd0, link_status_C}),
        .mkstatusdevice_instance_0_coe_status_d_coe_coe_status_d_coe ({17'd0, link_status_D}),
 
-       .mkseriallite3_instance_0_clk_gate_rx_clk_CLK_GATE_rx_clk (),                        // ignore clock gate
        .mkseriallite3_instance_0_coe_link_status_coe_link_status (link_status_A),           // 15-bits
        .mkseriallite3_instance_0_coe_qsfp28_rx_pins_x_coe_qsfp28_rx_pins_x (QSFP28A_RX_p),
        .mkseriallite3_instance_0_coe_qsfp28_tx_pins_coe_qsfp28_tx_pins (QSFP28A_TX_p),
        .mkseriallite3_instance_0_csi_qsfp_refclk_clk(QSFP28A_REFCLK_p),
 
-       .mkseriallite3_instance_1_clk_gate_rx_clk_CLK_GATE_rx_clk (),                        // ignore clock gate
        .mkseriallite3_instance_1_coe_link_status_coe_link_status (link_status_B),           // 15-bits
        .mkseriallite3_instance_1_coe_qsfp28_rx_pins_x_coe_qsfp28_rx_pins_x (QSFP28B_RX_p),
        .mkseriallite3_instance_1_coe_qsfp28_tx_pins_coe_qsfp28_tx_pins (QSFP28B_TX_p),
        .mkseriallite3_instance_1_csi_qsfp_refclk_clk(QSFP28B_REFCLK_p),
 
-       .mkseriallite3_instance_2_clk_gate_rx_clk_CLK_GATE_rx_clk (),                        // ignore clock gate
        .mkseriallite3_instance_2_coe_link_status_coe_link_status (link_status_C),           // 15-bits
        .mkseriallite3_instance_2_coe_qsfp28_rx_pins_x_coe_qsfp28_rx_pins_x (QSFP28C_RX_p),
        .mkseriallite3_instance_2_coe_qsfp28_tx_pins_coe_qsfp28_tx_pins (QSFP28C_TX_p),
        .mkseriallite3_instance_2_csi_qsfp_refclk_clk(QSFP28C_REFCLK_p),
 
-       .mkseriallite3_instance_3_clk_gate_rx_clk_CLK_GATE_rx_clk (),                        // ignore clock gate
        .mkseriallite3_instance_3_coe_link_status_coe_link_status (link_status_D),           // 15-bits
        .mkseriallite3_instance_3_coe_qsfp28_rx_pins_x_coe_qsfp28_rx_pins_x (QSFP28D_RX_p),
        .mkseriallite3_instance_3_coe_qsfp28_tx_pins_coe_qsfp28_tx_pins (QSFP28D_TX_p),

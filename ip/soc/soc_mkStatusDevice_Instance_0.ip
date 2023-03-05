@@ -110,12 +110,12 @@ https://fpgasoftware.intel.com/eula.-->
         <ipxact:parameter parameterId="associatedClock" type="string">
           <ipxact:name>associatedClock</ipxact:name>
           <ipxact:displayName>associatedClock</ipxact:displayName>
-          <ipxact:value></ipxact:value>
+          <ipxact:value>CLK</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="associatedReset" type="string">
           <ipxact:name>associatedReset</ipxact:name>
           <ipxact:displayName>associatedReset</ipxact:displayName>
-          <ipxact:value></ipxact:value>
+          <ipxact:value>RST_N</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="prSafe" type="bit">
           <ipxact:name>prSafe</ipxact:name>
@@ -147,12 +147,12 @@ https://fpgasoftware.intel.com/eula.-->
         <ipxact:parameter parameterId="associatedClock" type="string">
           <ipxact:name>associatedClock</ipxact:name>
           <ipxact:displayName>associatedClock</ipxact:displayName>
-          <ipxact:value></ipxact:value>
+          <ipxact:value>CLK</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="associatedReset" type="string">
           <ipxact:name>associatedReset</ipxact:name>
           <ipxact:displayName>associatedReset</ipxact:displayName>
-          <ipxact:value></ipxact:value>
+          <ipxact:value>RST_N</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="prSafe" type="bit">
           <ipxact:name>prSafe</ipxact:name>
@@ -184,12 +184,12 @@ https://fpgasoftware.intel.com/eula.-->
         <ipxact:parameter parameterId="associatedClock" type="string">
           <ipxact:name>associatedClock</ipxact:name>
           <ipxact:displayName>associatedClock</ipxact:displayName>
-          <ipxact:value></ipxact:value>
+          <ipxact:value>CLK</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="associatedReset" type="string">
           <ipxact:name>associatedReset</ipxact:name>
           <ipxact:displayName>associatedReset</ipxact:displayName>
-          <ipxact:value></ipxact:value>
+          <ipxact:value>RST_N</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="prSafe" type="bit">
           <ipxact:name>prSafe</ipxact:name>
@@ -221,12 +221,12 @@ https://fpgasoftware.intel.com/eula.-->
         <ipxact:parameter parameterId="associatedClock" type="string">
           <ipxact:name>associatedClock</ipxact:name>
           <ipxact:displayName>associatedClock</ipxact:displayName>
-          <ipxact:value></ipxact:value>
+          <ipxact:value>CLK</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="associatedReset" type="string">
           <ipxact:name>associatedReset</ipxact:name>
           <ipxact:displayName>associatedReset</ipxact:displayName>
-          <ipxact:value></ipxact:value>
+          <ipxact:value>RST_N</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="prSafe" type="bit">
           <ipxact:name>prSafe</ipxact:name>
@@ -1021,9 +1021,11 @@ https://fpgasoftware.intel.com/eula.-->
                 &lt;parameterValueMap&gt;
                     &lt;entry&gt;
                         &lt;key&gt;associatedClock&lt;/key&gt;
+                        &lt;value&gt;CLK&lt;/value&gt;
                     &lt;/entry&gt;
                     &lt;entry&gt;
                         &lt;key&gt;associatedReset&lt;/key&gt;
+                        &lt;value&gt;RST_N&lt;/value&gt;
                     &lt;/entry&gt;
                     &lt;entry&gt;
                         &lt;key&gt;prSafe&lt;/key&gt;
@@ -1054,9 +1056,11 @@ https://fpgasoftware.intel.com/eula.-->
                 &lt;parameterValueMap&gt;
                     &lt;entry&gt;
                         &lt;key&gt;associatedClock&lt;/key&gt;
+                        &lt;value&gt;CLK&lt;/value&gt;
                     &lt;/entry&gt;
                     &lt;entry&gt;
                         &lt;key&gt;associatedReset&lt;/key&gt;
+                        &lt;value&gt;RST_N&lt;/value&gt;
                     &lt;/entry&gt;
                     &lt;entry&gt;
                         &lt;key&gt;prSafe&lt;/key&gt;
@@ -1087,9 +1091,11 @@ https://fpgasoftware.intel.com/eula.-->
                 &lt;parameterValueMap&gt;
                     &lt;entry&gt;
                         &lt;key&gt;associatedClock&lt;/key&gt;
+                        &lt;value&gt;CLK&lt;/value&gt;
                     &lt;/entry&gt;
                     &lt;entry&gt;
                         &lt;key&gt;associatedReset&lt;/key&gt;
+                        &lt;value&gt;RST_N&lt;/value&gt;
                     &lt;/entry&gt;
                     &lt;entry&gt;
                         &lt;key&gt;prSafe&lt;/key&gt;
@@ -1120,9 +1126,11 @@ https://fpgasoftware.intel.com/eula.-->
                 &lt;parameterValueMap&gt;
                     &lt;entry&gt;
                         &lt;key&gt;associatedClock&lt;/key&gt;
+                        &lt;value&gt;CLK&lt;/value&gt;
                     &lt;/entry&gt;
                     &lt;entry&gt;
                         &lt;key&gt;associatedReset&lt;/key&gt;
+                        &lt;value&gt;RST_N&lt;/value&gt;
                     &lt;/entry&gt;
                     &lt;entry&gt;
                         &lt;key&gt;prSafe&lt;/key&gt;

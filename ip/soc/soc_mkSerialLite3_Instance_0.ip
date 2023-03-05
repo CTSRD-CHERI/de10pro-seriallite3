@@ -19,43 +19,6 @@ https://fpgasoftware.intel.com/eula.-->
   <ipxact:version>1.0</ipxact:version>
   <ipxact:busInterfaces>
     <ipxact:busInterface>
-      <ipxact:name>CLK_GATE_rx_clk</ipxact:name>
-      <ipxact:busType vendor="intel" library="intel" name="conduit" version="22.1"></ipxact:busType>
-      <ipxact:abstractionTypes>
-        <ipxact:abstractionType>
-          <ipxact:abstractionRef vendor="intel" library="intel" name="conduit" version="22.1"></ipxact:abstractionRef>
-          <ipxact:portMaps>
-            <ipxact:portMap>
-              <ipxact:logicalPort>
-                <ipxact:name>CLK_GATE_rx_clk</ipxact:name>
-              </ipxact:logicalPort>
-              <ipxact:physicalPort>
-                <ipxact:name>CLK_GATE_rx_clk</ipxact:name>
-              </ipxact:physicalPort>
-            </ipxact:portMap>
-          </ipxact:portMaps>
-        </ipxact:abstractionType>
-      </ipxact:abstractionTypes>
-      <ipxact:slave></ipxact:slave>
-      <ipxact:parameters>
-        <ipxact:parameter parameterId="associatedClock" type="string">
-          <ipxact:name>associatedClock</ipxact:name>
-          <ipxact:displayName>associatedClock</ipxact:displayName>
-          <ipxact:value>csi_clk</ipxact:value>
-        </ipxact:parameter>
-        <ipxact:parameter parameterId="associatedReset" type="string">
-          <ipxact:name>associatedReset</ipxact:name>
-          <ipxact:displayName>associatedReset</ipxact:displayName>
-          <ipxact:value>rsi_rst_n</ipxact:value>
-        </ipxact:parameter>
-        <ipxact:parameter parameterId="prSafe" type="bit">
-          <ipxact:name>prSafe</ipxact:name>
-          <ipxact:displayName>Partial Reconfiguration Safe</ipxact:displayName>
-          <ipxact:value>false</ipxact:value>
-        </ipxact:parameter>
-      </ipxact:parameters>
-    </ipxact:busInterface>
-    <ipxact:busInterface>
       <ipxact:name>coe_link_status</ipxact:name>
       <ipxact:busType vendor="intel" library="intel" name="conduit" version="22.1"></ipxact:busType>
       <ipxact:abstractionTypes>
@@ -67,7 +30,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>coe_link_status</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>coe_link_status</ipxact:name>
+                <ipxact:name>coe_C_csi_clk_C__R_rsi_rst_n_R__link_status</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
           </ipxact:portMaps>
@@ -104,7 +67,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>coe_qsfp28_rx_pins_x</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>coe_qsfp28_rx_pins_x</ipxact:name>
+                <ipxact:name>coe_C_csi_clk_C__R_rsi_rst_n_R__qsfp28_rx_pins_x</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
           </ipxact:portMaps>
@@ -141,7 +104,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>coe_qsfp28_tx_pins</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>coe_qsfp28_tx_pins</ipxact:name>
+                <ipxact:name>coe_C_csi_clk_C__R_rsi_rst_n_R__qsfp28_tx_pins</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
           </ipxact:portMaps>
@@ -336,7 +299,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>rready</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axls_management_rready</ipxact:name>
+                <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_rready</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -344,7 +307,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>rvalid</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axls_management_rvalid</ipxact:name>
+                <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_rvalid</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -352,7 +315,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>rresp</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axls_management_rresp</ipxact:name>
+                <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_rresp</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -360,7 +323,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>rdata</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axls_management_rdata</ipxact:name>
+                <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_rdata</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -368,7 +331,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>arready</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axls_management_arready</ipxact:name>
+                <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_arready</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -376,7 +339,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>arprot</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axls_management_arprot</ipxact:name>
+                <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_arprot</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -384,7 +347,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>araddr</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axls_management_araddr</ipxact:name>
+                <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_araddr</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -392,7 +355,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>arvalid</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axls_management_arvalid</ipxact:name>
+                <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_arvalid</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -400,7 +363,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>bready</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axls_management_bready</ipxact:name>
+                <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_bready</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -408,7 +371,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>bvalid</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axls_management_bvalid</ipxact:name>
+                <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_bvalid</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -416,7 +379,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>bresp</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axls_management_bresp</ipxact:name>
+                <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_bresp</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -424,7 +387,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>wready</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axls_management_wready</ipxact:name>
+                <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_wready</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -432,7 +395,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>wstrb</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axls_management_wstrb</ipxact:name>
+                <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_wstrb</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -440,7 +403,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>wdata</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axls_management_wdata</ipxact:name>
+                <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_wdata</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -448,7 +411,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>wvalid</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axls_management_wvalid</ipxact:name>
+                <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_wvalid</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -456,7 +419,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>awready</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axls_management_awready</ipxact:name>
+                <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_awready</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -464,7 +427,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>awprot</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axls_management_awprot</ipxact:name>
+                <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_awprot</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -472,7 +435,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>awaddr</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axls_management_awaddr</ipxact:name>
+                <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_awaddr</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -480,7 +443,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>awvalid</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axls_management_awvalid</ipxact:name>
+                <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_awvalid</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
           </ipxact:portMaps>
@@ -557,7 +520,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>reset_n</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>rsi_rst_n</ipxact:name>
+                <ipxact:name>_C_csi_clk_C_rsi_rst_n</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
           </ipxact:portMaps>
@@ -589,7 +552,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>reset_n</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>rsi_tx_rst_n</ipxact:name>
+                <ipxact:name>_C_csi_tx_clk_C_rsi_tx_rst_n</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
           </ipxact:portMaps>
@@ -621,7 +584,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>reset_n</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>rso_rx_rst_n</ipxact:name>
+                <ipxact:name>_C_cso_rx_clk_C_rso_rx_rst_n</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
           </ipxact:portMaps>
@@ -663,7 +626,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>tready</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axstrm_rx_tready</ipxact:name>
+                <ipxact:name>axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tready</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -671,7 +634,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>tvalid</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axstrm_rx_tvalid</ipxact:name>
+                <ipxact:name>axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tvalid</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -679,7 +642,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>tuser</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axstrm_rx_tuser</ipxact:name>
+                <ipxact:name>axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tuser</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -687,7 +650,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>tlast</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axstrm_rx_tlast</ipxact:name>
+                <ipxact:name>axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tlast</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -695,7 +658,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>tkeep</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axstrm_rx_tkeep</ipxact:name>
+                <ipxact:name>axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tkeep</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -703,7 +666,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>tstrb</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axstrm_rx_tstrb</ipxact:name>
+                <ipxact:name>axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tstrb</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -711,7 +674,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>tdata</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axstrm_rx_tdata</ipxact:name>
+                <ipxact:name>axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tdata</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
           </ipxact:portMaps>
@@ -743,7 +706,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>tready</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axstrs_tx_tready</ipxact:name>
+                <ipxact:name>axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tready</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -751,7 +714,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>tuser</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axstrs_tx_tuser</ipxact:name>
+                <ipxact:name>axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tuser</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -759,7 +722,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>tlast</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axstrs_tx_tlast</ipxact:name>
+                <ipxact:name>axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tlast</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -767,7 +730,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>tkeep</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axstrs_tx_tkeep</ipxact:name>
+                <ipxact:name>axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tkeep</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -775,7 +738,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>tstrb</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axstrs_tx_tstrb</ipxact:name>
+                <ipxact:name>axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tstrb</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -783,7 +746,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>tdata</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axstrs_tx_tdata</ipxact:name>
+                <ipxact:name>axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tdata</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
             <ipxact:portMap>
@@ -791,7 +754,7 @@ https://fpgasoftware.intel.com/eula.-->
                 <ipxact:name>tvalid</ipxact:name>
               </ipxact:logicalPort>
               <ipxact:physicalPort>
-                <ipxact:name>axstrs_tx_tvalid</ipxact:name>
+                <ipxact:name>axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tvalid</ipxact:name>
               </ipxact:physicalPort>
             </ipxact:portMap>
           </ipxact:portMaps>
@@ -832,20 +795,7 @@ https://fpgasoftware.intel.com/eula.-->
     </ipxact:instantiations>
     <ipxact:ports>
       <ipxact:port>
-        <ipxact:name>CLK_GATE_rx_clk</ipxact:name>
-        <ipxact:wire>
-          <ipxact:direction>out</ipxact:direction>
-          <ipxact:vectors></ipxact:vectors>
-          <ipxact:wireTypeDefs>
-            <ipxact:wireTypeDef>
-              <ipxact:typeName>STD_LOGIC</ipxact:typeName>
-              <ipxact:viewRef>QUARTUS_SYNTH</ipxact:viewRef>
-            </ipxact:wireTypeDef>
-          </ipxact:wireTypeDefs>
-        </ipxact:wire>
-      </ipxact:port>
-      <ipxact:port>
-        <ipxact:name>coe_link_status</ipxact:name>
+        <ipxact:name>coe_C_csi_clk_C__R_rsi_rst_n_R__link_status</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>out</ipxact:direction>
           <ipxact:vectors>
@@ -863,7 +813,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>coe_qsfp28_rx_pins_x</ipxact:name>
+        <ipxact:name>coe_C_csi_clk_C__R_rsi_rst_n_R__qsfp28_rx_pins_x</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>in</ipxact:direction>
           <ipxact:vectors>
@@ -881,7 +831,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>coe_qsfp28_tx_pins</ipxact:name>
+        <ipxact:name>coe_C_csi_clk_C__R_rsi_rst_n_R__qsfp28_tx_pins</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>out</ipxact:direction>
           <ipxact:vectors>
@@ -951,7 +901,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axls_management_rready</ipxact:name>
+        <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_rready</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>in</ipxact:direction>
           <ipxact:vectors></ipxact:vectors>
@@ -964,7 +914,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axls_management_rvalid</ipxact:name>
+        <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_rvalid</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>out</ipxact:direction>
           <ipxact:vectors></ipxact:vectors>
@@ -977,7 +927,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axls_management_rresp</ipxact:name>
+        <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_rresp</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>out</ipxact:direction>
           <ipxact:vectors>
@@ -995,7 +945,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axls_management_rdata</ipxact:name>
+        <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_rdata</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>out</ipxact:direction>
           <ipxact:vectors>
@@ -1013,7 +963,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axls_management_arready</ipxact:name>
+        <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_arready</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>out</ipxact:direction>
           <ipxact:vectors></ipxact:vectors>
@@ -1026,7 +976,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axls_management_arprot</ipxact:name>
+        <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_arprot</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>in</ipxact:direction>
           <ipxact:vectors>
@@ -1044,7 +994,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axls_management_araddr</ipxact:name>
+        <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_araddr</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>in</ipxact:direction>
           <ipxact:vectors>
@@ -1062,7 +1012,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axls_management_arvalid</ipxact:name>
+        <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_arvalid</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>in</ipxact:direction>
           <ipxact:vectors></ipxact:vectors>
@@ -1075,7 +1025,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axls_management_bready</ipxact:name>
+        <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_bready</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>in</ipxact:direction>
           <ipxact:vectors></ipxact:vectors>
@@ -1088,7 +1038,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axls_management_bvalid</ipxact:name>
+        <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_bvalid</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>out</ipxact:direction>
           <ipxact:vectors></ipxact:vectors>
@@ -1101,7 +1051,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axls_management_bresp</ipxact:name>
+        <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_bresp</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>out</ipxact:direction>
           <ipxact:vectors>
@@ -1119,7 +1069,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axls_management_wready</ipxact:name>
+        <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_wready</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>out</ipxact:direction>
           <ipxact:vectors></ipxact:vectors>
@@ -1132,7 +1082,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axls_management_wstrb</ipxact:name>
+        <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_wstrb</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>in</ipxact:direction>
           <ipxact:vectors>
@@ -1150,7 +1100,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axls_management_wdata</ipxact:name>
+        <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_wdata</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>in</ipxact:direction>
           <ipxact:vectors>
@@ -1168,7 +1118,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axls_management_wvalid</ipxact:name>
+        <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_wvalid</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>in</ipxact:direction>
           <ipxact:vectors></ipxact:vectors>
@@ -1181,7 +1131,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axls_management_awready</ipxact:name>
+        <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_awready</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>out</ipxact:direction>
           <ipxact:vectors></ipxact:vectors>
@@ -1194,7 +1144,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axls_management_awprot</ipxact:name>
+        <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_awprot</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>in</ipxact:direction>
           <ipxact:vectors>
@@ -1212,7 +1162,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axls_management_awaddr</ipxact:name>
+        <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_awaddr</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>in</ipxact:direction>
           <ipxact:vectors>
@@ -1230,7 +1180,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axls_management_awvalid</ipxact:name>
+        <ipxact:name>axls_C_csi_clk_C__R_rsi_rst_n_R__management_awvalid</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>in</ipxact:direction>
           <ipxact:vectors></ipxact:vectors>
@@ -1243,7 +1193,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>rsi_rst_n</ipxact:name>
+        <ipxact:name>_C_csi_clk_C_rsi_rst_n</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>in</ipxact:direction>
           <ipxact:vectors></ipxact:vectors>
@@ -1256,7 +1206,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>rsi_tx_rst_n</ipxact:name>
+        <ipxact:name>_C_csi_tx_clk_C_rsi_tx_rst_n</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>in</ipxact:direction>
           <ipxact:vectors></ipxact:vectors>
@@ -1269,7 +1219,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>rso_rx_rst_n</ipxact:name>
+        <ipxact:name>_C_cso_rx_clk_C_rso_rx_rst_n</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>out</ipxact:direction>
           <ipxact:vectors></ipxact:vectors>
@@ -1282,7 +1232,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axstrm_rx_tready</ipxact:name>
+        <ipxact:name>axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tready</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>in</ipxact:direction>
           <ipxact:vectors></ipxact:vectors>
@@ -1295,7 +1245,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axstrm_rx_tvalid</ipxact:name>
+        <ipxact:name>axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tvalid</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>out</ipxact:direction>
           <ipxact:vectors></ipxact:vectors>
@@ -1308,7 +1258,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axstrm_rx_tuser</ipxact:name>
+        <ipxact:name>axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tuser</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>out</ipxact:direction>
           <ipxact:vectors>
@@ -1326,7 +1276,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axstrm_rx_tlast</ipxact:name>
+        <ipxact:name>axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tlast</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>out</ipxact:direction>
           <ipxact:vectors></ipxact:vectors>
@@ -1339,7 +1289,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axstrm_rx_tkeep</ipxact:name>
+        <ipxact:name>axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tkeep</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>out</ipxact:direction>
           <ipxact:vectors>
@@ -1357,7 +1307,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axstrm_rx_tstrb</ipxact:name>
+        <ipxact:name>axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tstrb</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>out</ipxact:direction>
           <ipxact:vectors>
@@ -1375,7 +1325,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axstrm_rx_tdata</ipxact:name>
+        <ipxact:name>axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tdata</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>out</ipxact:direction>
           <ipxact:vectors>
@@ -1393,7 +1343,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axstrs_tx_tready</ipxact:name>
+        <ipxact:name>axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tready</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>out</ipxact:direction>
           <ipxact:vectors></ipxact:vectors>
@@ -1406,7 +1356,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axstrs_tx_tuser</ipxact:name>
+        <ipxact:name>axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tuser</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>in</ipxact:direction>
           <ipxact:vectors>
@@ -1424,7 +1374,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axstrs_tx_tlast</ipxact:name>
+        <ipxact:name>axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tlast</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>in</ipxact:direction>
           <ipxact:vectors></ipxact:vectors>
@@ -1437,7 +1387,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axstrs_tx_tkeep</ipxact:name>
+        <ipxact:name>axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tkeep</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>in</ipxact:direction>
           <ipxact:vectors>
@@ -1455,7 +1405,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axstrs_tx_tstrb</ipxact:name>
+        <ipxact:name>axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tstrb</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>in</ipxact:direction>
           <ipxact:vectors>
@@ -1473,7 +1423,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axstrs_tx_tdata</ipxact:name>
+        <ipxact:name>axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tdata</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>in</ipxact:direction>
           <ipxact:vectors>
@@ -1491,7 +1441,7 @@ https://fpgasoftware.intel.com/eula.-->
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
-        <ipxact:name>axstrs_tx_tvalid</ipxact:name>
+        <ipxact:name>axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tvalid</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>in</ipxact:direction>
           <ipxact:vectors></ipxact:vectors>
@@ -1572,47 +1522,12 @@ https://fpgasoftware.intel.com/eula.-->
           <ipxact:value>&lt;boundaryDefinition&gt;
     &lt;interfaces&gt;
         &lt;interface&gt;
-            &lt;name&gt;CLK_GATE_rx_clk&lt;/name&gt;
-            &lt;type&gt;conduit&lt;/type&gt;
-            &lt;isStart&gt;false&lt;/isStart&gt;
-            &lt;ports&gt;
-                &lt;port&gt;
-                    &lt;name&gt;CLK_GATE_rx_clk&lt;/name&gt;
-                    &lt;role&gt;CLK_GATE_rx_clk&lt;/role&gt;
-                    &lt;direction&gt;Output&lt;/direction&gt;
-                    &lt;width&gt;1&lt;/width&gt;
-                    &lt;lowerBound&gt;0&lt;/lowerBound&gt;
-                    &lt;vhdlType&gt;STD_LOGIC&lt;/vhdlType&gt;
-                    &lt;terminationValue&gt;0&lt;/terminationValue&gt;
-                &lt;/port&gt;
-            &lt;/ports&gt;
-            &lt;assignments&gt;
-                &lt;assignmentValueMap/&gt;
-            &lt;/assignments&gt;
-            &lt;parameters&gt;
-                &lt;parameterValueMap&gt;
-                    &lt;entry&gt;
-                        &lt;key&gt;associatedClock&lt;/key&gt;
-                        &lt;value&gt;csi_clk&lt;/value&gt;
-                    &lt;/entry&gt;
-                    &lt;entry&gt;
-                        &lt;key&gt;associatedReset&lt;/key&gt;
-                        &lt;value&gt;rsi_rst_n&lt;/value&gt;
-                    &lt;/entry&gt;
-                    &lt;entry&gt;
-                        &lt;key&gt;prSafe&lt;/key&gt;
-                        &lt;value&gt;false&lt;/value&gt;
-                    &lt;/entry&gt;
-                &lt;/parameterValueMap&gt;
-            &lt;/parameters&gt;
-        &lt;/interface&gt;
-        &lt;interface&gt;
             &lt;name&gt;coe_link_status&lt;/name&gt;
             &lt;type&gt;conduit&lt;/type&gt;
             &lt;isStart&gt;false&lt;/isStart&gt;
             &lt;ports&gt;
                 &lt;port&gt;
-                    &lt;name&gt;coe_link_status&lt;/name&gt;
+                    &lt;name&gt;coe_C_csi_clk_C__R_rsi_rst_n_R__link_status&lt;/name&gt;
                     &lt;role&gt;coe_link_status&lt;/role&gt;
                     &lt;direction&gt;Output&lt;/direction&gt;
                     &lt;width&gt;15&lt;/width&gt;
@@ -1647,7 +1562,7 @@ https://fpgasoftware.intel.com/eula.-->
             &lt;isStart&gt;false&lt;/isStart&gt;
             &lt;ports&gt;
                 &lt;port&gt;
-                    &lt;name&gt;coe_qsfp28_rx_pins_x&lt;/name&gt;
+                    &lt;name&gt;coe_C_csi_clk_C__R_rsi_rst_n_R__qsfp28_rx_pins_x&lt;/name&gt;
                     &lt;role&gt;coe_qsfp28_rx_pins_x&lt;/role&gt;
                     &lt;direction&gt;Input&lt;/direction&gt;
                     &lt;width&gt;4&lt;/width&gt;
@@ -1682,7 +1597,7 @@ https://fpgasoftware.intel.com/eula.-->
             &lt;isStart&gt;false&lt;/isStart&gt;
             &lt;ports&gt;
                 &lt;port&gt;
-                    &lt;name&gt;coe_qsfp28_tx_pins&lt;/name&gt;
+                    &lt;name&gt;coe_C_csi_clk_C__R_rsi_rst_n_R__qsfp28_tx_pins&lt;/name&gt;
                     &lt;role&gt;coe_qsfp28_tx_pins&lt;/role&gt;
                     &lt;direction&gt;Output&lt;/direction&gt;
                     &lt;width&gt;4&lt;/width&gt;
@@ -1860,7 +1775,7 @@ https://fpgasoftware.intel.com/eula.-->
             &lt;isStart&gt;false&lt;/isStart&gt;
             &lt;ports&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axls_management_rready&lt;/name&gt;
+                    &lt;name&gt;axls_C_csi_clk_C__R_rsi_rst_n_R__management_rready&lt;/name&gt;
                     &lt;role&gt;rready&lt;/role&gt;
                     &lt;direction&gt;Input&lt;/direction&gt;
                     &lt;width&gt;1&lt;/width&gt;
@@ -1869,7 +1784,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axls_management_rvalid&lt;/name&gt;
+                    &lt;name&gt;axls_C_csi_clk_C__R_rsi_rst_n_R__management_rvalid&lt;/name&gt;
                     &lt;role&gt;rvalid&lt;/role&gt;
                     &lt;direction&gt;Output&lt;/direction&gt;
                     &lt;width&gt;1&lt;/width&gt;
@@ -1878,7 +1793,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axls_management_rresp&lt;/name&gt;
+                    &lt;name&gt;axls_C_csi_clk_C__R_rsi_rst_n_R__management_rresp&lt;/name&gt;
                     &lt;role&gt;rresp&lt;/role&gt;
                     &lt;direction&gt;Output&lt;/direction&gt;
                     &lt;width&gt;2&lt;/width&gt;
@@ -1887,7 +1802,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axls_management_rdata&lt;/name&gt;
+                    &lt;name&gt;axls_C_csi_clk_C__R_rsi_rst_n_R__management_rdata&lt;/name&gt;
                     &lt;role&gt;rdata&lt;/role&gt;
                     &lt;direction&gt;Output&lt;/direction&gt;
                     &lt;width&gt;32&lt;/width&gt;
@@ -1896,7 +1811,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axls_management_arready&lt;/name&gt;
+                    &lt;name&gt;axls_C_csi_clk_C__R_rsi_rst_n_R__management_arready&lt;/name&gt;
                     &lt;role&gt;arready&lt;/role&gt;
                     &lt;direction&gt;Output&lt;/direction&gt;
                     &lt;width&gt;1&lt;/width&gt;
@@ -1905,7 +1820,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axls_management_arprot&lt;/name&gt;
+                    &lt;name&gt;axls_C_csi_clk_C__R_rsi_rst_n_R__management_arprot&lt;/name&gt;
                     &lt;role&gt;arprot&lt;/role&gt;
                     &lt;direction&gt;Input&lt;/direction&gt;
                     &lt;width&gt;3&lt;/width&gt;
@@ -1914,7 +1829,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axls_management_araddr&lt;/name&gt;
+                    &lt;name&gt;axls_C_csi_clk_C__R_rsi_rst_n_R__management_araddr&lt;/name&gt;
                     &lt;role&gt;araddr&lt;/role&gt;
                     &lt;direction&gt;Input&lt;/direction&gt;
                     &lt;width&gt;16&lt;/width&gt;
@@ -1923,7 +1838,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axls_management_arvalid&lt;/name&gt;
+                    &lt;name&gt;axls_C_csi_clk_C__R_rsi_rst_n_R__management_arvalid&lt;/name&gt;
                     &lt;role&gt;arvalid&lt;/role&gt;
                     &lt;direction&gt;Input&lt;/direction&gt;
                     &lt;width&gt;1&lt;/width&gt;
@@ -1932,7 +1847,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axls_management_bready&lt;/name&gt;
+                    &lt;name&gt;axls_C_csi_clk_C__R_rsi_rst_n_R__management_bready&lt;/name&gt;
                     &lt;role&gt;bready&lt;/role&gt;
                     &lt;direction&gt;Input&lt;/direction&gt;
                     &lt;width&gt;1&lt;/width&gt;
@@ -1941,7 +1856,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axls_management_bvalid&lt;/name&gt;
+                    &lt;name&gt;axls_C_csi_clk_C__R_rsi_rst_n_R__management_bvalid&lt;/name&gt;
                     &lt;role&gt;bvalid&lt;/role&gt;
                     &lt;direction&gt;Output&lt;/direction&gt;
                     &lt;width&gt;1&lt;/width&gt;
@@ -1950,7 +1865,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axls_management_bresp&lt;/name&gt;
+                    &lt;name&gt;axls_C_csi_clk_C__R_rsi_rst_n_R__management_bresp&lt;/name&gt;
                     &lt;role&gt;bresp&lt;/role&gt;
                     &lt;direction&gt;Output&lt;/direction&gt;
                     &lt;width&gt;2&lt;/width&gt;
@@ -1959,7 +1874,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axls_management_wready&lt;/name&gt;
+                    &lt;name&gt;axls_C_csi_clk_C__R_rsi_rst_n_R__management_wready&lt;/name&gt;
                     &lt;role&gt;wready&lt;/role&gt;
                     &lt;direction&gt;Output&lt;/direction&gt;
                     &lt;width&gt;1&lt;/width&gt;
@@ -1968,7 +1883,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axls_management_wstrb&lt;/name&gt;
+                    &lt;name&gt;axls_C_csi_clk_C__R_rsi_rst_n_R__management_wstrb&lt;/name&gt;
                     &lt;role&gt;wstrb&lt;/role&gt;
                     &lt;direction&gt;Input&lt;/direction&gt;
                     &lt;width&gt;4&lt;/width&gt;
@@ -1977,7 +1892,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axls_management_wdata&lt;/name&gt;
+                    &lt;name&gt;axls_C_csi_clk_C__R_rsi_rst_n_R__management_wdata&lt;/name&gt;
                     &lt;role&gt;wdata&lt;/role&gt;
                     &lt;direction&gt;Input&lt;/direction&gt;
                     &lt;width&gt;32&lt;/width&gt;
@@ -1986,7 +1901,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axls_management_wvalid&lt;/name&gt;
+                    &lt;name&gt;axls_C_csi_clk_C__R_rsi_rst_n_R__management_wvalid&lt;/name&gt;
                     &lt;role&gt;wvalid&lt;/role&gt;
                     &lt;direction&gt;Input&lt;/direction&gt;
                     &lt;width&gt;1&lt;/width&gt;
@@ -1995,7 +1910,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axls_management_awready&lt;/name&gt;
+                    &lt;name&gt;axls_C_csi_clk_C__R_rsi_rst_n_R__management_awready&lt;/name&gt;
                     &lt;role&gt;awready&lt;/role&gt;
                     &lt;direction&gt;Output&lt;/direction&gt;
                     &lt;width&gt;1&lt;/width&gt;
@@ -2004,7 +1919,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axls_management_awprot&lt;/name&gt;
+                    &lt;name&gt;axls_C_csi_clk_C__R_rsi_rst_n_R__management_awprot&lt;/name&gt;
                     &lt;role&gt;awprot&lt;/role&gt;
                     &lt;direction&gt;Input&lt;/direction&gt;
                     &lt;width&gt;3&lt;/width&gt;
@@ -2013,7 +1928,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axls_management_awaddr&lt;/name&gt;
+                    &lt;name&gt;axls_C_csi_clk_C__R_rsi_rst_n_R__management_awaddr&lt;/name&gt;
                     &lt;role&gt;awaddr&lt;/role&gt;
                     &lt;direction&gt;Input&lt;/direction&gt;
                     &lt;width&gt;16&lt;/width&gt;
@@ -2022,7 +1937,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axls_management_awvalid&lt;/name&gt;
+                    &lt;name&gt;axls_C_csi_clk_C__R_rsi_rst_n_R__management_awvalid&lt;/name&gt;
                     &lt;role&gt;awvalid&lt;/role&gt;
                     &lt;direction&gt;Input&lt;/direction&gt;
                     &lt;width&gt;1&lt;/width&gt;
@@ -2088,7 +2003,7 @@ https://fpgasoftware.intel.com/eula.-->
             &lt;isStart&gt;false&lt;/isStart&gt;
             &lt;ports&gt;
                 &lt;port&gt;
-                    &lt;name&gt;rsi_rst_n&lt;/name&gt;
+                    &lt;name&gt;_C_csi_clk_C_rsi_rst_n&lt;/name&gt;
                     &lt;role&gt;reset_n&lt;/role&gt;
                     &lt;direction&gt;Input&lt;/direction&gt;
                     &lt;width&gt;1&lt;/width&gt;
@@ -2119,7 +2034,7 @@ https://fpgasoftware.intel.com/eula.-->
             &lt;isStart&gt;false&lt;/isStart&gt;
             &lt;ports&gt;
                 &lt;port&gt;
-                    &lt;name&gt;rsi_tx_rst_n&lt;/name&gt;
+                    &lt;name&gt;_C_csi_tx_clk_C_rsi_tx_rst_n&lt;/name&gt;
                     &lt;role&gt;reset_n&lt;/role&gt;
                     &lt;direction&gt;Input&lt;/direction&gt;
                     &lt;width&gt;1&lt;/width&gt;
@@ -2150,7 +2065,7 @@ https://fpgasoftware.intel.com/eula.-->
             &lt;isStart&gt;true&lt;/isStart&gt;
             &lt;ports&gt;
                 &lt;port&gt;
-                    &lt;name&gt;rso_rx_rst_n&lt;/name&gt;
+                    &lt;name&gt;_C_cso_rx_clk_C_rso_rx_rst_n&lt;/name&gt;
                     &lt;role&gt;reset_n&lt;/role&gt;
                     &lt;direction&gt;Output&lt;/direction&gt;
                     &lt;width&gt;1&lt;/width&gt;
@@ -2188,7 +2103,7 @@ https://fpgasoftware.intel.com/eula.-->
             &lt;isStart&gt;true&lt;/isStart&gt;
             &lt;ports&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axstrm_rx_tready&lt;/name&gt;
+                    &lt;name&gt;axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tready&lt;/name&gt;
                     &lt;role&gt;tready&lt;/role&gt;
                     &lt;direction&gt;Input&lt;/direction&gt;
                     &lt;width&gt;1&lt;/width&gt;
@@ -2197,7 +2112,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axstrm_rx_tvalid&lt;/name&gt;
+                    &lt;name&gt;axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tvalid&lt;/name&gt;
                     &lt;role&gt;tvalid&lt;/role&gt;
                     &lt;direction&gt;Output&lt;/direction&gt;
                     &lt;width&gt;1&lt;/width&gt;
@@ -2206,7 +2121,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axstrm_rx_tuser&lt;/name&gt;
+                    &lt;name&gt;axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tuser&lt;/name&gt;
                     &lt;role&gt;tuser&lt;/role&gt;
                     &lt;direction&gt;Output&lt;/direction&gt;
                     &lt;width&gt;9&lt;/width&gt;
@@ -2215,7 +2130,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axstrm_rx_tlast&lt;/name&gt;
+                    &lt;name&gt;axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tlast&lt;/name&gt;
                     &lt;role&gt;tlast&lt;/role&gt;
                     &lt;direction&gt;Output&lt;/direction&gt;
                     &lt;width&gt;1&lt;/width&gt;
@@ -2224,7 +2139,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axstrm_rx_tkeep&lt;/name&gt;
+                    &lt;name&gt;axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tkeep&lt;/name&gt;
                     &lt;role&gt;tkeep&lt;/role&gt;
                     &lt;direction&gt;Output&lt;/direction&gt;
                     &lt;width&gt;32&lt;/width&gt;
@@ -2233,7 +2148,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axstrm_rx_tstrb&lt;/name&gt;
+                    &lt;name&gt;axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tstrb&lt;/name&gt;
                     &lt;role&gt;tstrb&lt;/role&gt;
                     &lt;direction&gt;Output&lt;/direction&gt;
                     &lt;width&gt;32&lt;/width&gt;
@@ -2242,7 +2157,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axstrm_rx_tdata&lt;/name&gt;
+                    &lt;name&gt;axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tdata&lt;/name&gt;
                     &lt;role&gt;tdata&lt;/role&gt;
                     &lt;direction&gt;Output&lt;/direction&gt;
                     &lt;width&gt;256&lt;/width&gt;
@@ -2273,7 +2188,7 @@ https://fpgasoftware.intel.com/eula.-->
             &lt;isStart&gt;false&lt;/isStart&gt;
             &lt;ports&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axstrs_tx_tready&lt;/name&gt;
+                    &lt;name&gt;axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tready&lt;/name&gt;
                     &lt;role&gt;tready&lt;/role&gt;
                     &lt;direction&gt;Output&lt;/direction&gt;
                     &lt;width&gt;1&lt;/width&gt;
@@ -2282,7 +2197,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axstrs_tx_tuser&lt;/name&gt;
+                    &lt;name&gt;axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tuser&lt;/name&gt;
                     &lt;role&gt;tuser&lt;/role&gt;
                     &lt;direction&gt;Input&lt;/direction&gt;
                     &lt;width&gt;9&lt;/width&gt;
@@ -2291,7 +2206,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axstrs_tx_tlast&lt;/name&gt;
+                    &lt;name&gt;axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tlast&lt;/name&gt;
                     &lt;role&gt;tlast&lt;/role&gt;
                     &lt;direction&gt;Input&lt;/direction&gt;
                     &lt;width&gt;1&lt;/width&gt;
@@ -2300,7 +2215,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axstrs_tx_tkeep&lt;/name&gt;
+                    &lt;name&gt;axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tkeep&lt;/name&gt;
                     &lt;role&gt;tkeep&lt;/role&gt;
                     &lt;direction&gt;Input&lt;/direction&gt;
                     &lt;width&gt;32&lt;/width&gt;
@@ -2309,7 +2224,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axstrs_tx_tstrb&lt;/name&gt;
+                    &lt;name&gt;axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tstrb&lt;/name&gt;
                     &lt;role&gt;tstrb&lt;/role&gt;
                     &lt;direction&gt;Input&lt;/direction&gt;
                     &lt;width&gt;32&lt;/width&gt;
@@ -2318,7 +2233,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axstrs_tx_tdata&lt;/name&gt;
+                    &lt;name&gt;axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tdata&lt;/name&gt;
                     &lt;role&gt;tdata&lt;/role&gt;
                     &lt;direction&gt;Input&lt;/direction&gt;
                     &lt;width&gt;256&lt;/width&gt;
@@ -2327,7 +2242,7 @@ https://fpgasoftware.intel.com/eula.-->
                     &lt;terminationValue&gt;0&lt;/terminationValue&gt;
                 &lt;/port&gt;
                 &lt;port&gt;
-                    &lt;name&gt;axstrs_tx_tvalid&lt;/name&gt;
+                    &lt;name&gt;axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tvalid&lt;/name&gt;
                     &lt;role&gt;tvalid&lt;/role&gt;
                     &lt;direction&gt;Input&lt;/direction&gt;
                     &lt;width&gt;1&lt;/width&gt;
@@ -2379,17 +2294,15 @@ https://fpgasoftware.intel.com/eula.-->
       </ipxact:parameters>
     </altera:altera_system_parameters>
     <altera:altera_interface_boundary>
-      <altera:interface_mapping altera:name="CLK_GATE_rx_clk" altera:internal="mkSerialLite3_Instance_0.CLK_GATE_rx_clk" altera:type="conduit" altera:dir="end">
-        <altera:port_mapping altera:name="CLK_GATE_rx_clk" altera:internal="CLK_GATE_rx_clk"></altera:port_mapping>
-      </altera:interface_mapping>
+      <altera:interface_mapping altera:name="CLK_GATE_rx_clk" altera:internal="mkSerialLite3_Instance_0.CLK_GATE_rx_clk"></altera:interface_mapping>
       <altera:interface_mapping altera:name="coe_link_status" altera:internal="mkSerialLite3_Instance_0.coe_link_status" altera:type="conduit" altera:dir="end">
-        <altera:port_mapping altera:name="coe_link_status" altera:internal="coe_link_status"></altera:port_mapping>
+        <altera:port_mapping altera:name="coe_C_csi_clk_C__R_rsi_rst_n_R__link_status" altera:internal="coe_C_csi_clk_C__R_rsi_rst_n_R__link_status"></altera:port_mapping>
       </altera:interface_mapping>
       <altera:interface_mapping altera:name="coe_qsfp28_rx_pins_x" altera:internal="mkSerialLite3_Instance_0.coe_qsfp28_rx_pins_x" altera:type="conduit" altera:dir="end">
-        <altera:port_mapping altera:name="coe_qsfp28_rx_pins_x" altera:internal="coe_qsfp28_rx_pins_x"></altera:port_mapping>
+        <altera:port_mapping altera:name="coe_C_csi_clk_C__R_rsi_rst_n_R__qsfp28_rx_pins_x" altera:internal="coe_C_csi_clk_C__R_rsi_rst_n_R__qsfp28_rx_pins_x"></altera:port_mapping>
       </altera:interface_mapping>
       <altera:interface_mapping altera:name="coe_qsfp28_tx_pins" altera:internal="mkSerialLite3_Instance_0.coe_qsfp28_tx_pins" altera:type="conduit" altera:dir="end">
-        <altera:port_mapping altera:name="coe_qsfp28_tx_pins" altera:internal="coe_qsfp28_tx_pins"></altera:port_mapping>
+        <altera:port_mapping altera:name="coe_C_csi_clk_C__R_rsi_rst_n_R__qsfp28_tx_pins" altera:internal="coe_C_csi_clk_C__R_rsi_rst_n_R__qsfp28_tx_pins"></altera:port_mapping>
       </altera:interface_mapping>
       <altera:interface_mapping altera:name="coe_xcvr_atx_pll_s10_htile_tx_clk" altera:internal="mkSerialLite3_Instance_0.coe_xcvr_atx_pll_s10_htile_tx_clk"></altera:interface_mapping>
       <altera:interface_mapping altera:name="coe_xcvr_atx_pll_s10_htile_tx_locked" altera:internal="mkSerialLite3_Instance_0.coe_xcvr_atx_pll_s10_htile_tx_locked"></altera:interface_mapping>
@@ -2409,55 +2322,55 @@ https://fpgasoftware.intel.com/eula.-->
         <altera:port_mapping altera:name="cso_rx_clk" altera:internal="cso_rx_clk"></altera:port_mapping>
       </altera:interface_mapping>
       <altera:interface_mapping altera:name="management" altera:internal="mkSerialLite3_Instance_0.management" altera:type="axi4lite" altera:dir="end">
-        <altera:port_mapping altera:name="axls_management_araddr" altera:internal="axls_management_araddr"></altera:port_mapping>
-        <altera:port_mapping altera:name="axls_management_arprot" altera:internal="axls_management_arprot"></altera:port_mapping>
-        <altera:port_mapping altera:name="axls_management_arready" altera:internal="axls_management_arready"></altera:port_mapping>
-        <altera:port_mapping altera:name="axls_management_arvalid" altera:internal="axls_management_arvalid"></altera:port_mapping>
-        <altera:port_mapping altera:name="axls_management_awaddr" altera:internal="axls_management_awaddr"></altera:port_mapping>
-        <altera:port_mapping altera:name="axls_management_awprot" altera:internal="axls_management_awprot"></altera:port_mapping>
-        <altera:port_mapping altera:name="axls_management_awready" altera:internal="axls_management_awready"></altera:port_mapping>
-        <altera:port_mapping altera:name="axls_management_awvalid" altera:internal="axls_management_awvalid"></altera:port_mapping>
-        <altera:port_mapping altera:name="axls_management_bready" altera:internal="axls_management_bready"></altera:port_mapping>
-        <altera:port_mapping altera:name="axls_management_bresp" altera:internal="axls_management_bresp"></altera:port_mapping>
-        <altera:port_mapping altera:name="axls_management_bvalid" altera:internal="axls_management_bvalid"></altera:port_mapping>
-        <altera:port_mapping altera:name="axls_management_rdata" altera:internal="axls_management_rdata"></altera:port_mapping>
-        <altera:port_mapping altera:name="axls_management_rready" altera:internal="axls_management_rready"></altera:port_mapping>
-        <altera:port_mapping altera:name="axls_management_rresp" altera:internal="axls_management_rresp"></altera:port_mapping>
-        <altera:port_mapping altera:name="axls_management_rvalid" altera:internal="axls_management_rvalid"></altera:port_mapping>
-        <altera:port_mapping altera:name="axls_management_wdata" altera:internal="axls_management_wdata"></altera:port_mapping>
-        <altera:port_mapping altera:name="axls_management_wready" altera:internal="axls_management_wready"></altera:port_mapping>
-        <altera:port_mapping altera:name="axls_management_wstrb" altera:internal="axls_management_wstrb"></altera:port_mapping>
-        <altera:port_mapping altera:name="axls_management_wvalid" altera:internal="axls_management_wvalid"></altera:port_mapping>
+        <altera:port_mapping altera:name="axls_C_csi_clk_C__R_rsi_rst_n_R__management_araddr" altera:internal="axls_C_csi_clk_C__R_rsi_rst_n_R__management_araddr"></altera:port_mapping>
+        <altera:port_mapping altera:name="axls_C_csi_clk_C__R_rsi_rst_n_R__management_arprot" altera:internal="axls_C_csi_clk_C__R_rsi_rst_n_R__management_arprot"></altera:port_mapping>
+        <altera:port_mapping altera:name="axls_C_csi_clk_C__R_rsi_rst_n_R__management_arready" altera:internal="axls_C_csi_clk_C__R_rsi_rst_n_R__management_arready"></altera:port_mapping>
+        <altera:port_mapping altera:name="axls_C_csi_clk_C__R_rsi_rst_n_R__management_arvalid" altera:internal="axls_C_csi_clk_C__R_rsi_rst_n_R__management_arvalid"></altera:port_mapping>
+        <altera:port_mapping altera:name="axls_C_csi_clk_C__R_rsi_rst_n_R__management_awaddr" altera:internal="axls_C_csi_clk_C__R_rsi_rst_n_R__management_awaddr"></altera:port_mapping>
+        <altera:port_mapping altera:name="axls_C_csi_clk_C__R_rsi_rst_n_R__management_awprot" altera:internal="axls_C_csi_clk_C__R_rsi_rst_n_R__management_awprot"></altera:port_mapping>
+        <altera:port_mapping altera:name="axls_C_csi_clk_C__R_rsi_rst_n_R__management_awready" altera:internal="axls_C_csi_clk_C__R_rsi_rst_n_R__management_awready"></altera:port_mapping>
+        <altera:port_mapping altera:name="axls_C_csi_clk_C__R_rsi_rst_n_R__management_awvalid" altera:internal="axls_C_csi_clk_C__R_rsi_rst_n_R__management_awvalid"></altera:port_mapping>
+        <altera:port_mapping altera:name="axls_C_csi_clk_C__R_rsi_rst_n_R__management_bready" altera:internal="axls_C_csi_clk_C__R_rsi_rst_n_R__management_bready"></altera:port_mapping>
+        <altera:port_mapping altera:name="axls_C_csi_clk_C__R_rsi_rst_n_R__management_bresp" altera:internal="axls_C_csi_clk_C__R_rsi_rst_n_R__management_bresp"></altera:port_mapping>
+        <altera:port_mapping altera:name="axls_C_csi_clk_C__R_rsi_rst_n_R__management_bvalid" altera:internal="axls_C_csi_clk_C__R_rsi_rst_n_R__management_bvalid"></altera:port_mapping>
+        <altera:port_mapping altera:name="axls_C_csi_clk_C__R_rsi_rst_n_R__management_rdata" altera:internal="axls_C_csi_clk_C__R_rsi_rst_n_R__management_rdata"></altera:port_mapping>
+        <altera:port_mapping altera:name="axls_C_csi_clk_C__R_rsi_rst_n_R__management_rready" altera:internal="axls_C_csi_clk_C__R_rsi_rst_n_R__management_rready"></altera:port_mapping>
+        <altera:port_mapping altera:name="axls_C_csi_clk_C__R_rsi_rst_n_R__management_rresp" altera:internal="axls_C_csi_clk_C__R_rsi_rst_n_R__management_rresp"></altera:port_mapping>
+        <altera:port_mapping altera:name="axls_C_csi_clk_C__R_rsi_rst_n_R__management_rvalid" altera:internal="axls_C_csi_clk_C__R_rsi_rst_n_R__management_rvalid"></altera:port_mapping>
+        <altera:port_mapping altera:name="axls_C_csi_clk_C__R_rsi_rst_n_R__management_wdata" altera:internal="axls_C_csi_clk_C__R_rsi_rst_n_R__management_wdata"></altera:port_mapping>
+        <altera:port_mapping altera:name="axls_C_csi_clk_C__R_rsi_rst_n_R__management_wready" altera:internal="axls_C_csi_clk_C__R_rsi_rst_n_R__management_wready"></altera:port_mapping>
+        <altera:port_mapping altera:name="axls_C_csi_clk_C__R_rsi_rst_n_R__management_wstrb" altera:internal="axls_C_csi_clk_C__R_rsi_rst_n_R__management_wstrb"></altera:port_mapping>
+        <altera:port_mapping altera:name="axls_C_csi_clk_C__R_rsi_rst_n_R__management_wvalid" altera:internal="axls_C_csi_clk_C__R_rsi_rst_n_R__management_wvalid"></altera:port_mapping>
       </altera:interface_mapping>
       <altera:interface_mapping altera:name="rsi_rst" altera:internal="mkSerialLite3_Instance_0.rsi_rst"></altera:interface_mapping>
       <altera:interface_mapping altera:name="rsi_rst_n" altera:internal="mkSerialLite3_Instance_0.rsi_rst_n" altera:type="reset" altera:dir="end">
-        <altera:port_mapping altera:name="rsi_rst_n" altera:internal="rsi_rst_n"></altera:port_mapping>
+        <altera:port_mapping altera:name="_C_csi_clk_C_rsi_rst_n" altera:internal="_C_csi_clk_C_rsi_rst_n"></altera:port_mapping>
       </altera:interface_mapping>
       <altera:interface_mapping altera:name="rsi_tx_rst" altera:internal="mkSerialLite3_Instance_0.rsi_tx_rst"></altera:interface_mapping>
       <altera:interface_mapping altera:name="rsi_tx_rst_n" altera:internal="mkSerialLite3_Instance_0.rsi_tx_rst_n" altera:type="reset" altera:dir="end">
-        <altera:port_mapping altera:name="rsi_tx_rst_n" altera:internal="rsi_tx_rst_n"></altera:port_mapping>
+        <altera:port_mapping altera:name="_C_csi_tx_clk_C_rsi_tx_rst_n" altera:internal="_C_csi_tx_clk_C_rsi_tx_rst_n"></altera:port_mapping>
       </altera:interface_mapping>
       <altera:interface_mapping altera:name="rso_rx_rst" altera:internal="mkSerialLite3_Instance_0.rso_rx_rst"></altera:interface_mapping>
       <altera:interface_mapping altera:name="rso_rx_rst_n" altera:internal="mkSerialLite3_Instance_0.rso_rx_rst_n" altera:type="reset" altera:dir="start">
-        <altera:port_mapping altera:name="rso_rx_rst_n" altera:internal="rso_rx_rst_n"></altera:port_mapping>
+        <altera:port_mapping altera:name="_C_cso_rx_clk_C_rso_rx_rst_n" altera:internal="_C_cso_rx_clk_C_rso_rx_rst_n"></altera:port_mapping>
       </altera:interface_mapping>
       <altera:interface_mapping altera:name="rx" altera:internal="mkSerialLite3_Instance_0.rx" altera:type="axi4stream" altera:dir="start">
-        <altera:port_mapping altera:name="axstrm_rx_tdata" altera:internal="axstrm_rx_tdata"></altera:port_mapping>
-        <altera:port_mapping altera:name="axstrm_rx_tkeep" altera:internal="axstrm_rx_tkeep"></altera:port_mapping>
-        <altera:port_mapping altera:name="axstrm_rx_tlast" altera:internal="axstrm_rx_tlast"></altera:port_mapping>
-        <altera:port_mapping altera:name="axstrm_rx_tready" altera:internal="axstrm_rx_tready"></altera:port_mapping>
-        <altera:port_mapping altera:name="axstrm_rx_tstrb" altera:internal="axstrm_rx_tstrb"></altera:port_mapping>
-        <altera:port_mapping altera:name="axstrm_rx_tuser" altera:internal="axstrm_rx_tuser"></altera:port_mapping>
-        <altera:port_mapping altera:name="axstrm_rx_tvalid" altera:internal="axstrm_rx_tvalid"></altera:port_mapping>
+        <altera:port_mapping altera:name="axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tdata" altera:internal="axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tdata"></altera:port_mapping>
+        <altera:port_mapping altera:name="axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tkeep" altera:internal="axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tkeep"></altera:port_mapping>
+        <altera:port_mapping altera:name="axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tlast" altera:internal="axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tlast"></altera:port_mapping>
+        <altera:port_mapping altera:name="axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tready" altera:internal="axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tready"></altera:port_mapping>
+        <altera:port_mapping altera:name="axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tstrb" altera:internal="axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tstrb"></altera:port_mapping>
+        <altera:port_mapping altera:name="axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tuser" altera:internal="axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tuser"></altera:port_mapping>
+        <altera:port_mapping altera:name="axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tvalid" altera:internal="axstrm_C_cso_rx_clk_C__R_rso_rx_rst_n_R__rx_tvalid"></altera:port_mapping>
       </altera:interface_mapping>
       <altera:interface_mapping altera:name="tx" altera:internal="mkSerialLite3_Instance_0.tx" altera:type="axi4stream" altera:dir="end">
-        <altera:port_mapping altera:name="axstrs_tx_tdata" altera:internal="axstrs_tx_tdata"></altera:port_mapping>
-        <altera:port_mapping altera:name="axstrs_tx_tkeep" altera:internal="axstrs_tx_tkeep"></altera:port_mapping>
-        <altera:port_mapping altera:name="axstrs_tx_tlast" altera:internal="axstrs_tx_tlast"></altera:port_mapping>
-        <altera:port_mapping altera:name="axstrs_tx_tready" altera:internal="axstrs_tx_tready"></altera:port_mapping>
-        <altera:port_mapping altera:name="axstrs_tx_tstrb" altera:internal="axstrs_tx_tstrb"></altera:port_mapping>
-        <altera:port_mapping altera:name="axstrs_tx_tuser" altera:internal="axstrs_tx_tuser"></altera:port_mapping>
-        <altera:port_mapping altera:name="axstrs_tx_tvalid" altera:internal="axstrs_tx_tvalid"></altera:port_mapping>
+        <altera:port_mapping altera:name="axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tdata" altera:internal="axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tdata"></altera:port_mapping>
+        <altera:port_mapping altera:name="axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tkeep" altera:internal="axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tkeep"></altera:port_mapping>
+        <altera:port_mapping altera:name="axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tlast" altera:internal="axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tlast"></altera:port_mapping>
+        <altera:port_mapping altera:name="axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tready" altera:internal="axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tready"></altera:port_mapping>
+        <altera:port_mapping altera:name="axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tstrb" altera:internal="axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tstrb"></altera:port_mapping>
+        <altera:port_mapping altera:name="axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tuser" altera:internal="axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tuser"></altera:port_mapping>
+        <altera:port_mapping altera:name="axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tvalid" altera:internal="axstrs_C_csi_tx_clk_C__R_rsi_tx_rst_n_R__tx_tvalid"></altera:port_mapping>
       </altera:interface_mapping>
     </altera:altera_interface_boundary>
     <altera:altera_has_warnings>true</altera:altera_has_warnings>
