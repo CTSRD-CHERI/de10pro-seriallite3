@@ -3,4 +3,4 @@
 	url = https://github.com/CTSRD-CHERI/vipbundle.git
 [submodule "S10FPGA"]
 	path = S10FPGA
-	url = git@github.com:CTSRD-CHERI/S10FPGA.git
+	url = https://github.com/CTSRD-CHERI/S10FPGA.git
