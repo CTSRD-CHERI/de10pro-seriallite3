@@ -40,6 +40,9 @@ BERT_RTL = $(BERT_BSV_DIR)/output/mkBERT_Instance.v
 STATUSDEV_HW_TCL = $(CURDIR)/mkStatusDevice_hw.tcl
 STATUSDEV_BSV_DIR = $(CURDIR)/S10FPGA
 STATUSDEV_RTL = $(STATUSDEV_BSV_DIR)/output/mkStatusDevice_Instance.v
+STATUSDEV15_HW_TCL = $(CURDIR)/mkStatusDevice_Status15_hw.tcl
+STATUSDEV15_BSV_DIR = $(CURDIR)/S10FPGA
+STATUSDEV15_RTL = $(STATUSDEV_BSV_DIR)/output/mkStatusDevice_Instance_Status15.v
 
 .PHONY: help
 help:
@@ -119,6 +122,14 @@ generate_status_dev_tcl: $(STATUSDEV_HW_TCL)
 clean_status_dev_tcl:
 	rm -f $(STATUSDEV_HW_TCL)
 
+# get the tcl for the status device
+$(STATUSDEV15_HW_TCL): $(VIPBUNDLE) $(STATUSDEV15_RTL)
+	$(VIPBUNDLE) -f quartus_ip_tcl -o $@ $(STATUSDEV15_RTL)
+.PHONY: generate_status_dev_15_tcl clean_status_dev_15_tcl
+generate_status_dev_15_tcl: $(STATUSDEV15_HW_TCL)
+clean_status_dev_15_tcl:
+	rm -f $(STATUSDEV15_HW_TCL)
+
 #-----------------------------------------------------------------------------
 # Build the RTL for the status device
 $(STATUSDEV_RTL):
@@ -130,6 +141,14 @@ clean_status_dev_rtl:
 mrproper_status_dev_rtl:
 	$(MAKE) -C $(STATUSDEV_BSV_DIR) mrproper
 
+$(STATUSDEV15_RTL):
+	$(MAKE) -C $(STATUSDEV15_BSV_DIR) mkStatusDevice_Instance_Status15
+.PHONY: generate_status_dev_15_rtl clean_status_dev_15_rtl mrproper_status_dev_15_rtl
+generate_status_dev_15_rtl: $(STATUSDEV15_RTL)
+clean_status_dev_15_rtl:
+	$(MAKE) -C $(STATUSDEV15_BSV_DIR) clean
+mrproper_status_dev_15_rtl:
+	$(MAKE) -C $(STATUSDEV15_BSV_DIR) mrproper
 
 #-----------------------------------------------------------------------------
 # build vipbundle
