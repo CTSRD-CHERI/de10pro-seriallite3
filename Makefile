@@ -29,8 +29,8 @@ IP_SRC = soc.qsys				\
 	 $(wildcard *.ip)			\
 	 $(wildcard ip/soc/*.ip)
 
-VIPBUNDLEDIR = $(CURDIR)/vipbundle
-VIPBUNDLE = $(VIPBUNDLEDIR)/vipbundle
+VIPBUNDLEDIR ?= $(CURDIR)/vipbundle
+VIPBUNDLE ?= $(VIPBUNDLEDIR)/vipbundle
 SERIALLITE3_HW_TCL = $(CURDIR)/mkSerialLite3_hw.tcl
 SERIALLITE3_BSV_DIR = $(CURDIR)/S10FPGA
 SERIALLITE3_RTL = $(SERIALLITE3_BSV_DIR)/output/mkSerialLite3_Instance.v
