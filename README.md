@@ -85,10 +85,9 @@ parameters are included in the DE10Pro.qsf file.
   * Bit 2: An SEU error occurred and cannot be corrected (ECC enabled). Don't care (ECC disabled)
   * Bit 3: A burst gap error occurred due to a mismatch in the BURST GAP parameter value and the gap between end of burst and start of burst.
 * **error_rx** - This vector indicates the state of the sink adaptation module’s FIFO buffer. N represents the number of lanes.  N=4 in our setup:
-  * [N+4]: Since we're using advanced clocking mode, this is don't care, so we've removed it from our error status.
-  * [N+3]: Since we're using advanced clocking mode, this is don't care, so we've removed it from our error status.
-  * [N+2]: Since we're using advanced clocking mode, this is don't care, so we've removed it from our error status.
-  * [N+1]: Don't care. Tied to zero. So we've removed it from our error status.
-  * [N]: Loss of alignment
-  * [N-1:0]: PCS sync header, multiframe, or CRC-32 error
-
+  * Bit [N+4]: Since we're using advanced clocking mode, this is don't care, so we've removed it from our error status.
+  * Bit [N+3]: Since we're using advanced clocking mode, this is don't care, so we've removed it from our error status.
+  * Bit [N+2]: Since we're using advanced clocking mode, this is don't care, so we've removed it from our error status.
+  * Bit [N+1]: Don't care. Tied to zero. So we've removed it from our error status.
+  * Bit [N]: Loss of alignment
+  * Bit [N-1:0]: PCS sync header, multiframe, or CRC-32 error
